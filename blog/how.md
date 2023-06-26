@@ -32,8 +32,8 @@ remove:
 CONTRIBUTING.md
 CONTRIBUTORS_GUIDE.md
 auth_test.go
-
 conn_test.go
+
 cpu
 example_test.go
 examples
