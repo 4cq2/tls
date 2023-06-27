@@ -50,11 +50,14 @@ func UClient(conn net.Conn, config *Config, clientHelloID ClientHelloID) *UConn 
 // BuildHandshakeState behavior varies based on ClientHelloID and
 // whether it was already called before.
 // If HelloGolang:
-//   [only once] make default ClientHello and overwrite existing state
+//
+//	[only once] make default ClientHello and overwrite existing state
+//
 // If any other mimicking ClientHelloID is used:
-//   [only once] make ClientHello based on ID and overwrite existing state
-//   [each call] apply uconn.Extensions config to internal crypto/tls structures
-//   [each call] marshal ClientHello.
+//
+//	[only once] make ClientHello based on ID and overwrite existing state
+//	[each call] apply uconn.Extensions config to internal crypto/tls structures
+//	[each call] marshal ClientHello.
 //
 // BuildHandshakeState is automatically called before uTLS performs handshake,
 // amd should only be called explicitly to inspect/change fields of
@@ -511,9 +514,9 @@ func (uconn *UConn) GetOutKeystream(length int) ([]byte, error) {
 
 // SetTLSVers sets min and max TLS version in all appropriate places.
 // Function will use first non-zero version parsed in following order:
-//   1) Provided minTLSVers, maxTLSVers
-//   2) specExtensions may have SupportedVersionsExtension
-//   3) [default] min = TLS 1.0, max = TLS 1.2
+//  1. Provided minTLSVers, maxTLSVers
+//  2. specExtensions may have SupportedVersionsExtension
+//  3. [default] min = TLS 1.0, max = TLS 1.2
 //
 // Error is only returned if things are in clearly undesirable state
 // to help user fix them.
