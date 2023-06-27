@@ -5,10 +5,144 @@
 package tls
 
 import (
+	"bufio"
 	"crypto/hmac"
 	"crypto/sha512"
+	"encoding/binary"
 	"fmt"
+	"net"
+	"net/http"
 )
+
+type Transport struct {
+	Conn *UConn
+	Spec ClientHelloSpec
+}
+
+func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	conf := Config{ServerName: req.URL.Host}
+	conn, err := net.Dial("tcp", req.URL.Host+":443")
+	if err != nil {
+		return nil, err
+	}
+	t.Conn = UClient(conn, &conf, HelloCustom)
+	if err := t.Conn.ApplyPreset(&t.Spec); err != nil {
+		return nil, err
+	}
+	if err := req.Write(t.Conn); err != nil {
+		return nil, err
+	}
+	return http.ReadResponse(bufio.NewReader(t.Conn), req)
+}
+
+var Android_API_26 = ClientHelloSpec{
+	CipherSuites: []uint16{
+		TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+		TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+		TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+		TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+		TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+		TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+		TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+		TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+		TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+		TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+		TLS_RSA_WITH_AES_128_GCM_SHA256,
+		TLS_RSA_WITH_AES_256_GCM_SHA384,
+		TLS_RSA_WITH_AES_128_CBC_SHA,
+		TLS_RSA_WITH_AES_256_CBC_SHA,
+	},
+	Extensions: []TLSExtension{
+		&RenegotiationInfoExtension{},
+		&SNIExtension{},
+		&UtlsExtendedMasterSecretExtension{},
+		&SessionTicketExtension{},
+		&SignatureAlgorithmsExtension{
+			SupportedSignatureAlgorithms: []SignatureScheme{
+				ECDSAWithP256AndSHA256,
+			},
+		},
+		&StatusRequestExtension{},
+		&ALPNExtension{
+			AlpnProtocols: []string{"http/1.1"},
+		},
+		&SupportedPointsExtension{
+			SupportedPoints: []uint8{pointFormatUncompressed},
+		},
+		&SupportedCurvesExtension{
+			Curves: []CurveID{
+				X25519,
+				CurveP256,
+				CurveP384,
+			},
+		},
+	},
+}
+
+type builder []byte
+
+func (b *builder) Add_Bytes(v []byte) {
+	*b = append(*b, v...)
+}
+
+func (b *builder) Add_String(v string) {
+	*b = append(*b, v...)
+}
+
+func (b *builder) add_uint16(v uint16) {
+	*b = binary.BigEndian.AppendUint16(*b, v)
+}
+
+func (b *builder) add_uint16_prefixed(f continuation) {
+	var child builder
+	f(&child)
+	length := uint16(len(child))
+	b.add_uint16(length)
+	*b = append(*b, child...)
+}
+
+func (b *builder) add_uint24(v uint32) {
+	child := binary.BigEndian.AppendUint32(nil, v)
+	*b = append(*b, child[1:]...)
+}
+
+func (b *builder) add_uint24_prefixed(f continuation) {
+	var child builder
+	f(&child)
+	length := uint32(len(child))
+	b.add_uint24(length)
+	*b = append(*b, child...)
+}
+
+func (b *builder) add_uint32(v uint32) {
+	*b = binary.BigEndian.AppendUint32(*b, v)
+}
+
+func (b *builder) Add_Uint64(v uint64) {
+	*b = binary.BigEndian.AppendUint64(*b, v)
+}
+
+func (b *builder) add_uint32_prefixed(f continuation) {
+	var child builder
+	f(&child)
+	length := uint32(len(child))
+	b.add_uint32(length)
+	*b = append(*b, child...)
+}
+
+func (b *builder) add_uint8(v uint8) {
+	*b = append(*b, v)
+}
+
+func (b *builder) add_uint8_prefixed(f continuation) {
+	var child builder
+	f(&child)
+	length := uint8(len(child))
+	b.add_uint8(length)
+	*b = append(*b, child...)
+}
+
+type continuation func(*builder)
 
 // Naming convention:
 // Unsupported things are prefixed with "Fake"
