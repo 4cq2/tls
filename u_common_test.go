@@ -58,7 +58,7 @@ func Test_Android(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	user, err := user_info(home + "/Documents/gmail.txt")
+	user, err := user_info(home + "/2a/gmail.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
