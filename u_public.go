@@ -10,24 +10,24 @@ import (
 	"hash"
 )
 
-// ClientHandshakeState includes both TLS 1.3-only and TLS 1.2-only states,
+// _ClientHandshakeState includes both TLS 1.3-only and TLS 1.2-only states,
 // only one of them will be used, depending on negotiated version.
 //
-// ClientHandshakeState will be converted into and from either
+// _ClientHandshakeState will be converted into and from either
 //   - clientHandshakeState      (TLS 1.2)
 //   - clientHandshakeStateTLS13 (TLS 1.3)
 //
 // uTLS will call .handshake() on one of these private internal states,
 // to perform TLS handshake using standard crypto/tls implementation.
-type ClientHandshakeState struct {
-	_C           *Conn
-	ServerHello  *ServerHelloMsg
-	Hello        *ClientHelloMsg
-	MasterSecret []byte
-	Session      *ClientSessionState
+type _ClientHandshakeState struct {
+	_C            *Conn
+	_ServerHello  *ServerHelloMsg
+	_Hello        *ClientHelloMsg
+	_MasterSecret []byte
+	_Session      *ClientSessionState
 
-	State12 TLS12OnlyState
-	State13 TLS13OnlyState
+	_State12 TLS12OnlyState
+	_State13 TLS13OnlyState
 
 	uconn *UConn
 }
@@ -51,34 +51,34 @@ type TLS12OnlyState struct {
 	Suite        _CipherSuite
 }
 
-func (chs *ClientHandshakeState) toPrivate13() *clientHandshakeStateTLS13 {
+func (chs *_ClientHandshakeState) toPrivate13() *clientHandshakeStateTLS13 {
 	if chs == nil {
 		return nil
 	} else {
 		return &clientHandshakeStateTLS13{
 			c:           chs._C,
-			serverHello: chs.ServerHello.getPrivatePtr(),
-			hello:       chs.Hello.getPrivatePtr(),
-			ecdheParams: chs.State13.EcdheParams,
+			serverHello: chs._ServerHello.getPrivatePtr(),
+			hello:       chs._Hello.getPrivatePtr(),
+			ecdheParams: chs._State13.EcdheParams,
 
-			session:     chs.Session,
-			earlySecret: chs.State13.EarlySecret,
-			binderKey:   chs.State13.BinderKey,
+			session:     chs._Session,
+			earlySecret: chs._State13.EarlySecret,
+			binderKey:   chs._State13.BinderKey,
 
-			certReq:       chs.State13.CertReq.toPrivate(),
-			usingPSK:      chs.State13.UsingPSK,
-			sentDummyCCS:  chs.State13.SentDummyCCS,
-			suite:         chs.State13.Suite.toPrivate(),
-			transcript:    chs.State13.Transcript,
-			masterSecret:  chs.MasterSecret,
-			trafficSecret: chs.State13.TrafficSecret,
+			certReq:       chs._State13.CertReq.toPrivate(),
+			usingPSK:      chs._State13.UsingPSK,
+			sentDummyCCS:  chs._State13.SentDummyCCS,
+			suite:         chs._State13.Suite.toPrivate(),
+			transcript:    chs._State13.Transcript,
+			masterSecret:  chs._MasterSecret,
+			trafficSecret: chs._State13.TrafficSecret,
 
 			uconn: chs.uconn,
 		}
 	}
 }
 
-func (chs13 *clientHandshakeStateTLS13) toPublic13() *ClientHandshakeState {
+func (chs13 *clientHandshakeStateTLS13) toPublic13() *_ClientHandshakeState {
 	if chs13 == nil {
 		return nil
 	} else {
@@ -93,43 +93,43 @@ func (chs13 *clientHandshakeStateTLS13) toPublic13() *ClientHandshakeState {
 			TrafficSecret: chs13.trafficSecret,
 			Transcript:    chs13.transcript,
 		}
-		return &ClientHandshakeState{
-			_C:          chs13.c,
-			ServerHello: chs13.serverHello.getPublicPtr(),
-			Hello:       chs13.hello.getPublicPtr(),
+		return &_ClientHandshakeState{
+			_C:           chs13.c,
+			_ServerHello: chs13.serverHello.getPublicPtr(),
+			_Hello:       chs13.hello.getPublicPtr(),
 
-			Session: chs13.session,
+			_Session: chs13.session,
 
-			MasterSecret: chs13.masterSecret,
+			_MasterSecret: chs13.masterSecret,
 
-			State13: tls13State,
+			_State13: tls13State,
 
 			uconn: chs13.uconn,
 		}
 	}
 }
 
-func (chs *ClientHandshakeState) toPrivate12() *clientHandshakeState {
+func (chs *_ClientHandshakeState) toPrivate12() *clientHandshakeState {
 	if chs == nil {
 		return nil
 	} else {
 		return &clientHandshakeState{
 			c:           chs._C,
-			serverHello: chs.ServerHello.getPrivatePtr(),
-			hello:       chs.Hello.getPrivatePtr(),
-			suite:       chs.State12.Suite.getPrivatePtr(),
-			session:     chs.Session,
+			serverHello: chs._ServerHello.getPrivatePtr(),
+			hello:       chs._Hello.getPrivatePtr(),
+			suite:       chs._State12.Suite.getPrivatePtr(),
+			session:     chs._Session,
 
-			masterSecret: chs.MasterSecret,
+			masterSecret: chs._MasterSecret,
 
-			finishedHash: chs.State12.FinishedHash.getPrivateObj(),
+			finishedHash: chs._State12.FinishedHash.getPrivateObj(),
 
 			uconn: chs.uconn,
 		}
 	}
 }
 
-func (chs12 *clientHandshakeState) toPublic12() *ClientHandshakeState {
+func (chs12 *clientHandshakeState) toPublic12() *_ClientHandshakeState {
 	if chs12 == nil {
 		return nil
 	} else {
@@ -137,16 +137,16 @@ func (chs12 *clientHandshakeState) toPublic12() *ClientHandshakeState {
 			Suite:        chs12.suite.getPublicObj(),
 			FinishedHash: chs12.finishedHash.getPublicObj(),
 		}
-		return &ClientHandshakeState{
-			_C:          chs12.c,
-			ServerHello: chs12.serverHello.getPublicPtr(),
-			Hello:       chs12.hello.getPublicPtr(),
+		return &_ClientHandshakeState{
+			_C:           chs12.c,
+			_ServerHello: chs12.serverHello.getPublicPtr(),
+			_Hello:       chs12.hello.getPublicPtr(),
 
-			Session: chs12.session,
+			_Session: chs12.session,
 
-			MasterSecret: chs12.masterSecret,
+			_MasterSecret: chs12.masterSecret,
 
-			State12: tls12State,
+			_State12: tls12State,
 
 			uconn: chs12.uconn,
 		}

@@ -533,7 +533,7 @@ func (uconn *UConn) applyPresetByID(id ClientHelloID) (err error) {
 	var spec ClientHelloSpec
 	uconn.ClientHelloID = id
 	// choose/generate the spec
-	switch id.Client {
+	switch id._Client {
 	case helloRandomized, helloRandomizedNoALPN, helloRandomizedALPN:
 		spec, err = uconn.generateRandomizedSpec()
 		if err != nil {
@@ -567,10 +567,10 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 	if err != nil {
 		return err
 	}
-	uconn.HandshakeState.Hello = privateHello.getPublicPtr()
-	uconn.HandshakeState.State13.EcdheParams = ecdheParams
-	hello := uconn.HandshakeState.Hello
-	session := uconn.HandshakeState.Session
+	uconn.HandshakeState._Hello = privateHello.getPublicPtr()
+	uconn.HandshakeState._State13.EcdheParams = ecdheParams
+	hello := uconn.HandshakeState._Hello
+	session := uconn.HandshakeState._Session
 
 	switch len(hello.Random) {
 	case 0:
@@ -674,7 +674,7 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 				ext.KeyShares[i].Data = ecdheParams.PublicKey()
 				if !preferredCurveIsSet {
 					// only do this once for the first non-grease curve
-					uconn.HandshakeState.State13.EcdheParams = ecdheParams
+					uconn.HandshakeState._State13.EcdheParams = ecdheParams
 					preferredCurveIsSet = true
 				}
 			}
@@ -715,7 +715,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 	id := uconn.ClientHelloID
 
 	var WithALPN bool
-	switch id.Client {
+	switch id._Client {
 	case helloRandomizedALPN:
 		WithALPN = true
 	case helloRandomizedNoALPN:
@@ -727,7 +727,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 			WithALPN = false
 		}
 	default:
-		return p, fmt.Errorf("using non-randomized ClientHelloID %v to generate randomized spec", id.Client)
+		return p, fmt.Errorf("using non-randomized ClientHelloID %v to generate randomized spec", id._Client)
 	}
 
 	p.CipherSuites = make([]uint16, len(defaultCipherSuites()))
@@ -758,7 +758,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 	p.CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
 
 	sni := SNIExtension{uconn.config.ServerName}
-	sessionTicket := SessionTicketExtension{Session: uconn.HandshakeState.Session}
+	sessionTicket := SessionTicketExtension{Session: uconn.HandshakeState._Session}
 
 	sigAndHashAlgos := []SignatureScheme{
 		ECDSAWithP256AndSHA256,

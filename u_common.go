@@ -207,7 +207,7 @@ const (
 )
 
 type ClientHelloID struct {
-	Client string
+	_Client string
 
 	// Version specifies version of a mimicked clients (e.g. browsers).
 	// Not used in randomized, custom handshake, and default Go.
@@ -219,11 +219,11 @@ type ClientHelloID struct {
 }
 
 func (p *ClientHelloID) Str() string {
-	return fmt.Sprintf("%s-%s", p.Client, p.Version)
+	return fmt.Sprintf("%s-%s", p._Client, p.Version)
 }
 
 func (p *ClientHelloID) IsSet() bool {
-	return (p.Client == "") && (p.Version == "")
+	return (p._Client == "") && (p.Version == "")
 }
 
 const (

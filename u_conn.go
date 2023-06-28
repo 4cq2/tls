@@ -24,7 +24,7 @@ type UConn struct {
 	ClientHelloID ClientHelloID
 
 	ClientHelloBuilt bool
-	HandshakeState   ClientHandshakeState
+	HandshakeState   _ClientHandshakeState
 
 	// sessionID may or may not depend on ticket; nil => random
 	GetSessionID func(ticket []byte) [32]byte
@@ -41,7 +41,7 @@ func UClient(conn net.Conn, config *Config, clientHelloID ClientHelloID) *UConn 
 		config = &Config{}
 	}
 	tlsConn := Conn{conn: conn, config: config, isClient: true}
-	handshakeState := ClientHandshakeState{_C: &tlsConn, Hello: &ClientHelloMsg{}}
+	handshakeState := _ClientHandshakeState{_C: &tlsConn, _Hello: &ClientHelloMsg{}}
 	uconn := UConn{Conn: &tlsConn, ClientHelloID: clientHelloID, HandshakeState: handshakeState}
 	uconn.HandshakeState.uconn = &uconn
 	return &uconn
@@ -74,8 +74,8 @@ func (uconn *UConn) BuildHandshakeState() error {
 			return err
 		}
 
-		uconn.HandshakeState.Hello = hello.getPublicPtr()
-		uconn.HandshakeState.State13.EcdheParams = ecdheParams
+		uconn.HandshakeState._Hello = hello.getPublicPtr()
+		uconn.HandshakeState._State13.EcdheParams = ecdheParams
 		uconn.HandshakeState._C = uconn.Conn
 	} else {
 		if !uconn.ClientHelloBuilt {
@@ -106,13 +106,13 @@ func (uconn *UConn) BuildHandshakeState() error {
 // but the extension itself still MAY be present for mimicking purposes.
 // Session tickets to be reused - use same cache on following connections.
 func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
-	uconn.HandshakeState.Session = session
+	uconn.HandshakeState._Session = session
 	var sessionTicket []uint8
 	if session != nil {
 		sessionTicket = session.sessionTicket
 	}
-	uconn.HandshakeState.Hello.TicketSupported = true
-	uconn.HandshakeState.Hello.SessionTicket = sessionTicket
+	uconn.HandshakeState._Hello.TicketSupported = true
+	uconn.HandshakeState._Hello.SessionTicket = sessionTicket
 
 	for _, ext := range uconn.Extensions {
 		st, ok := ext.(*SessionTicketExtension)
@@ -124,7 +124,7 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 			if len(session.SessionTicket()) > 0 {
 				if uconn.GetSessionID != nil {
 					sid := uconn.GetSessionID(session.SessionTicket())
-					uconn.HandshakeState.Hello.SessionId = sid[:]
+					uconn.HandshakeState._Hello.SessionId = sid[:]
 					return nil
 				}
 			}
@@ -133,7 +133,7 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 			if err != nil {
 				return err
 			}
-			uconn.HandshakeState.Hello.SessionId = sessionID[:]
+			uconn.HandshakeState._Hello.SessionId = sessionID[:]
 		}
 		return nil
 	}
@@ -143,7 +143,7 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 // If you want session tickets to be reused - use same cache on following connections
 func (uconn *UConn) SetSessionCache(cache ClientSessionCache) {
 	uconn.config.ClientSessionCache = cache
-	uconn.HandshakeState.Hello.TicketSupported = true
+	uconn.HandshakeState._Hello.TicketSupported = true
 }
 
 // SetClientRandom sets client random explicitly.
@@ -153,8 +153,8 @@ func (uconn *UConn) SetClientRandom(r []byte) error {
 	if len(r) != 32 {
 		return errors.New("Incorrect client random length! Expected: 32, got: " + strconv.Itoa(len(r)))
 	} else {
-		uconn.HandshakeState.Hello.Random = make([]byte, 32)
-		copy(uconn.HandshakeState.Hello.Random, r)
+		uconn.HandshakeState._Hello.Random = make([]byte, 32)
+		copy(uconn.HandshakeState._Hello.Random, r)
 		return nil
 	}
 }
@@ -295,10 +295,10 @@ func (c *UConn) Write(b []byte) (int, error) {
 // and performs client TLS handshake with that state
 func (c *UConn) clientHandshake() (err error) {
 	// [uTLS section begins]
-	hello := c.HandshakeState.Hello.getPrivatePtr()
-	defer func() { c.HandshakeState.Hello = hello.getPublicPtr() }()
+	hello := c.HandshakeState._Hello.getPrivatePtr()
+	defer func() { c.HandshakeState._Hello = hello.getPublicPtr() }()
 
-	sessionIsAlreadySet := c.HandshakeState.Session != nil
+	sessionIsAlreadySet := c.HandshakeState._Session != nil
 
 	// after this point exactly 1 out of 2 HandshakeState pointers is non-nil,
 	// useTLS13 variable tells which pointer
@@ -425,7 +425,7 @@ func (uconn *UConn) ApplyConfig() error {
 }
 
 func (uconn *UConn) MarshalClientHello() error {
-	hello := uconn.HandshakeState.Hello
+	hello := uconn.HandshakeState._Hello
 	headerLength := 2 + 32 + 1 + len(hello.SessionId) +
 		2 + len(hello.CipherSuites)*2 +
 		1 + len(hello.CompressionMethods)
@@ -572,7 +572,7 @@ func (uconn *UConn) SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []T
 		return fmt.Errorf("uTLS does not support 0x%X as max version", maxTLSVers)
 	}
 
-	uconn.HandshakeState.Hello.SupportedVersions = makeSupportedVersions(minTLSVers, maxTLSVers)
+	uconn.HandshakeState._Hello.SupportedVersions = makeSupportedVersions(minTLSVers, maxTLSVers)
 	uconn.config.MinVersion = minTLSVers
 	uconn.config.MaxVersion = maxTLSVers
 
