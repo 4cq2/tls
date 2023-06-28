@@ -918,10 +918,10 @@ func (c *Config) BuildNameToCertificate() {
 	c.NameToCertificate = make(map[string]*Certificate)
 	for i := range c.Certificates {
 		cert := &c.Certificates[i]
-		x509Cert := cert.Leaf
+		x509Cert := cert._Leaf
 		if x509Cert == nil {
 			var err error
-			x509Cert, err = x509.ParseCertificate(cert.Certificate[0])
+			x509Cert, err = x509.ParseCertificate(cert._Certificate[0])
 			if err != nil {
 				continue
 			}
@@ -963,23 +963,23 @@ var writerMutex sync.Mutex
 
 // A Certificate is a chain of one or more certificates, leaf first.
 type Certificate struct {
-	Certificate [][]byte
-	// PrivateKey contains the private key corresponding to the public key in
+	_Certificate [][]byte
+	// _PrivateKey contains the private key corresponding to the public key in
 	// Leaf. This must implement crypto.Signer with an RSA or ECDSA PublicKey.
 	// For a server up to TLS 1.2, it can also implement crypto.Decrypter with
 	// an RSA PublicKey.
-	PrivateKey crypto.PrivateKey
-	// OCSPStaple contains an optional OCSP response which will be served
+	_PrivateKey crypto.PrivateKey
+	// _OCSPStaple contains an optional OCSP response which will be served
 	// to clients that request it.
-	OCSPStaple []byte
+	_OCSPStaple []byte
 	// SignedCertificateTimestamps contains an optional list of Signed
 	// Certificate Timestamps which will be served to clients that request it.
 	SignedCertificateTimestamps [][]byte
-	// Leaf is the parsed form of the leaf certificate, which may be
+	// _Leaf is the parsed form of the leaf certificate, which may be
 	// initialized using x509.ParseCertificate to reduce per-handshake
 	// processing for TLS clients doing client authentication. If nil, the
 	// leaf certificate will be parsed as needed.
-	Leaf *x509.Certificate
+	_Leaf *x509.Certificate
 }
 
 type handshakeMessage interface {

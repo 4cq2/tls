@@ -207,13 +207,13 @@ func X509KeyPair(certPEMBlock, keyPEMBlock []byte) (Certificate, error) {
 			break
 		}
 		if certDERBlock.Type == "CERTIFICATE" {
-			cert.Certificate = append(cert.Certificate, certDERBlock.Bytes)
+			cert._Certificate = append(cert._Certificate, certDERBlock.Bytes)
 		} else {
 			skippedBlockTypes = append(skippedBlockTypes, certDERBlock.Type)
 		}
 	}
 
-	if len(cert.Certificate) == 0 {
+	if len(cert._Certificate) == 0 {
 		if len(skippedBlockTypes) == 0 {
 			return fail(errors.New("tls: failed to find any PEM data in certificate input"))
 		}
@@ -244,19 +244,19 @@ func X509KeyPair(certPEMBlock, keyPEMBlock []byte) (Certificate, error) {
 
 	// We don't need to parse the public key for TLS, but we so do anyway
 	// to check that it looks sane and matches the private key.
-	x509Cert, err := x509.ParseCertificate(cert.Certificate[0])
+	x509Cert, err := x509.ParseCertificate(cert._Certificate[0])
 	if err != nil {
 		return fail(err)
 	}
 
-	cert.PrivateKey, err = parsePrivateKey(keyDERBlock.Bytes)
+	cert._PrivateKey, err = parsePrivateKey(keyDERBlock.Bytes)
 	if err != nil {
 		return fail(err)
 	}
 
 	switch pub := x509Cert.PublicKey.(type) {
 	case *rsa.PublicKey:
-		priv, ok := cert.PrivateKey.(*rsa.PrivateKey)
+		priv, ok := cert._PrivateKey.(*rsa.PrivateKey)
 		if !ok {
 			return fail(errors.New("tls: private key type does not match public key type"))
 		}
@@ -264,7 +264,7 @@ func X509KeyPair(certPEMBlock, keyPEMBlock []byte) (Certificate, error) {
 			return fail(errors.New("tls: private key does not match public key"))
 		}
 	case *ecdsa.PublicKey:
-		priv, ok := cert.PrivateKey.(*ecdsa.PrivateKey)
+		priv, ok := cert._PrivateKey.(*ecdsa.PrivateKey)
 		if !ok {
 			return fail(errors.New("tls: private key type does not match public key type"))
 		}

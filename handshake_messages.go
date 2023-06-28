@@ -1319,7 +1319,7 @@ func (m *certificateMsgTLS13) marshal() []byte {
 
 		certificate := m.certificate
 		if !m.ocspStapling {
-			certificate.OCSPStaple = nil
+			certificate._OCSPStaple = nil
 		}
 		if !m.scts {
 			certificate.SignedCertificateTimestamps = nil
@@ -1333,7 +1333,7 @@ func (m *certificateMsgTLS13) marshal() []byte {
 
 func marshalCertificate(b *cryptobyte.Builder, certificate Certificate) {
 	b.AddUint24LengthPrefixed(func(b *cryptobyte.Builder) {
-		for i, cert := range certificate.Certificate {
+		for i, cert := range certificate._Certificate {
 			b.AddUint24LengthPrefixed(func(b *cryptobyte.Builder) {
 				b.AddBytes(cert)
 			})
@@ -1342,12 +1342,12 @@ func marshalCertificate(b *cryptobyte.Builder, certificate Certificate) {
 					// This library only supports OCSP and SCT for leaf certificates.
 					return
 				}
-				if certificate.OCSPStaple != nil {
+				if certificate._OCSPStaple != nil {
 					b.AddUint16(extensionStatusRequest)
 					b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
 						b.AddUint8(statusTypeOCSP)
 						b.AddUint24LengthPrefixed(func(b *cryptobyte.Builder) {
-							b.AddBytes(certificate.OCSPStaple)
+							b.AddBytes(certificate._OCSPStaple)
 						})
 					})
 				}
@@ -1381,7 +1381,7 @@ func (m *certificateMsgTLS13) unmarshal(data []byte) bool {
 	}
 
 	m.scts = m.certificate.SignedCertificateTimestamps != nil
-	m.ocspStapling = m.certificate.OCSPStaple != nil
+	m.ocspStapling = m.certificate._OCSPStaple != nil
 
 	return true
 }
@@ -1398,7 +1398,7 @@ func unmarshalCertificate(s *cryptobyte.String, certificate *Certificate) bool {
 			!certList.ReadUint16LengthPrefixed(&extensions) {
 			return false
 		}
-		certificate.Certificate = append(certificate.Certificate, cert)
+		certificate._Certificate = append(certificate._Certificate, cert)
 		for !extensions.Empty() {
 			var extension uint16
 			var extData cryptobyte.String
@@ -1406,7 +1406,7 @@ func unmarshalCertificate(s *cryptobyte.String, certificate *Certificate) bool {
 				!extensions.ReadUint16LengthPrefixed(&extData) {
 				return false
 			}
-			if len(certificate.Certificate) > 1 {
+			if len(certificate._Certificate) > 1 {
 				// This library only supports OCSP and SCT for leaf certificates.
 				continue
 			}
@@ -1415,8 +1415,8 @@ func unmarshalCertificate(s *cryptobyte.String, certificate *Certificate) bool {
 			case extensionStatusRequest:
 				var statusType uint8
 				if !extData.ReadUint8(&statusType) || statusType != statusTypeOCSP ||
-					!readUint24LengthPrefixed(&extData, &certificate.OCSPStaple) ||
-					len(certificate.OCSPStaple) == 0 {
+					!readUint24LengthPrefixed(&extData, &certificate._OCSPStaple) ||
+					len(certificate._OCSPStaple) == 0 {
 					return false
 				}
 			case extensionSCT:

@@ -263,7 +263,7 @@ Curves:
 		hs.hello.scts = hs.cert.SignedCertificateTimestamps
 	}
 
-	if priv, ok := hs.cert.PrivateKey.(crypto.Signer); ok {
+	if priv, ok := hs.cert._PrivateKey.(crypto.Signer); ok {
 		switch priv.Public().(type) {
 		case *ecdsa.PublicKey:
 			hs.ecdsaOk = true
@@ -274,7 +274,7 @@ Curves:
 			return fmt.Errorf("tls: unsupported signing key type (%T)", priv.Public())
 		}
 	}
-	if priv, ok := hs.cert.PrivateKey.(crypto.Decrypter); ok {
+	if priv, ok := hs.cert._PrivateKey.(crypto.Decrypter); ok {
 		switch priv.Public().(type) {
 		case *rsa.PublicKey:
 			hs.rsaDecryptOk = true
@@ -393,7 +393,7 @@ func (hs *serverHandshakeState) doResumeHandshake() error {
 	}
 
 	if err := c.processCertsFromClient(Certificate{
-		Certificate: hs.sessionState.certificates,
+		_Certificate: hs.sessionState.certificates,
 	}); err != nil {
 		return err
 	}
@@ -406,7 +406,7 @@ func (hs *serverHandshakeState) doResumeHandshake() error {
 func (hs *serverHandshakeState) doFullHandshake() error {
 	c := hs.c
 
-	if hs.clientHello.ocspStapling && len(hs.cert.OCSPStaple) > 0 {
+	if hs.clientHello.ocspStapling && len(hs.cert._OCSPStaple) > 0 {
 		hs.hello.ocspStapling = true
 	}
 
@@ -426,7 +426,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 	}
 
 	certMsg := new(certificateMsg)
-	certMsg.certificates = hs.cert.Certificate
+	certMsg.certificates = hs.cert._Certificate
 	hs.finishedHash.Write(certMsg.marshal())
 	if _, err := c.writeRecord(recordTypeHandshake, certMsg.marshal()); err != nil {
 		return err
@@ -434,7 +434,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 
 	if hs.hello.ocspStapling {
 		certStatus := new(certificateStatusMsg)
-		certStatus.response = hs.cert.OCSPStaple
+		certStatus.response = hs.cert._OCSPStaple
 		hs.finishedHash.Write(certStatus.marshal())
 		if _, err := c.writeRecord(recordTypeHandshake, certStatus.marshal()); err != nil {
 			return err
@@ -508,7 +508,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 		hs.finishedHash.Write(certMsg.marshal())
 
 		if err := c.processCertsFromClient(Certificate{
-			Certificate: certMsg.certificates,
+			_Certificate: certMsg.certificates,
 		}); err != nil {
 			return err
 		}
@@ -706,7 +706,7 @@ func (hs *serverHandshakeState) sendFinished(out []byte) error {
 // Certificates message or from a sessionState and verifies them. It returns
 // the public key of the leaf certificate.
 func (c *Conn) processCertsFromClient(certificate Certificate) error {
-	certificates := certificate.Certificate
+	certificates := certificate._Certificate
 	certs := make([]*x509.Certificate, len(certificates))
 	var err error
 	for i, asn1Data := range certificates {
@@ -761,7 +761,7 @@ func (c *Conn) processCertsFromClient(certificate Certificate) error {
 	}
 
 	c.peerCertificates = certs
-	c.ocspResponse = certificate.OCSPStaple
+	c.ocspResponse = certificate._OCSPStaple
 	c.scts = certificate.SignedCertificateTimestamps
 	return nil
 }

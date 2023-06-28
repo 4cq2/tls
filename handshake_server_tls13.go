@@ -280,7 +280,7 @@ func (hs *serverHandshakeStateTLS13) checkForResumption() error {
 		// PSK connections don't re-establish client certificates, but carry
 		// them over in the session ticket. Ensure the presence of client certs
 		// in the ticket is consistent with the configured requirements.
-		sessionHasClientCerts := len(sessionState.certificate.Certificate) != 0
+		sessionHasClientCerts := len(sessionState.certificate._Certificate) != 0
 		needClientCerts := requiresClientCert(c.config.ClientAuth)
 		if needClientCerts && !sessionHasClientCerts {
 			continue
@@ -610,7 +610,7 @@ func (hs *serverHandshakeStateTLS13) sendServerCertificate() error {
 
 	certMsg.certificate = *hs.cert
 	certMsg.scts = hs.clientHello.scts && len(hs.cert.SignedCertificateTimestamps) > 0
-	certMsg.ocspStapling = hs.clientHello.ocspStapling && len(hs.cert.OCSPStaple) > 0
+	certMsg.ocspStapling = hs.clientHello.ocspStapling && len(hs.cert._OCSPStaple) > 0
 
 	hs.transcript.Write(certMsg.marshal())
 	if _, err := c.writeRecord(recordTypeHandshake, certMsg.marshal()); err != nil {
@@ -633,9 +633,9 @@ func (hs *serverHandshakeStateTLS13) sendServerCertificate() error {
 	if sigType == signatureRSAPSS {
 		signOpts = &rsa.PSSOptions{SaltLength: rsa.PSSSaltLengthEqualsHash, Hash: sigHash}
 	}
-	sig, err := hs.cert.PrivateKey.(crypto.Signer).Sign(c.config.rand(), h.Sum(nil), signOpts)
+	sig, err := hs.cert._PrivateKey.(crypto.Signer).Sign(c.config.rand(), h.Sum(nil), signOpts)
 	if err != nil {
-		public := hs.cert.PrivateKey.(crypto.Signer).Public()
+		public := hs.cert._PrivateKey.(crypto.Signer).Public()
 		if rsaKey, ok := public.(*rsa.PublicKey); ok && sigType == signatureRSAPSS &&
 			rsaKey.N.BitLen()/8 < sigHash.Size()*2+2 { // key too small for RSA-PSS
 			c.sendAlert(alertHandshakeFailure)
@@ -743,8 +743,8 @@ func (hs *serverHandshakeStateTLS13) sendSessionTickets() error {
 		createdAt:        uint64(c.config.time().Unix()),
 		resumptionSecret: resumptionSecret,
 		certificate: Certificate{
-			Certificate:                 certsFromClient,
-			OCSPStaple:                  c.ocspResponse,
+			_Certificate:                certsFromClient,
+			_OCSPStaple:                 c.ocspResponse,
 			SignedCertificateTimestamps: c.scts,
 		},
 	}
@@ -788,7 +788,7 @@ func (hs *serverHandshakeStateTLS13) readClientCertificate() error {
 		return err
 	}
 
-	if len(certMsg.certificate.Certificate) != 0 {
+	if len(certMsg.certificate._Certificate) != 0 {
 		msg, err = c.readHandshake()
 		if err != nil {
 			return err

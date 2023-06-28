@@ -56,13 +56,13 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				},
 				&StatusRequestExtension{},
 				&SCTExtension{},
-				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&FakeChannelIDExtension{},
 				&SupportedPointsExtension{SupportedPoints: []byte{pointFormatUncompressed}},
 				&SupportedCurvesExtension{[]CurveID{CurveID(GREASE_PLACEHOLDER),
 					X25519, CurveP256, CurveP384}},
 				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
+				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 			GetSessionID: sha256.Sum256,
 		}, nil
@@ -111,7 +111,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				}},
 				&StatusRequestExtension{},
 				&SCTExtension{},
-				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&FakeChannelIDExtension{},
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
@@ -133,9 +133,9 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CurveP256,
 					CurveP384,
 				}},
-				&FakeCertCompressionAlgsExtension{[]CertCompressionAlgo{CertCompressionBrotli}},
+				&FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{_CertCompressionBrotli}},
 				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
+				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case HelloChrome_72:
@@ -177,7 +177,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					0x00, // pointFormatUncompressed
 				}},
 				&SessionTicketExtension{},
-				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					ECDSAWithP256AndSHA256,
@@ -205,11 +205,11 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					VersionTLS11,
 					VersionTLS10,
 				}},
-				&FakeCertCompressionAlgsExtension{[]CertCompressionAlgo{
-					CertCompressionBrotli,
+				&FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
+					_CertCompressionBrotli,
 				}},
 				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
+				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case HelloChrome_83:
@@ -250,7 +250,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					0x00, // pointFormatUncompressed
 				}},
 				&SessionTicketExtension{},
-				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					ECDSAWithP256AndSHA256,
@@ -277,11 +277,11 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					VersionTLS11,
 					VersionTLS10,
 				}},
-				&FakeCertCompressionAlgsExtension{[]CertCompressionAlgo{
-					CertCompressionBrotli,
+				&FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
+					_CertCompressionBrotli,
 				}},
 				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
+				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case HelloFirefox_55, HelloFirefox_56:
@@ -313,7 +313,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&SupportedCurvesExtension{[]CurveID{X25519, CurveP256, CurveP384, CurveP521}},
 				&SupportedPointsExtension{SupportedPoints: []byte{pointFormatUncompressed}},
 				&SessionTicketExtension{},
-				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					ECDSAWithP256AndSHA256,
@@ -328,7 +328,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					ECDSAWithSHA1,
 					PKCS1WithSHA1},
 				},
-				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
+				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 			GetSessionID: nil,
 		}, nil
@@ -375,7 +375,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					pointFormatUncompressed,
 				}},
 				&SessionTicketExtension{},
-				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&KeyShareExtension{[]KeyShare{
 					{Group: X25519},
@@ -401,7 +401,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				}},
 				&PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&FakeRecordSizeLimitExtension{0x4001},
-				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
+				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			}}, nil
 	case HelloIOS_11_1:
 		return ClientHelloSpec{
@@ -450,7 +450,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&StatusRequestExtension{},
 				&NPNExtension{},
 				&SCTExtension{},
-				&_ALPNExtension{AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
+				&ALPNExtension{_AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
 				}},
@@ -512,7 +512,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&StatusRequestExtension{},
 				&NPNExtension{},
 				&SCTExtension{},
-				&_ALPNExtension{AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
+				&ALPNExtension{_AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
 				}},
@@ -806,7 +806,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 
 	curves := SupportedCurvesExtension{curveIDs}
 
-	padding := UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle}
+	padding := UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle}
 	reneg := RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient}
 
 	p.Extensions = []TLSExtension{
@@ -822,7 +822,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 			// if user didn't specify alpn yet, choose something popular
 			uconn.config.NextProtos = []string{"h2", "http/1.1"}
 		}
-		alpn := _ALPNExtension{AlpnProtocols: uconn.config.NextProtos}
+		alpn := ALPNExtension{_AlpnProtocols: uconn.config.NextProtos}
 		p.Extensions = append(p.Extensions, &alpn)
 	}
 

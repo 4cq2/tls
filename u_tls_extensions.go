@@ -235,25 +235,25 @@ func (e *RenegotiationInfoExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type _ALPNExtension struct {
-	AlpnProtocols []string
+type ALPNExtension struct {
+	_AlpnProtocols []string
 }
 
-func (e *_ALPNExtension) writeToUConn(uc *UConn) error {
-	uc.config.NextProtos = e.AlpnProtocols
-	uc.HandshakeState.Hello.AlpnProtocols = e.AlpnProtocols
+func (e *ALPNExtension) writeToUConn(uc *UConn) error {
+	uc.config.NextProtos = e._AlpnProtocols
+	uc.HandshakeState.Hello.AlpnProtocols = e._AlpnProtocols
 	return nil
 }
 
-func (e *_ALPNExtension) Len() int {
+func (e *ALPNExtension) Len() int {
 	bLen := 2 + 2 + 2
-	for _, s := range e.AlpnProtocols {
+	for _, s := range e._AlpnProtocols {
 		bLen += 1 + len(s)
 	}
 	return bLen
 }
 
-func (e *_ALPNExtension) Read(b []byte) (int, error) {
+func (e *ALPNExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -264,7 +264,7 @@ func (e *_ALPNExtension) Read(b []byte) (int, error) {
 	b = b[6:]
 
 	stringsLength := 0
-	for _, s := range e.AlpnProtocols {
+	for _, s := range e._AlpnProtocols {
 		l := len(s)
 		b[0] = byte(l)
 		copy(b[1:], s)
@@ -500,7 +500,7 @@ func (e *UtlsPaddingExtension) Read(b []byte) (int, error) {
 }
 
 // https://github.com/google/boringssl/blob/7d7554b6b3c79e707e25521e61e066ce2b996e4c/ssl/t1_lib.c#L2803
-func BoringPaddingStyle(unpaddedLen int) (int, bool) {
+func _BoringPaddingStyle(unpaddedLen int) (int, bool) {
 	if unpaddedLen > 0xff && unpaddedLen < 0x200 {
 		paddingLen := 0x200 - unpaddedLen
 		if paddingLen >= 4+1 {
@@ -690,7 +690,7 @@ func (e *FakeChannelIDExtension) Read(b []byte) (int, error) {
 }
 
 type FakeCertCompressionAlgsExtension struct {
-	Methods []CertCompressionAlgo
+	Methods []_CertCompressionAlgo
 }
 
 func (e *FakeCertCompressionAlgsExtension) writeToUConn(uc *UConn) error {

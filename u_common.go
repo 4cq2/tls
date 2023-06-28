@@ -63,8 +63,8 @@ var Android_API_26 = ClientHelloSpec{
 			},
 		},
 		&StatusRequestExtension{},
-		&_ALPNExtension{
-			AlpnProtocols: []string{"http/1.1"},
+		&ALPNExtension{
+			_AlpnProtocols: []string{"http/1.1"},
 		},
 		&SupportedPointsExtension{
 			SupportedPoints: []uint8{pointFormatUncompressed},
@@ -194,11 +194,11 @@ var (
 )
 
 // https://tools.ietf.org/html/draft-ietf-tls-certificate-compression-04
-type CertCompressionAlgo uint16
+type _CertCompressionAlgo uint16
 
 const (
-	CertCompressionZlib   CertCompressionAlgo = 0x0001
-	CertCompressionBrotli CertCompressionAlgo = 0x0002
+	_CertCompressionZlib   _CertCompressionAlgo = 0x0001
+	_CertCompressionBrotli _CertCompressionAlgo = 0x0002
 )
 
 const (

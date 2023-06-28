@@ -38,7 +38,7 @@ func (ka rsaKeyAgreement) processClientKeyExchange(config *Config, cert *Certifi
 		}
 		ciphertext = ckx.ciphertext[2:]
 	}
-	priv, ok := cert.PrivateKey.(crypto.Decrypter)
+	priv, ok := cert._PrivateKey.(crypto.Decrypter)
 	if !ok {
 		return nil, errors.New("tls: certificate private key does not implement crypto.Decrypter")
 	}
@@ -172,7 +172,7 @@ NextCandidate:
 	serverECDHParams[3] = byte(len(ecdhePublic))
 	copy(serverECDHParams[4:], ecdhePublic)
 
-	priv, ok := cert.PrivateKey.(crypto.Signer)
+	priv, ok := cert._PrivateKey.(crypto.Signer)
 	if !ok {
 		return nil, errors.New("tls: certificate private key does not implement crypto.Signer")
 	}

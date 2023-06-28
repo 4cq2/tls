@@ -234,7 +234,7 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 				alpnProtocols = append(alpnProtocols, string(proto))
 
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &_ALPNExtension{alpnProtocols})
+			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &ALPNExtension{alpnProtocols})
 
 		case extensionSCT:
 			// RFC 6962, Section 3.3.1
@@ -301,7 +301,7 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsExtendedMasterSecretExtension{})
 
 		case utlsExtensionPadding:
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle})
+			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle})
 
 		case fakeExtensionChannelID, fakeCertCompressionAlgs, fakeRecordSizeLimit:
 			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &GenericExtension{extension, extData})
@@ -352,7 +352,7 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 			}
 		}
 		if !alreadyHasPadding {
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle})
+			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle})
 		}
 	}
 

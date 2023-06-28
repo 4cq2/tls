@@ -544,7 +544,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 	// certificate to send.
 	if certRequested {
 		certMsg = new(certificateMsg)
-		certMsg.certificates = chainToSend.Certificate
+		certMsg.certificates = chainToSend._Certificate
 		hs.finishedHash.Write(certMsg.marshal())
 		if _, err := c.writeRecord(recordTypeHandshake, certMsg.marshal()); err != nil {
 			return err
@@ -563,15 +563,15 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		}
 	}
 
-	if chainToSend != nil && len(chainToSend.Certificate) > 0 {
+	if chainToSend != nil && len(chainToSend._Certificate) > 0 {
 		certVerify := &certificateVerifyMsg{
 			hasSignatureAlgorithm: c.vers >= VersionTLS12,
 		}
 
-		key, ok := chainToSend.PrivateKey.(crypto.Signer)
+		key, ok := chainToSend._PrivateKey.(crypto.Signer)
 		if !ok {
 			c.sendAlert(alertInternalError)
-			return fmt.Errorf("tls: client certificate private key of type %T does not implement crypto.Signer", chainToSend.PrivateKey)
+			return fmt.Errorf("tls: client certificate private key of type %T does not implement crypto.Signer", chainToSend._PrivateKey)
 		}
 
 		signatureAlgorithm, sigType, hashFunc, err := pickSignatureAlgorithm(key.Public(), certReq.supportedSignatureAlgorithms, hs.hello.supportedSignatureAlgorithms, c.vers)
@@ -949,8 +949,8 @@ func (c *Conn) getClientCertificate(cri *CertificateRequestInfo) (*Certificate, 
 			return &chain, nil
 		}
 
-		for j, cert := range chain.Certificate {
-			x509Cert := chain.Leaf
+		for j, cert := range chain._Certificate {
+			x509Cert := chain._Leaf
 			// Parse the certificate if this isn't the leaf node, or if
 			// chain.Leaf was nil.
 			if j != 0 || x509Cert == nil {

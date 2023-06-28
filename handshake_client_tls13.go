@@ -489,16 +489,16 @@ func (hs *clientHandshakeStateTLS13) readServerCertificate() error {
 		c.sendAlert(alertUnexpectedMessage)
 		return unexpectedMessageError(certMsg, msg)
 	}
-	if len(certMsg.certificate.Certificate) == 0 {
+	if len(certMsg.certificate._Certificate) == 0 {
 		c.sendAlert(alertDecodeError)
 		return errors.New("tls: received empty certificates message")
 	}
 	hs.transcript.Write(certMsg.marshal())
 
 	c.scts = certMsg.certificate.SignedCertificateTimestamps
-	c.ocspResponse = certMsg.certificate.OCSPStaple
+	c.ocspResponse = certMsg.certificate._OCSPStaple
 
-	if err := c.verifyServerCertificate(certMsg.certificate.Certificate); err != nil {
+	if err := c.verifyServerCertificate(certMsg.certificate._Certificate); err != nil {
 		return err
 	}
 
@@ -606,7 +606,7 @@ func (hs *clientHandshakeStateTLS13) sendClientCertificate() error {
 
 	certMsg.certificate = *cert
 	certMsg.scts = hs.certReq.scts && len(cert.SignedCertificateTimestamps) > 0
-	certMsg.ocspStapling = hs.certReq.ocspStapling && len(cert.OCSPStaple) > 0
+	certMsg.ocspStapling = hs.certReq.ocspStapling && len(cert._OCSPStaple) > 0
 
 	hs.transcript.Write(certMsg.marshal())
 	if _, err := c.writeRecord(recordTypeHandshake, certMsg.marshal()); err != nil {
@@ -614,7 +614,7 @@ func (hs *clientHandshakeStateTLS13) sendClientCertificate() error {
 	}
 
 	// If we sent an empty certificate message, skip the CertificateVerify.
-	if len(cert.Certificate) == 0 {
+	if len(cert._Certificate) == 0 {
 		return nil
 	}
 
@@ -653,7 +653,7 @@ func (hs *clientHandshakeStateTLS13) sendClientCertificate() error {
 	if sigType == signatureRSAPSS {
 		signOpts = &rsa.PSSOptions{SaltLength: rsa.PSSSaltLengthEqualsHash, Hash: sigHash}
 	}
-	sig, err := cert.PrivateKey.(crypto.Signer).Sign(c.config.rand(), h.Sum(nil), signOpts)
+	sig, err := cert._PrivateKey.(crypto.Signer).Sign(c.config.rand(), h.Sum(nil), signOpts)
 	if err != nil {
 		c.sendAlert(alertInternalError)
 		return errors.New("tls: failed to sign handshake: " + err.Error())
