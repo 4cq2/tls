@@ -63,7 +63,7 @@ var Android_API_26 = ClientHelloSpec{
 			},
 		},
 		&StatusRequestExtension{},
-		&ALPNExtension{
+		&_ALPNExtension{
 			AlpnProtocols: []string{"http/1.1"},
 		},
 		&SupportedPointsExtension{

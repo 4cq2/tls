@@ -1,4 +1,3 @@
-rf 'mv ALPNExtension _ALPNExtension'
 rf 'mv ALPNExtension.AlpnProtocols ALPNExtension._AlpnProtocols'
 rf 'mv ALPNExtension.Len ALPNExtension._Len'
 rf 'mv ALPNExtension.Read ALPNExtension._Read'

@@ -234,7 +234,7 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 				alpnProtocols = append(alpnProtocols, string(proto))
 
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &ALPNExtension{alpnProtocols})
+			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &_ALPNExtension{alpnProtocols})
 
 		case extensionSCT:
 			// RFC 6962, Section 3.3.1

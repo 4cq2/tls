@@ -235,17 +235,17 @@ func (e *RenegotiationInfoExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type ALPNExtension struct {
+type _ALPNExtension struct {
 	AlpnProtocols []string
 }
 
-func (e *ALPNExtension) writeToUConn(uc *UConn) error {
+func (e *_ALPNExtension) writeToUConn(uc *UConn) error {
 	uc.config.NextProtos = e.AlpnProtocols
 	uc.HandshakeState.Hello.AlpnProtocols = e.AlpnProtocols
 	return nil
 }
 
-func (e *ALPNExtension) Len() int {
+func (e *_ALPNExtension) Len() int {
 	bLen := 2 + 2 + 2
 	for _, s := range e.AlpnProtocols {
 		bLen += 1 + len(s)
@@ -253,7 +253,7 @@ func (e *ALPNExtension) Len() int {
 	return bLen
 }
 
-func (e *ALPNExtension) Read(b []byte) (int, error) {
+func (e *_ALPNExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}

@@ -56,7 +56,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				},
 				&StatusRequestExtension{},
 				&SCTExtension{},
-				&ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
 				&FakeChannelIDExtension{},
 				&SupportedPointsExtension{SupportedPoints: []byte{pointFormatUncompressed}},
 				&SupportedCurvesExtension{[]CurveID{CurveID(GREASE_PLACEHOLDER),
@@ -111,7 +111,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				}},
 				&StatusRequestExtension{},
 				&SCTExtension{},
-				&ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
 				&FakeChannelIDExtension{},
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
@@ -177,7 +177,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					0x00, // pointFormatUncompressed
 				}},
 				&SessionTicketExtension{},
-				&ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					ECDSAWithP256AndSHA256,
@@ -250,7 +250,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					0x00, // pointFormatUncompressed
 				}},
 				&SessionTicketExtension{},
-				&ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					ECDSAWithP256AndSHA256,
@@ -313,7 +313,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&SupportedCurvesExtension{[]CurveID{X25519, CurveP256, CurveP384, CurveP521}},
 				&SupportedPointsExtension{SupportedPoints: []byte{pointFormatUncompressed}},
 				&SessionTicketExtension{},
-				&ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					ECDSAWithP256AndSHA256,
@@ -375,7 +375,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					pointFormatUncompressed,
 				}},
 				&SessionTicketExtension{},
-				&ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
+				&_ALPNExtension{AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&KeyShareExtension{[]KeyShare{
 					{Group: X25519},
@@ -450,7 +450,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&StatusRequestExtension{},
 				&NPNExtension{},
 				&SCTExtension{},
-				&ALPNExtension{AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
+				&_ALPNExtension{AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
 				}},
@@ -512,7 +512,7 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&StatusRequestExtension{},
 				&NPNExtension{},
 				&SCTExtension{},
-				&ALPNExtension{AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
+				&_ALPNExtension{AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
 				}},
@@ -822,7 +822,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 			// if user didn't specify alpn yet, choose something popular
 			uconn.config.NextProtos = []string{"h2", "http/1.1"}
 		}
-		alpn := ALPNExtension{AlpnProtocols: uconn.config.NextProtos}
+		alpn := _ALPNExtension{AlpnProtocols: uconn.config.NextProtos}
 		p.Extensions = append(p.Extensions, &alpn)
 	}
 
