@@ -28,7 +28,7 @@ type serverHandshakeStateTLS13 struct {
 	sentDummyCCS    bool
 	usingPSK        bool
 	suite           *cipherSuiteTLS13
-	cert            *Certificate
+	cert            *_Certificate
 	sigAlg          SignatureScheme
 	earlySecret     []byte
 	sharedKey       []byte
@@ -609,7 +609,7 @@ func (hs *serverHandshakeStateTLS13) sendServerCertificate() error {
 	certMsg := new(certificateMsgTLS13)
 
 	certMsg.certificate = *hs.cert
-	certMsg.scts = hs.clientHello.scts && len(hs.cert.SignedCertificateTimestamps) > 0
+	certMsg.scts = hs.clientHello.scts && len(hs.cert._SignedCertificateTimestamps) > 0
 	certMsg.ocspStapling = hs.clientHello.ocspStapling && len(hs.cert._OCSPStaple) > 0
 
 	hs.transcript.Write(certMsg.marshal())
@@ -742,10 +742,10 @@ func (hs *serverHandshakeStateTLS13) sendSessionTickets() error {
 		cipherSuite:      hs.suite.id,
 		createdAt:        uint64(c.config.time().Unix()),
 		resumptionSecret: resumptionSecret,
-		certificate: Certificate{
-			_Certificate:                certsFromClient,
-			_OCSPStaple:                 c.ocspResponse,
-			SignedCertificateTimestamps: c.scts,
+		certificate: _Certificate{
+			_Certificate:                 certsFromClient,
+			_OCSPStaple:                  c.ocspResponse,
+			_SignedCertificateTimestamps: c.scts,
 		},
 	}
 	var err error

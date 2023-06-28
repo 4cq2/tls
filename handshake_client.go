@@ -513,7 +513,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		}
 	}
 
-	var chainToSend *Certificate
+	var chainToSend *_Certificate
 	var certRequested bool
 	certReq, ok := msg.(*certificateRequestMsg)
 	if ok {
@@ -873,7 +873,7 @@ var (
 
 // certificateRequestInfoFromMsg generates a CertificateRequestInfo from a TLS
 // <= 1.2 CertificateRequest, making an effort to fill in missing information.
-func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *CertificateRequestInfo {
+func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *_CertificateRequestInfo {
 	var rsaAvail, ecdsaAvail bool
 	for _, certType := range certReq.certificateTypes {
 		switch certType {
@@ -884,8 +884,8 @@ func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *CertificateR
 		}
 	}
 
-	cri := &CertificateRequestInfo{
-		AcceptableCAs: certReq.certificateAuthorities,
+	cri := &_CertificateRequestInfo{
+		_AcceptableCAs: certReq.certificateAuthorities,
 	}
 
 	if !certReq.hasSignatureAlgorithm {
@@ -895,11 +895,11 @@ func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *CertificateR
 		// certificate types.
 		switch {
 		case rsaAvail && ecdsaAvail:
-			cri.SignatureSchemes = tls11SignatureSchemes
+			cri._SignatureSchemes = tls11SignatureSchemes
 		case rsaAvail:
-			cri.SignatureSchemes = tls11SignatureSchemesRSA
+			cri._SignatureSchemes = tls11SignatureSchemesRSA
 		case ecdsaAvail:
-			cri.SignatureSchemes = tls11SignatureSchemesECDSA
+			cri._SignatureSchemes = tls11SignatureSchemesECDSA
 		}
 		return cri
 	}
@@ -908,16 +908,16 @@ func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *CertificateR
 	// the leaf key, while the certificate types only apply to the leaf key.
 	// See RFC 5246, Section 7.4.4 (where it calls this "somewhat complicated").
 	// Filter the signature schemes based on the certificate type.
-	cri.SignatureSchemes = make([]SignatureScheme, 0, len(certReq.supportedSignatureAlgorithms))
+	cri._SignatureSchemes = make([]SignatureScheme, 0, len(certReq.supportedSignatureAlgorithms))
 	for _, sigScheme := range certReq.supportedSignatureAlgorithms {
 		switch signatureFromSignatureScheme(sigScheme) {
 		case signatureECDSA:
 			if ecdsaAvail {
-				cri.SignatureSchemes = append(cri.SignatureSchemes, sigScheme)
+				cri._SignatureSchemes = append(cri._SignatureSchemes, sigScheme)
 			}
 		case signatureRSAPSS, signaturePKCS1v15:
 			if rsaAvail {
-				cri.SignatureSchemes = append(cri.SignatureSchemes, sigScheme)
+				cri._SignatureSchemes = append(cri._SignatureSchemes, sigScheme)
 			}
 		}
 	}
@@ -925,7 +925,7 @@ func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *CertificateR
 	return cri
 }
 
-func (c *Conn) getClientCertificate(cri *CertificateRequestInfo) (*Certificate, error) {
+func (c *Conn) getClientCertificate(cri *_CertificateRequestInfo) (*_Certificate, error) {
 	if c.config.GetClientCertificate != nil {
 		return c.config.GetClientCertificate(cri)
 	}
@@ -936,7 +936,7 @@ func (c *Conn) getClientCertificate(cri *CertificateRequestInfo) (*Certificate, 
 	for i, chain := range c.config.Certificates {
 		sigOK := false
 		for _, alg := range signatureSchemesForCertificate(c.vers, &chain) {
-			if isSupportedSignatureAlgorithm(alg, cri.SignatureSchemes) {
+			if isSupportedSignatureAlgorithm(alg, cri._SignatureSchemes) {
 				sigOK = true
 				break
 			}
@@ -945,7 +945,7 @@ func (c *Conn) getClientCertificate(cri *CertificateRequestInfo) (*Certificate, 
 			continue
 		}
 
-		if len(cri.AcceptableCAs) == 0 {
+		if len(cri._AcceptableCAs) == 0 {
 			return &chain, nil
 		}
 
@@ -961,7 +961,7 @@ func (c *Conn) getClientCertificate(cri *CertificateRequestInfo) (*Certificate, 
 				}
 			}
 
-			for _, ca := range cri.AcceptableCAs {
+			for _, ca := range cri._AcceptableCAs {
 				if bytes.Equal(x509Cert.RawIssuer, ca) {
 					return &chain, nil
 				}
@@ -970,7 +970,7 @@ func (c *Conn) getClientCertificate(cri *CertificateRequestInfo) (*Certificate, 
 	}
 
 	// No acceptable certificate found. Don't send a certificate.
-	return new(Certificate), nil
+	return new(_Certificate), nil
 }
 
 // clientSessionCacheKey returns a key used to cache sessionTickets that could

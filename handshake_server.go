@@ -30,7 +30,7 @@ type serverHandshakeState struct {
 	sessionState *sessionState
 	finishedHash finishedHash
 	masterSecret []byte
-	cert         *Certificate
+	cert         *_Certificate
 }
 
 // serverHandshake performs a TLS handshake as a server.
@@ -260,7 +260,7 @@ Curves:
 		return err
 	}
 	if hs.clientHello.scts {
-		hs.hello.scts = hs.cert.SignedCertificateTimestamps
+		hs.hello.scts = hs.cert._SignedCertificateTimestamps
 	}
 
 	if priv, ok := hs.cert._PrivateKey.(crypto.Signer); ok {
@@ -392,7 +392,7 @@ func (hs *serverHandshakeState) doResumeHandshake() error {
 		return err
 	}
 
-	if err := c.processCertsFromClient(Certificate{
+	if err := c.processCertsFromClient(_Certificate{
 		_Certificate: hs.sessionState.certificates,
 	}); err != nil {
 		return err
@@ -507,7 +507,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 		}
 		hs.finishedHash.Write(certMsg.marshal())
 
-		if err := c.processCertsFromClient(Certificate{
+		if err := c.processCertsFromClient(_Certificate{
 			_Certificate: certMsg.certificates,
 		}); err != nil {
 			return err
@@ -705,7 +705,7 @@ func (hs *serverHandshakeState) sendFinished(out []byte) error {
 // processCertsFromClient takes a chain of client certificates either from a
 // Certificates message or from a sessionState and verifies them. It returns
 // the public key of the leaf certificate.
-func (c *Conn) processCertsFromClient(certificate Certificate) error {
+func (c *Conn) processCertsFromClient(certificate _Certificate) error {
 	certificates := certificate._Certificate
 	certs := make([]*x509.Certificate, len(certificates))
 	var err error
@@ -762,7 +762,7 @@ func (c *Conn) processCertsFromClient(certificate Certificate) error {
 
 	c.peerCertificates = certs
 	c.ocspResponse = certificate._OCSPStaple
-	c.scts = certificate.SignedCertificateTimestamps
+	c.scts = certificate._SignedCertificateTimestamps
 	return nil
 }
 

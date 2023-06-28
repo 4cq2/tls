@@ -358,19 +358,19 @@ type ClientHelloInfo struct {
 	Conn net.Conn
 }
 
-// CertificateRequestInfo contains information from a server's
+// _CertificateRequestInfo contains information from a server's
 // CertificateRequest message, which is used to demand a certificate and proof
 // of control from a client.
-type CertificateRequestInfo struct {
-	// AcceptableCAs contains zero or more, DER-encoded, X.501
+type _CertificateRequestInfo struct {
+	// _AcceptableCAs contains zero or more, DER-encoded, X.501
 	// Distinguished Names. These are the names of root or intermediate CAs
 	// that the server wishes the returned certificate to be signed by. An
 	// empty slice indicates that the server has no preference.
-	AcceptableCAs [][]byte
+	_AcceptableCAs [][]byte
 
-	// SignatureSchemes lists the signature schemes that the server is
+	// _SignatureSchemes lists the signature schemes that the server is
 	// willing to verify.
-	SignatureSchemes []SignatureScheme
+	_SignatureSchemes []SignatureScheme
 }
 
 // RenegotiationSupport enumerates the different levels of support for TLS
@@ -422,7 +422,7 @@ type Config struct {
 	// at least one certificate or else set GetCertificate. Clients doing
 	// client-authentication may set either Certificates or
 	// GetClientCertificate.
-	Certificates []Certificate
+	Certificates []_Certificate
 
 	// NameToCertificate maps from a certificate name to an element of
 	// Certificates. Note that a certificate name can be of the form
@@ -430,7 +430,7 @@ type Config struct {
 	// See Config.BuildNameToCertificate
 	// The nil value causes the first element of Certificates to be used
 	// for all connections.
-	NameToCertificate map[string]*Certificate
+	NameToCertificate map[string]*_Certificate
 
 	// GetCertificate returns a Certificate based on the given
 	// ClientHelloInfo. It will only be called if the client supplies SNI
@@ -439,7 +439,7 @@ type Config struct {
 	// If GetCertificate is nil or returns nil, then the certificate is
 	// retrieved from NameToCertificate. If NameToCertificate is nil, the
 	// first element of Certificates will be used.
-	GetCertificate func(*ClientHelloInfo) (*Certificate, error)
+	GetCertificate func(*ClientHelloInfo) (*_Certificate, error)
 
 	// GetClientCertificate, if not nil, is called when a server requests a
 	// certificate from a client. If set, the contents of Certificates will
@@ -454,7 +454,7 @@ type Config struct {
 	//
 	// GetClientCertificate may be called multiple times for the same
 	// connection if renegotiation occurs or if TLS 1.3 is in use.
-	GetClientCertificate func(*CertificateRequestInfo) (*Certificate, error)
+	GetClientCertificate func(*_CertificateRequestInfo) (*_Certificate, error)
 
 	// GetConfigForClient, if not nil, is called after a ClientHello is
 	// received from a client. It may return a non-nil Config in order to
@@ -869,7 +869,7 @@ func (c *Config) mutualVersion(isClient bool, peerVersions []uint16) (uint16, bo
 
 // getCertificate returns the best certificate for the given ClientHelloInfo,
 // defaulting to the first element of c.Certificates.
-func (c *Config) getCertificate(clientHello *ClientHelloInfo) (*Certificate, error) {
+func (c *Config) getCertificate(clientHello *ClientHelloInfo) (*_Certificate, error) {
 	if c.GetCertificate != nil &&
 		(len(c.Certificates) == 0 || len(clientHello.ServerName) > 0) {
 		cert, err := c.GetCertificate(clientHello)
@@ -915,7 +915,7 @@ func (c *Config) getCertificate(clientHello *ClientHelloInfo) (*Certificate, err
 // from the CommonName and SubjectAlternateName fields of each of the leaf
 // certificates.
 func (c *Config) BuildNameToCertificate() {
-	c.NameToCertificate = make(map[string]*Certificate)
+	c.NameToCertificate = make(map[string]*_Certificate)
 	for i := range c.Certificates {
 		cert := &c.Certificates[i]
 		x509Cert := cert._Leaf
@@ -961,8 +961,8 @@ func (c *Config) writeKeyLog(label string, clientRandom, secret []byte) error {
 // and is only for debugging, so a global mutex saves space.
 var writerMutex sync.Mutex
 
-// A Certificate is a chain of one or more certificates, leaf first.
-type Certificate struct {
+// A _Certificate is a chain of one or more certificates, leaf first.
+type _Certificate struct {
 	_Certificate [][]byte
 	// _PrivateKey contains the private key corresponding to the public key in
 	// Leaf. This must implement crypto.Signer with an RSA or ECDSA PublicKey.
@@ -972,9 +972,9 @@ type Certificate struct {
 	// _OCSPStaple contains an optional OCSP response which will be served
 	// to clients that request it.
 	_OCSPStaple []byte
-	// SignedCertificateTimestamps contains an optional list of Signed
+	// _SignedCertificateTimestamps contains an optional list of Signed
 	// Certificate Timestamps which will be served to clients that request it.
-	SignedCertificateTimestamps [][]byte
+	_SignedCertificateTimestamps [][]byte
 	// _Leaf is the parsed form of the leaf certificate, which may be
 	// initialized using x509.ParseCertificate to reduce per-handshake
 	// processing for TLS clients doing client authentication. If nil, the

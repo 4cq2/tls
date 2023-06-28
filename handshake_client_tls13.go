@@ -495,7 +495,7 @@ func (hs *clientHandshakeStateTLS13) readServerCertificate() error {
 	}
 	hs.transcript.Write(certMsg.marshal())
 
-	c.scts = certMsg.certificate.SignedCertificateTimestamps
+	c.scts = certMsg.certificate._SignedCertificateTimestamps
 	c.ocspResponse = certMsg.certificate._OCSPStaple
 
 	if err := c.verifyServerCertificate(certMsg.certificate._Certificate); err != nil {
@@ -594,9 +594,9 @@ func (hs *clientHandshakeStateTLS13) sendClientCertificate() error {
 		return nil
 	}
 
-	cert, err := c.getClientCertificate(&CertificateRequestInfo{
-		AcceptableCAs:    hs.certReq.certificateAuthorities,
-		SignatureSchemes: hs.certReq.supportedSignatureAlgorithms,
+	cert, err := c.getClientCertificate(&_CertificateRequestInfo{
+		_AcceptableCAs:    hs.certReq.certificateAuthorities,
+		_SignatureSchemes: hs.certReq.supportedSignatureAlgorithms,
 	})
 	if err != nil {
 		return err
@@ -605,7 +605,7 @@ func (hs *clientHandshakeStateTLS13) sendClientCertificate() error {
 	certMsg := new(certificateMsgTLS13)
 
 	certMsg.certificate = *cert
-	certMsg.scts = hs.certReq.scts && len(cert.SignedCertificateTimestamps) > 0
+	certMsg.scts = hs.certReq.scts && len(cert._SignedCertificateTimestamps) > 0
 	certMsg.ocspStapling = hs.certReq.ocspStapling && len(cert._OCSPStaple) > 0
 
 	hs.transcript.Write(certMsg.marshal())

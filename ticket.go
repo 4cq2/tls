@@ -113,8 +113,8 @@ type sessionStateTLS13 struct {
 	// uint8 revision = 0;
 	cipherSuite      uint16
 	createdAt        uint64
-	resumptionSecret []byte      // opaque resumption_master_secret<1..2^8-1>;
-	certificate      Certificate // CertificateEntry certificate_list<0..2^24-1>;
+	resumptionSecret []byte       // opaque resumption_master_secret<1..2^8-1>;
+	certificate      _Certificate // CertificateEntry certificate_list<0..2^24-1>;
 }
 
 func (m *sessionStateTLS13) marshal() []byte {

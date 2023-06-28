@@ -1302,7 +1302,7 @@ func (m *certificateMsg) unmarshal(data []byte) bool {
 
 type certificateMsgTLS13 struct {
 	raw          []byte
-	certificate  Certificate
+	certificate  _Certificate
 	ocspStapling bool
 	scts         bool
 }
@@ -1322,7 +1322,7 @@ func (m *certificateMsgTLS13) marshal() []byte {
 			certificate._OCSPStaple = nil
 		}
 		if !m.scts {
-			certificate.SignedCertificateTimestamps = nil
+			certificate._SignedCertificateTimestamps = nil
 		}
 		marshalCertificate(b, certificate)
 	})
@@ -1331,7 +1331,7 @@ func (m *certificateMsgTLS13) marshal() []byte {
 	return m.raw
 }
 
-func marshalCertificate(b *cryptobyte.Builder, certificate Certificate) {
+func marshalCertificate(b *cryptobyte.Builder, certificate _Certificate) {
 	b.AddUint24LengthPrefixed(func(b *cryptobyte.Builder) {
 		for i, cert := range certificate._Certificate {
 			b.AddUint24LengthPrefixed(func(b *cryptobyte.Builder) {
@@ -1351,11 +1351,11 @@ func marshalCertificate(b *cryptobyte.Builder, certificate Certificate) {
 						})
 					})
 				}
-				if certificate.SignedCertificateTimestamps != nil {
+				if certificate._SignedCertificateTimestamps != nil {
 					b.AddUint16(extensionSCT)
 					b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
 						b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
-							for _, sct := range certificate.SignedCertificateTimestamps {
+							for _, sct := range certificate._SignedCertificateTimestamps {
 								b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
 									b.AddBytes(sct)
 								})
@@ -1380,13 +1380,13 @@ func (m *certificateMsgTLS13) unmarshal(data []byte) bool {
 		return false
 	}
 
-	m.scts = m.certificate.SignedCertificateTimestamps != nil
+	m.scts = m.certificate._SignedCertificateTimestamps != nil
 	m.ocspStapling = m.certificate._OCSPStaple != nil
 
 	return true
 }
 
-func unmarshalCertificate(s *cryptobyte.String, certificate *Certificate) bool {
+func unmarshalCertificate(s *cryptobyte.String, certificate *_Certificate) bool {
 	var certList cryptobyte.String
 	if !s.ReadUint24LengthPrefixed(&certList) {
 		return false
@@ -1430,8 +1430,8 @@ func unmarshalCertificate(s *cryptobyte.String, certificate *Certificate) bool {
 						len(sct) == 0 {
 						return false
 					}
-					certificate.SignedCertificateTimestamps = append(
-						certificate.SignedCertificateTimestamps, sct)
+					certificate._SignedCertificateTimestamps = append(
+						certificate._SignedCertificateTimestamps, sct)
 				}
 			default:
 				// Ignore unknown extensions.

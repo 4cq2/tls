@@ -137,7 +137,7 @@ func writeSignedMessage(sigHash io.Writer, context string, transcript hash.Hash)
 // for a given certificate, based on the public key and the protocol version. It
 // does not support the crypto.Decrypter interface, so shouldn't be used on the
 // server side in TLS 1.2 and earlier.
-func signatureSchemesForCertificate(version uint16, cert *Certificate) []SignatureScheme {
+func signatureSchemesForCertificate(version uint16, cert *_Certificate) []SignatureScheme {
 	priv, ok := cert._PrivateKey.(crypto.Signer)
 	if !ok {
 		return nil
@@ -190,7 +190,7 @@ func signatureSchemesForCertificate(version uint16, cert *Certificate) []Signatu
 
 // unsupportedCertificateError returns a helpful error for certificates with
 // an unsupported private key.
-func unsupportedCertificateError(cert *Certificate) error {
+func unsupportedCertificateError(cert *_Certificate) error {
 	switch cert._PrivateKey.(type) {
 	case rsa.PrivateKey, ecdsa.PrivateKey:
 		return fmt.Errorf("tls: unsupported certificate: private key is %T, expected *%T",

@@ -158,12 +158,12 @@ type EcdheParameters interface {
 }
 
 type CertificateRequestMsgTLS13 struct {
-	Raw                              []byte
-	OcspStapling                     bool
-	Scts                             bool
-	SupportedSignatureAlgorithms     []SignatureScheme
+	_Raw                             []byte
+	_OcspStapling                    bool
+	_Scts                            bool
+	_SupportedSignatureAlgorithms    []SignatureScheme
 	SupportedSignatureAlgorithmsCert []SignatureScheme
-	CertificateAuthorities           [][]byte
+	_CertificateAuthorities          [][]byte
 }
 
 func (crm *certificateRequestMsgTLS13) toPublic() *CertificateRequestMsgTLS13 {
@@ -171,12 +171,12 @@ func (crm *certificateRequestMsgTLS13) toPublic() *CertificateRequestMsgTLS13 {
 		return nil
 	} else {
 		return &CertificateRequestMsgTLS13{
-			Raw:                              crm.raw,
-			OcspStapling:                     crm.ocspStapling,
-			Scts:                             crm.scts,
-			SupportedSignatureAlgorithms:     crm.supportedSignatureAlgorithms,
+			_Raw:                             crm.raw,
+			_OcspStapling:                    crm.ocspStapling,
+			_Scts:                            crm.scts,
+			_SupportedSignatureAlgorithms:    crm.supportedSignatureAlgorithms,
 			SupportedSignatureAlgorithmsCert: crm.supportedSignatureAlgorithmsCert,
-			CertificateAuthorities:           crm.certificateAuthorities,
+			_CertificateAuthorities:          crm.certificateAuthorities,
 		}
 	}
 }
@@ -186,12 +186,12 @@ func (crm *CertificateRequestMsgTLS13) toPrivate() *certificateRequestMsgTLS13 {
 		return nil
 	} else {
 		return &certificateRequestMsgTLS13{
-			raw:                              crm.Raw,
-			ocspStapling:                     crm.OcspStapling,
-			scts:                             crm.Scts,
-			supportedSignatureAlgorithms:     crm.SupportedSignatureAlgorithms,
+			raw:                              crm._Raw,
+			ocspStapling:                     crm._OcspStapling,
+			scts:                             crm._Scts,
+			supportedSignatureAlgorithms:     crm._SupportedSignatureAlgorithms,
 			supportedSignatureAlgorithmsCert: crm.SupportedSignatureAlgorithmsCert,
-			certificateAuthorities:           crm.CertificateAuthorities,
+			certificateAuthorities:           crm._CertificateAuthorities,
 		}
 	}
 }

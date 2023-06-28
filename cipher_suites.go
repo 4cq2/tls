@@ -26,8 +26,8 @@ type keyAgreement interface {
 	// In the case that the key agreement protocol doesn't use a
 	// ServerKeyExchange message, generateServerKeyExchange can return nil,
 	// nil.
-	generateServerKeyExchange(*Config, *Certificate, *clientHelloMsg, *serverHelloMsg) (*serverKeyExchangeMsg, error)
-	processClientKeyExchange(*Config, *Certificate, *clientKeyExchangeMsg, uint16) ([]byte, error)
+	generateServerKeyExchange(*Config, *_Certificate, *clientHelloMsg, *serverHelloMsg) (*serverKeyExchangeMsg, error)
+	processClientKeyExchange(*Config, *_Certificate, *clientKeyExchangeMsg, uint16) ([]byte, error)
 
 	// On the client side, the next two methods are called in order.
 
