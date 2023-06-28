@@ -228,12 +228,12 @@ func (cs *ConnectionState) ExportKeyingMaterial(label string, context []byte, le
 	return cs.ekm(label, context, length)
 }
 
-// ClientAuthType declares the policy the server will follow for
+// _ClientAuthType declares the policy the server will follow for
 // TLS Client Authentication.
-type ClientAuthType int
+type _ClientAuthType int
 
 const (
-	NoClientCert ClientAuthType = iota
+	NoClientCert _ClientAuthType = iota
 	RequestClientCert
 	RequireAnyClientCert
 	VerifyClientCertIfGiven
@@ -242,7 +242,7 @@ const (
 
 // requiresClientCert reports whether the ClientAuthType requires a client
 // certificate to be provided.
-func requiresClientCert(c ClientAuthType) bool {
+func requiresClientCert(c _ClientAuthType) bool {
 	switch c {
 	case RequireAnyClientCert, RequireAndVerifyClientCert:
 		return true
@@ -506,7 +506,7 @@ type Config struct {
 
 	// ClientAuth determines the server's policy for
 	// TLS Client Authentication. The default is NoClientCert.
-	ClientAuth ClientAuthType
+	ClientAuth _ClientAuthType
 
 	// ClientCAs defines the set of root certificate authorities
 	// that servers use if required to verify a client certificate

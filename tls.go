@@ -37,11 +37,11 @@ func Server(conn net.Conn, config *Config) *Conn {
 	return &Conn{conn: conn, config: config}
 }
 
-// Client returns a new TLS client side connection
+// _Client returns a new TLS client side connection
 // using conn as the underlying transport.
 // The config cannot be nil: users must set either ServerName or
 // InsecureSkipVerify in the config.
-func Client(conn net.Conn, config *Config) *Conn {
+func _Client(conn net.Conn, config *Config) *Conn {
 	return &Conn{conn: conn, config: config, isClient: true}
 }
 
@@ -145,7 +145,7 @@ func DialWithDialer(dialer *net.Dialer, network, addr string, config *Config) (*
 		config = c
 	}
 
-	conn := Client(rawConn, config)
+	conn := _Client(rawConn, config)
 
 	if timeout == 0 {
 		err = conn.Handshake()

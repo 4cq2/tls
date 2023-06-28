@@ -20,7 +20,7 @@ import (
 // uTLS will call .handshake() on one of these private internal states,
 // to perform TLS handshake using standard crypto/tls implementation.
 type ClientHandshakeState struct {
-	C            *Conn
+	_C           *Conn
 	ServerHello  *ServerHelloMsg
 	Hello        *ClientHelloMsg
 	MasterSecret []byte
@@ -34,11 +34,11 @@ type ClientHandshakeState struct {
 
 // TLS 1.3 only
 type TLS13OnlyState struct {
-	Suite         *CipherSuiteTLS13
+	Suite         *_CipherSuiteTLS13
 	EcdheParams   EcdheParameters
 	EarlySecret   []byte
 	BinderKey     []byte
-	CertReq       *CertificateRequestMsgTLS13
+	CertReq       *_CertificateRequestMsgTLS13
 	UsingPSK      bool
 	SentDummyCCS  bool
 	Transcript    hash.Hash
@@ -48,7 +48,7 @@ type TLS13OnlyState struct {
 // TLS 1.2 and before only
 type TLS12OnlyState struct {
 	FinishedHash FinishedHash
-	Suite        CipherSuite
+	Suite        _CipherSuite
 }
 
 func (chs *ClientHandshakeState) toPrivate13() *clientHandshakeStateTLS13 {
@@ -56,7 +56,7 @@ func (chs *ClientHandshakeState) toPrivate13() *clientHandshakeStateTLS13 {
 		return nil
 	} else {
 		return &clientHandshakeStateTLS13{
-			c:           chs.C,
+			c:           chs._C,
 			serverHello: chs.ServerHello.getPrivatePtr(),
 			hello:       chs.Hello.getPrivatePtr(),
 			ecdheParams: chs.State13.EcdheParams,
@@ -94,7 +94,7 @@ func (chs13 *clientHandshakeStateTLS13) toPublic13() *ClientHandshakeState {
 			Transcript:    chs13.transcript,
 		}
 		return &ClientHandshakeState{
-			C:           chs13.c,
+			_C:          chs13.c,
 			ServerHello: chs13.serverHello.getPublicPtr(),
 			Hello:       chs13.hello.getPublicPtr(),
 
@@ -114,7 +114,7 @@ func (chs *ClientHandshakeState) toPrivate12() *clientHandshakeState {
 		return nil
 	} else {
 		return &clientHandshakeState{
-			c:           chs.C,
+			c:           chs._C,
 			serverHello: chs.ServerHello.getPrivatePtr(),
 			hello:       chs.Hello.getPrivatePtr(),
 			suite:       chs.State12.Suite.getPrivatePtr(),
@@ -138,7 +138,7 @@ func (chs12 *clientHandshakeState) toPublic12() *ClientHandshakeState {
 			FinishedHash: chs12.finishedHash.getPublicObj(),
 		}
 		return &ClientHandshakeState{
-			C:           chs12.c,
+			_C:          chs12.c,
 			ServerHello: chs12.serverHello.getPublicPtr(),
 			Hello:       chs12.hello.getPublicPtr(),
 
@@ -157,31 +157,31 @@ type EcdheParameters interface {
 	ecdheParameters
 }
 
-type CertificateRequestMsgTLS13 struct {
-	_Raw                             []byte
-	_OcspStapling                    bool
-	_Scts                            bool
-	_SupportedSignatureAlgorithms    []SignatureScheme
-	SupportedSignatureAlgorithmsCert []SignatureScheme
-	_CertificateAuthorities          [][]byte
+type _CertificateRequestMsgTLS13 struct {
+	_Raw                              []byte
+	_OcspStapling                     bool
+	_Scts                             bool
+	_SupportedSignatureAlgorithms     []SignatureScheme
+	_SupportedSignatureAlgorithmsCert []SignatureScheme
+	_CertificateAuthorities           [][]byte
 }
 
-func (crm *certificateRequestMsgTLS13) toPublic() *CertificateRequestMsgTLS13 {
+func (crm *certificateRequestMsgTLS13) toPublic() *_CertificateRequestMsgTLS13 {
 	if crm == nil {
 		return nil
 	} else {
-		return &CertificateRequestMsgTLS13{
-			_Raw:                             crm.raw,
-			_OcspStapling:                    crm.ocspStapling,
-			_Scts:                            crm.scts,
-			_SupportedSignatureAlgorithms:    crm.supportedSignatureAlgorithms,
-			SupportedSignatureAlgorithmsCert: crm.supportedSignatureAlgorithmsCert,
-			_CertificateAuthorities:          crm.certificateAuthorities,
+		return &_CertificateRequestMsgTLS13{
+			_Raw:                              crm.raw,
+			_OcspStapling:                     crm.ocspStapling,
+			_Scts:                             crm.scts,
+			_SupportedSignatureAlgorithms:     crm.supportedSignatureAlgorithms,
+			_SupportedSignatureAlgorithmsCert: crm.supportedSignatureAlgorithmsCert,
+			_CertificateAuthorities:           crm.certificateAuthorities,
 		}
 	}
 }
 
-func (crm *CertificateRequestMsgTLS13) toPrivate() *certificateRequestMsgTLS13 {
+func (crm *_CertificateRequestMsgTLS13) toPrivate() *certificateRequestMsgTLS13 {
 	if crm == nil {
 		return nil
 	} else {
@@ -190,41 +190,41 @@ func (crm *CertificateRequestMsgTLS13) toPrivate() *certificateRequestMsgTLS13 {
 			ocspStapling:                     crm._OcspStapling,
 			scts:                             crm._Scts,
 			supportedSignatureAlgorithms:     crm._SupportedSignatureAlgorithms,
-			supportedSignatureAlgorithmsCert: crm.SupportedSignatureAlgorithmsCert,
+			supportedSignatureAlgorithmsCert: crm._SupportedSignatureAlgorithmsCert,
 			certificateAuthorities:           crm._CertificateAuthorities,
 		}
 	}
 }
 
-type CipherSuiteTLS13 struct {
-	Id     uint16
-	KeyLen int
-	Aead   func(key, fixedNonce []byte) aead
-	Hash   crypto.Hash
+type _CipherSuiteTLS13 struct {
+	_Id     uint16
+	_KeyLen int
+	_Aead   func(key, fixedNonce []byte) aead
+	_Hash   crypto.Hash
 }
 
-func (c *cipherSuiteTLS13) toPublic() *CipherSuiteTLS13 {
+func (c *cipherSuiteTLS13) toPublic() *_CipherSuiteTLS13 {
 	if c == nil {
 		return nil
 	} else {
-		return &CipherSuiteTLS13{
-			Id:     c.id,
-			KeyLen: c.keyLen,
-			Aead:   c.aead,
-			Hash:   c.hash,
+		return &_CipherSuiteTLS13{
+			_Id:     c.id,
+			_KeyLen: c.keyLen,
+			_Aead:   c.aead,
+			_Hash:   c.hash,
 		}
 	}
 }
 
-func (c *CipherSuiteTLS13) toPrivate() *cipherSuiteTLS13 {
+func (c *_CipherSuiteTLS13) toPrivate() *cipherSuiteTLS13 {
 	if c == nil {
 		return nil
 	} else {
 		return &cipherSuiteTLS13{
-			id:     c.Id,
-			keyLen: c.KeyLen,
-			aead:   c.Aead,
-			hash:   c.Hash,
+			id:     c._Id,
+			keyLen: c._KeyLen,
+			aead:   c._Aead,
+			hash:   c._Hash,
 		}
 	}
 }
@@ -432,54 +432,54 @@ func UnmarshalClientHello(data []byte) *ClientHelloMsg {
 	return nil
 }
 
-// A CipherSuite is a specific combination of key agreement, cipher and MAC
+// A _CipherSuite is a specific combination of key agreement, cipher and MAC
 // function. All cipher suites currently assume RSA key agreement.
-type CipherSuite struct {
-	Id uint16
+type _CipherSuite struct {
+	_Id uint16
 	// the lengths, in bytes, of the key material needed for each component.
-	KeyLen int
-	MacLen int
-	IvLen  int
-	Ka     func(version uint16) keyAgreement
+	_KeyLen int
+	_MacLen int
+	_IvLen  int
+	_Ka     func(version uint16) keyAgreement
 	// flags is a bitmask of the suite* values, above.
-	Flags  int
-	Cipher func(key, iv []byte, isRead bool) interface{}
-	Mac    func(version uint16, macKey []byte) macFunction
-	Aead   func(key, fixedNonce []byte) aead
+	_Flags  int
+	_Cipher func(key, iv []byte, isRead bool) interface{}
+	_Mac    func(version uint16, macKey []byte) macFunction
+	_Aead   func(key, fixedNonce []byte) aead
 }
 
-func (cs *CipherSuite) getPrivatePtr() *cipherSuite {
+func (cs *_CipherSuite) getPrivatePtr() *cipherSuite {
 	if cs == nil {
 		return nil
 	} else {
 		return &cipherSuite{
-			id:     cs.Id,
-			keyLen: cs.KeyLen,
-			macLen: cs.MacLen,
-			ivLen:  cs.IvLen,
-			ka:     cs.Ka,
-			flags:  cs.Flags,
-			cipher: cs.Cipher,
-			mac:    cs.Mac,
-			aead:   cs.Aead,
+			id:     cs._Id,
+			keyLen: cs._KeyLen,
+			macLen: cs._MacLen,
+			ivLen:  cs._IvLen,
+			ka:     cs._Ka,
+			flags:  cs._Flags,
+			cipher: cs._Cipher,
+			mac:    cs._Mac,
+			aead:   cs._Aead,
 		}
 	}
 }
 
-func (cs *cipherSuite) getPublicObj() CipherSuite {
+func (cs *cipherSuite) getPublicObj() _CipherSuite {
 	if cs == nil {
-		return CipherSuite{}
+		return _CipherSuite{}
 	} else {
-		return CipherSuite{
-			Id:     cs.id,
-			KeyLen: cs.keyLen,
-			MacLen: cs.macLen,
-			IvLen:  cs.ivLen,
-			Ka:     cs.ka,
-			Flags:  cs.flags,
-			Cipher: cs.cipher,
-			Mac:    cs.mac,
-			Aead:   cs.aead,
+		return _CipherSuite{
+			_Id:     cs.id,
+			_KeyLen: cs.keyLen,
+			_MacLen: cs.macLen,
+			_IvLen:  cs.ivLen,
+			_Ka:     cs.ka,
+			_Flags:  cs.flags,
+			_Cipher: cs.cipher,
+			_Mac:    cs.mac,
+			_Aead:   cs.aead,
 		}
 	}
 }

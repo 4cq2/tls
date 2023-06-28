@@ -41,7 +41,7 @@ func UClient(conn net.Conn, config *Config, clientHelloID ClientHelloID) *UConn 
 		config = &Config{}
 	}
 	tlsConn := Conn{conn: conn, config: config, isClient: true}
-	handshakeState := ClientHandshakeState{C: &tlsConn, Hello: &ClientHelloMsg{}}
+	handshakeState := ClientHandshakeState{_C: &tlsConn, Hello: &ClientHelloMsg{}}
 	uconn := UConn{Conn: &tlsConn, ClientHelloID: clientHelloID, HandshakeState: handshakeState}
 	uconn.HandshakeState.uconn = &uconn
 	return &uconn
@@ -76,7 +76,7 @@ func (uconn *UConn) BuildHandshakeState() error {
 
 		uconn.HandshakeState.Hello = hello.getPublicPtr()
 		uconn.HandshakeState.State13.EcdheParams = ecdheParams
-		uconn.HandshakeState.C = uconn.Conn
+		uconn.HandshakeState._C = uconn.Conn
 	} else {
 		if !uconn.ClientHelloBuilt {
 			err := uconn.applyPresetByID(uconn.ClientHelloID)
