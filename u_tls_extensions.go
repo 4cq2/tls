@@ -25,7 +25,7 @@ type NPNExtension struct {
 
 func (e *NPNExtension) writeToUConn(uc *UConn) error {
 	uc.config.NextProtos = e.NextProtos
-	uc.HandshakeState._Hello.NextProtoNeg = true
+	uc.HandshakeState._Hello._NextProtoNeg = true
 	return nil
 }
 
@@ -79,7 +79,7 @@ type StatusRequestExtension struct {
 }
 
 func (e *StatusRequestExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello.OcspStapling = true
+	uc.HandshakeState._Hello._OcspStapling = true
 	return nil
 }
 
@@ -205,7 +205,7 @@ func (e *RenegotiationInfoExtension) writeToUConn(uc *UConn) error {
 	case RenegotiateOnceAsClient:
 		fallthrough
 	case RenegotiateFreelyAsClient:
-		uc.HandshakeState._Hello.SecureRenegotiationSupported = true
+		uc.HandshakeState._Hello._SecureRenegotiationSupported = true
 	case RenegotiateNever:
 	default:
 	}
@@ -285,7 +285,7 @@ type SCTExtension struct {
 }
 
 func (e *SCTExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello.Scts = true
+	uc.HandshakeState._Hello._Scts = true
 	return nil
 }
 
@@ -375,7 +375,7 @@ type UtlsExtendedMasterSecretExtension struct {
 // TODO: update when this extension is implemented in crypto/tls
 // but we probably won't have to enable it in Config
 func (e *UtlsExtendedMasterSecretExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello.Ems = true
+	uc.HandshakeState._Hello._Ems = true
 	return nil
 }
 
@@ -557,7 +557,7 @@ func (e *KeyShareExtension) Read(b []byte) (int, error) {
 }
 
 func (e *KeyShareExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello.KeyShares = e.KeyShares
+	uc.HandshakeState._Hello._KeyShares = e.KeyShares
 	return nil
 }
 
@@ -594,7 +594,7 @@ func (e *PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
 }
 
 func (e *PSKKeyExchangeModesExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello.PskModes = e.Modes
+	uc.HandshakeState._Hello._PskModes = e.Modes
 	return nil
 }
 

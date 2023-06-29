@@ -317,35 +317,35 @@ func (shm *serverHelloMsg) getPublicPtr() *ServerHelloMsg {
 }
 
 type ClientHelloMsg struct {
-	Raw                          []byte
-	Vers                         uint16
-	Random                       []byte
-	SessionId                    []byte
-	_CipherSuites                []uint16
-	CompressionMethods           []uint8
-	NextProtoNeg                 bool
-	ServerName                   string
-	OcspStapling                 bool
-	Scts                         bool
-	Ems                          bool // [UTLS] actually implemented due to its prevalence
-	SupportedCurves              []CurveID
-	SupportedPoints              []uint8
-	TicketSupported              bool
-	SessionTicket                []uint8
-	SupportedSignatureAlgorithms []SignatureScheme
-	SecureRenegotiation          []byte
-	SecureRenegotiationSupported bool
-	_AlpnProtocols               []string
+	_Raw                          []byte
+	Vers                          uint16
+	_Random                       []byte
+	SessionId                     []byte
+	_CipherSuites                 []uint16
+	_CompressionMethods           []uint8
+	_NextProtoNeg                 bool
+	ServerName                    string
+	_OcspStapling                 bool
+	_Scts                         bool
+	_Ems                          bool // [UTLS] actually implemented due to its prevalence
+	SupportedCurves               []CurveID
+	SupportedPoints               []uint8
+	TicketSupported               bool
+	SessionTicket                 []uint8
+	SupportedSignatureAlgorithms  []SignatureScheme
+	_SecureRenegotiation          []byte
+	_SecureRenegotiationSupported bool
+	_AlpnProtocols                []string
 
 	// 1.3
 	SupportedSignatureAlgorithmsCert []SignatureScheme
 	SupportedVersions                []uint16
-	Cookie                           []byte
-	KeyShares                        []KeyShare
-	EarlyData                        bool
-	PskModes                         []uint8
-	PskIdentities                    []pskIdentity
-	PskBinders                       [][]byte
+	_Cookie                          []byte
+	_KeyShares                       []KeyShare
+	_EarlyData                       bool
+	_PskModes                        []uint8
+	_PskIdentities                   []pskIdentity
+	_PskBinders                      [][]byte
 }
 
 func (chm *ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
@@ -353,34 +353,34 @@ func (chm *ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
 		return nil
 	} else {
 		return &clientHelloMsg{
-			raw:                          chm.Raw,
+			raw:                          chm._Raw,
 			vers:                         chm.Vers,
-			random:                       chm.Random,
+			random:                       chm._Random,
 			sessionId:                    chm.SessionId,
 			cipherSuites:                 chm._CipherSuites,
-			compressionMethods:           chm.CompressionMethods,
-			nextProtoNeg:                 chm.NextProtoNeg,
+			compressionMethods:           chm._CompressionMethods,
+			nextProtoNeg:                 chm._NextProtoNeg,
 			serverName:                   chm.ServerName,
-			ocspStapling:                 chm.OcspStapling,
-			scts:                         chm.Scts,
-			ems:                          chm.Ems,
+			ocspStapling:                 chm._OcspStapling,
+			scts:                         chm._Scts,
+			ems:                          chm._Ems,
 			supportedCurves:              chm.SupportedCurves,
 			supportedPoints:              chm.SupportedPoints,
 			ticketSupported:              chm.TicketSupported,
 			sessionTicket:                chm.SessionTicket,
 			supportedSignatureAlgorithms: chm.SupportedSignatureAlgorithms,
-			secureRenegotiation:          chm.SecureRenegotiation,
-			secureRenegotiationSupported: chm.SecureRenegotiationSupported,
+			secureRenegotiation:          chm._SecureRenegotiation,
+			secureRenegotiationSupported: chm._SecureRenegotiationSupported,
 			alpnProtocols:                chm._AlpnProtocols,
 
 			supportedSignatureAlgorithmsCert: chm.SupportedSignatureAlgorithmsCert,
 			supportedVersions:                chm.SupportedVersions,
-			cookie:                           chm.Cookie,
-			keyShares:                        KeyShares(chm.KeyShares).ToPrivate(),
-			earlyData:                        chm.EarlyData,
-			pskModes:                         chm.PskModes,
-			pskIdentities:                    chm.PskIdentities,
-			pskBinders:                       chm.PskBinders,
+			cookie:                           chm._Cookie,
+			keyShares:                        KeyShares(chm._KeyShares).ToPrivate(),
+			earlyData:                        chm._EarlyData,
+			pskModes:                         chm._PskModes,
+			pskIdentities:                    chm._PskIdentities,
+			pskBinders:                       chm._PskBinders,
 		}
 	}
 }
@@ -390,34 +390,34 @@ func (chm *clientHelloMsg) getPublicPtr() *ClientHelloMsg {
 		return nil
 	} else {
 		return &ClientHelloMsg{
-			Raw:                          chm.raw,
-			Vers:                         chm.vers,
-			Random:                       chm.random,
-			SessionId:                    chm.sessionId,
-			_CipherSuites:                chm.cipherSuites,
-			CompressionMethods:           chm.compressionMethods,
-			NextProtoNeg:                 chm.nextProtoNeg,
-			ServerName:                   chm.serverName,
-			OcspStapling:                 chm.ocspStapling,
-			Scts:                         chm.scts,
-			Ems:                          chm.ems,
-			SupportedCurves:              chm.supportedCurves,
-			SupportedPoints:              chm.supportedPoints,
-			TicketSupported:              chm.ticketSupported,
-			SessionTicket:                chm.sessionTicket,
-			SupportedSignatureAlgorithms: chm.supportedSignatureAlgorithms,
-			SecureRenegotiation:          chm.secureRenegotiation,
-			SecureRenegotiationSupported: chm.secureRenegotiationSupported,
-			_AlpnProtocols:               chm.alpnProtocols,
+			_Raw:                          chm.raw,
+			Vers:                          chm.vers,
+			_Random:                       chm.random,
+			SessionId:                     chm.sessionId,
+			_CipherSuites:                 chm.cipherSuites,
+			_CompressionMethods:           chm.compressionMethods,
+			_NextProtoNeg:                 chm.nextProtoNeg,
+			ServerName:                    chm.serverName,
+			_OcspStapling:                 chm.ocspStapling,
+			_Scts:                         chm.scts,
+			_Ems:                          chm.ems,
+			SupportedCurves:               chm.supportedCurves,
+			SupportedPoints:               chm.supportedPoints,
+			TicketSupported:               chm.ticketSupported,
+			SessionTicket:                 chm.sessionTicket,
+			SupportedSignatureAlgorithms:  chm.supportedSignatureAlgorithms,
+			_SecureRenegotiation:          chm.secureRenegotiation,
+			_SecureRenegotiationSupported: chm.secureRenegotiationSupported,
+			_AlpnProtocols:                chm.alpnProtocols,
 
 			SupportedSignatureAlgorithmsCert: chm.supportedSignatureAlgorithmsCert,
 			SupportedVersions:                chm.supportedVersions,
-			Cookie:                           chm.cookie,
-			KeyShares:                        keyShares(chm.keyShares).ToPublic(),
-			EarlyData:                        chm.earlyData,
-			PskModes:                         chm.pskModes,
-			PskIdentities:                    chm.pskIdentities,
-			PskBinders:                       chm.pskBinders,
+			_Cookie:                          chm.cookie,
+			_KeyShares:                       keyShares(chm.keyShares).ToPublic(),
+			_EarlyData:                       chm.earlyData,
+			_PskModes:                        chm.pskModes,
+			_PskIdentities:                   chm.pskIdentities,
+			_PskBinders:                      chm.pskBinders,
 		}
 	}
 }

@@ -153,8 +153,8 @@ func (uconn *UConn) SetClientRandom(r []byte) error {
 	if len(r) != 32 {
 		return errors.New("Incorrect client random length! Expected: 32, got: " + strconv.Itoa(len(r)))
 	} else {
-		uconn.HandshakeState._Hello.Random = make([]byte, 32)
-		copy(uconn.HandshakeState._Hello.Random, r)
+		uconn.HandshakeState._Hello._Random = make([]byte, 32)
+		copy(uconn.HandshakeState._Hello._Random, r)
 		return nil
 	}
 }
@@ -428,7 +428,7 @@ func (uconn *UConn) MarshalClientHello() error {
 	hello := uconn.HandshakeState._Hello
 	headerLength := 2 + 32 + 1 + len(hello.SessionId) +
 		2 + len(hello._CipherSuites)*2 +
-		1 + len(hello.CompressionMethods)
+		1 + len(hello._CompressionMethods)
 
 	extensionsLen := 0
 	var paddingExt *UtlsPaddingExtension
@@ -467,7 +467,7 @@ func (uconn *UConn) MarshalClientHello() error {
 	binary.Write(bufferedWriter, binary.BigEndian, helloLenBytes)
 	binary.Write(bufferedWriter, binary.BigEndian, hello.Vers)
 
-	binary.Write(bufferedWriter, binary.BigEndian, hello.Random)
+	binary.Write(bufferedWriter, binary.BigEndian, hello._Random)
 
 	binary.Write(bufferedWriter, binary.BigEndian, uint8(len(hello.SessionId)))
 	binary.Write(bufferedWriter, binary.BigEndian, hello.SessionId)
@@ -477,8 +477,8 @@ func (uconn *UConn) MarshalClientHello() error {
 		binary.Write(bufferedWriter, binary.BigEndian, suite)
 	}
 
-	binary.Write(bufferedWriter, binary.BigEndian, uint8(len(hello.CompressionMethods)))
-	binary.Write(bufferedWriter, binary.BigEndian, hello.CompressionMethods)
+	binary.Write(bufferedWriter, binary.BigEndian, uint8(len(hello._CompressionMethods)))
+	binary.Write(bufferedWriter, binary.BigEndian, hello._CompressionMethods)
 
 	if len(uconn.Extensions) > 0 {
 		binary.Write(bufferedWriter, binary.BigEndian, uint16(extensionsLen))
@@ -497,7 +497,7 @@ func (uconn *UConn) MarshalClientHello() error {
 			". Got: " + strconv.Itoa(helloBuffer.Len()))
 	}
 
-	hello.Raw = helloBuffer.Bytes()
+	hello._Raw = helloBuffer.Bytes()
 	return nil
 }
 

@@ -310,7 +310,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 			if err = hs.uconn.MarshalClientHello(); err != nil {
 				return err
 			}
-			hs.hello.raw = hs.uconn.HandshakeState._Hello.Raw
+			hs.hello.raw = hs.uconn.HandshakeState._Hello._Raw
 		}
 	}
 	// [UTLS SECTION ENDS]

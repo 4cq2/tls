@@ -572,10 +572,10 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 	hello := uconn.HandshakeState._Hello
 	session := uconn.HandshakeState._Session
 
-	switch len(hello.Random) {
+	switch len(hello._Random) {
 	case 0:
-		hello.Random = make([]byte, 32)
-		_, err := io.ReadFull(uconn.config.rand(), hello.Random)
+		hello._Random = make([]byte, 32)
+		_, err := io.ReadFull(uconn.config.rand(), hello._Random)
 		if err != nil {
 			return errors.New("tls: short read from Rand: " + err.Error())
 		}
@@ -583,13 +583,13 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 	// carry on
 	default:
 		return errors.New("ClientHello expected length: 32 bytes. Got: " +
-			strconv.Itoa(len(hello.Random)) + " bytes")
+			strconv.Itoa(len(hello._Random)) + " bytes")
 	}
 	if len(hello._CipherSuites) == 0 {
 		hello._CipherSuites = defaultCipherSuites()
 	}
-	if len(hello.CompressionMethods) == 0 {
-		hello.CompressionMethods = []uint8{compressionNone}
+	if len(hello._CompressionMethods) == 0 {
+		hello._CompressionMethods = []uint8{compressionNone}
 	}
 
 	// Currently, GREASE is assumed to come from BoringSSL
@@ -691,7 +691,7 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 
 	// The default golang behavior in makeClientHello always sets NextProtoNeg if NextProtos is set,
 	// but NextProtos is also used by ALPN and our spec nmay not actually have a NPN extension
-	hello.NextProtoNeg = haveNPN
+	hello._NextProtoNeg = haveNPN
 
 	return nil
 }
