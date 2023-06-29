@@ -21,7 +21,7 @@ type UConn struct {
 	*Conn
 
 	Extensions    []TLSExtension
-	ClientHelloID ClientHelloID
+	ClientHelloID _ClientHelloID
 
 	ClientHelloBuilt bool
 	HandshakeState   _ClientHandshakeState
@@ -36,7 +36,7 @@ type UConn struct {
 
 // UClient returns a new uTLS client, with behavior depending on clientHelloID.
 // Config CAN be nil, but make sure to eventually specify ServerName.
-func UClient(conn net.Conn, config *Config, clientHelloID ClientHelloID) *UConn {
+func UClient(conn net.Conn, config *Config, clientHelloID _ClientHelloID) *UConn {
 	if config == nil {
 		config = &Config{}
 	}
@@ -427,7 +427,7 @@ func (uconn *UConn) ApplyConfig() error {
 func (uconn *UConn) MarshalClientHello() error {
 	hello := uconn.HandshakeState._Hello
 	headerLength := 2 + 32 + 1 + len(hello.SessionId) +
-		2 + len(hello.CipherSuites)*2 +
+		2 + len(hello._CipherSuites)*2 +
 		1 + len(hello.CompressionMethods)
 
 	extensionsLen := 0
@@ -472,8 +472,8 @@ func (uconn *UConn) MarshalClientHello() error {
 	binary.Write(bufferedWriter, binary.BigEndian, uint8(len(hello.SessionId)))
 	binary.Write(bufferedWriter, binary.BigEndian, hello.SessionId)
 
-	binary.Write(bufferedWriter, binary.BigEndian, uint16(len(hello.CipherSuites)<<1))
-	for _, suite := range hello.CipherSuites {
+	binary.Write(bufferedWriter, binary.BigEndian, uint16(len(hello._CipherSuites)<<1))
+	for _, suite := range hello._CipherSuites {
 		binary.Write(bufferedWriter, binary.BigEndian, suite)
 	}
 

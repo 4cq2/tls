@@ -311,51 +311,51 @@ const (
 	ECDSAWithSHA1 SignatureScheme = 0x0203
 )
 
-// ClientHelloInfo contains information from a ClientHello message in order to
+// _ClientHelloInfo contains information from a ClientHello message in order to
 // guide certificate selection in the GetCertificate callback.
-type ClientHelloInfo struct {
-	// CipherSuites lists the CipherSuites supported by the client (e.g.
+type _ClientHelloInfo struct {
+	// _CipherSuites lists the _CipherSuites supported by the client (e.g.
 	// TLS_AES_128_GCM_SHA256, TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256).
-	CipherSuites []uint16
+	_CipherSuites []uint16
 
-	// ServerName indicates the name of the server requested by the client
-	// in order to support virtual hosting. ServerName is only set if the
+	// _ServerName indicates the name of the server requested by the client
+	// in order to support virtual hosting. _ServerName is only set if the
 	// client is using SNI (see RFC 4366, Section 3.1).
-	ServerName string
+	_ServerName string
 
-	// SupportedCurves lists the elliptic curves supported by the client.
-	// SupportedCurves is set only if the Supported Elliptic Curves
+	// _SupportedCurves lists the elliptic curves supported by the client.
+	// _SupportedCurves is set only if the Supported Elliptic Curves
 	// Extension is being used (see RFC 4492, Section 5.1.1).
-	SupportedCurves []CurveID
+	_SupportedCurves []CurveID
 
-	// SupportedPoints lists the point formats supported by the client.
-	// SupportedPoints is set only if the Supported Point Formats Extension
+	// _SupportedPoints lists the point formats supported by the client.
+	// _SupportedPoints is set only if the Supported Point Formats Extension
 	// is being used (see RFC 4492, Section 5.1.2).
-	SupportedPoints []uint8
+	_SupportedPoints []uint8
 
-	// SignatureSchemes lists the signature and hash schemes that the client
-	// is willing to verify. SignatureSchemes is set only if the Signature
+	// _SignatureSchemes lists the signature and hash schemes that the client
+	// is willing to verify. _SignatureSchemes is set only if the Signature
 	// Algorithms Extension is being used (see RFC 5246, Section 7.4.1.4.1).
-	SignatureSchemes []SignatureScheme
+	_SignatureSchemes []SignatureScheme
 
-	// SupportedProtos lists the application protocols supported by the client.
-	// SupportedProtos is set only if the Application-Layer Protocol
+	// _SupportedProtos lists the application protocols supported by the client.
+	// _SupportedProtos is set only if the Application-Layer Protocol
 	// Negotiation Extension is being used (see RFC 7301, Section 3.1).
 	//
 	// Servers can select a protocol by setting Config.NextProtos in a
 	// GetConfigForClient return value.
-	SupportedProtos []string
+	_SupportedProtos []string
 
-	// SupportedVersions lists the TLS versions supported by the client.
+	// _SupportedVersions lists the TLS versions supported by the client.
 	// For TLS versions less than 1.3, this is extrapolated from the max
 	// version advertised by the client, so values other than the greatest
 	// might be rejected if used.
-	SupportedVersions []uint16
+	_SupportedVersions []uint16
 
-	// Conn is the underlying net.Conn for the connection. Do not read
+	// _Conn is the underlying net._Conn for the connection. Do not read
 	// from, or write to, this connection; that will cause the TLS
 	// connection to fail.
-	Conn net.Conn
+	_Conn net.Conn
 }
 
 // _CertificateRequestInfo contains information from a server's
@@ -439,7 +439,7 @@ type Config struct {
 	// If GetCertificate is nil or returns nil, then the certificate is
 	// retrieved from NameToCertificate. If NameToCertificate is nil, the
 	// first element of Certificates will be used.
-	GetCertificate func(*ClientHelloInfo) (*_Certificate, error)
+	GetCertificate func(*_ClientHelloInfo) (*_Certificate, error)
 
 	// GetClientCertificate, if not nil, is called when a server requests a
 	// certificate from a client. If set, the contents of Certificates will
@@ -474,7 +474,7 @@ type Config struct {
 	// not in the returned config then it will be copied into the returned
 	// config before use. If neither of those cases applies then the key
 	// material from the returned config will be used for session tickets.
-	GetConfigForClient func(*ClientHelloInfo) (*Config, error)
+	GetConfigForClient func(*_ClientHelloInfo) (*Config, error)
 
 	// VerifyPeerCertificate, if not nil, is called after normal
 	// certificate verification by either a TLS client or server. It
@@ -869,9 +869,9 @@ func (c *Config) mutualVersion(isClient bool, peerVersions []uint16) (uint16, bo
 
 // getCertificate returns the best certificate for the given ClientHelloInfo,
 // defaulting to the first element of c.Certificates.
-func (c *Config) getCertificate(clientHello *ClientHelloInfo) (*_Certificate, error) {
+func (c *Config) getCertificate(clientHello *_ClientHelloInfo) (*_Certificate, error) {
 	if c.GetCertificate != nil &&
-		(len(c.Certificates) == 0 || len(clientHello.ServerName) > 0) {
+		(len(c.Certificates) == 0 || len(clientHello._ServerName) > 0) {
 		cert, err := c.GetCertificate(clientHello)
 		if cert != nil || err != nil {
 			return cert, err
@@ -887,7 +887,7 @@ func (c *Config) getCertificate(clientHello *ClientHelloInfo) (*_Certificate, er
 		return &c.Certificates[0], nil
 	}
 
-	name := strings.ToLower(clientHello.ServerName)
+	name := strings.ToLower(clientHello._ServerName)
 	for len(name) > 0 && name[len(name)-1] == '.' {
 		name = name[:len(name)-1]
 	}

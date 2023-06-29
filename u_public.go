@@ -321,7 +321,7 @@ type ClientHelloMsg struct {
 	Vers                         uint16
 	Random                       []byte
 	SessionId                    []byte
-	CipherSuites                 []uint16
+	_CipherSuites                []uint16
 	CompressionMethods           []uint8
 	NextProtoNeg                 bool
 	ServerName                   string
@@ -335,7 +335,7 @@ type ClientHelloMsg struct {
 	SupportedSignatureAlgorithms []SignatureScheme
 	SecureRenegotiation          []byte
 	SecureRenegotiationSupported bool
-	AlpnProtocols                []string
+	_AlpnProtocols               []string
 
 	// 1.3
 	SupportedSignatureAlgorithmsCert []SignatureScheme
@@ -357,7 +357,7 @@ func (chm *ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
 			vers:                         chm.Vers,
 			random:                       chm.Random,
 			sessionId:                    chm.SessionId,
-			cipherSuites:                 chm.CipherSuites,
+			cipherSuites:                 chm._CipherSuites,
 			compressionMethods:           chm.CompressionMethods,
 			nextProtoNeg:                 chm.NextProtoNeg,
 			serverName:                   chm.ServerName,
@@ -371,7 +371,7 @@ func (chm *ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
 			supportedSignatureAlgorithms: chm.SupportedSignatureAlgorithms,
 			secureRenegotiation:          chm.SecureRenegotiation,
 			secureRenegotiationSupported: chm.SecureRenegotiationSupported,
-			alpnProtocols:                chm.AlpnProtocols,
+			alpnProtocols:                chm._AlpnProtocols,
 
 			supportedSignatureAlgorithmsCert: chm.SupportedSignatureAlgorithmsCert,
 			supportedVersions:                chm.SupportedVersions,
@@ -394,7 +394,7 @@ func (chm *clientHelloMsg) getPublicPtr() *ClientHelloMsg {
 			Vers:                         chm.vers,
 			Random:                       chm.random,
 			SessionId:                    chm.sessionId,
-			CipherSuites:                 chm.cipherSuites,
+			_CipherSuites:                chm.cipherSuites,
 			CompressionMethods:           chm.compressionMethods,
 			NextProtoNeg:                 chm.nextProtoNeg,
 			ServerName:                   chm.serverName,
@@ -408,7 +408,7 @@ func (chm *clientHelloMsg) getPublicPtr() *ClientHelloMsg {
 			SupportedSignatureAlgorithms: chm.supportedSignatureAlgorithms,
 			SecureRenegotiation:          chm.secureRenegotiation,
 			SecureRenegotiationSupported: chm.secureRenegotiationSupported,
-			AlpnProtocols:                chm.alpnProtocols,
+			_AlpnProtocols:               chm.alpnProtocols,
 
 			SupportedSignatureAlgorithmsCert: chm.supportedSignatureAlgorithmsCert,
 			SupportedVersions:                chm.supportedVersions,

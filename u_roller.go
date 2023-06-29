@@ -7,9 +7,9 @@ import (
 )
 
 type Roller struct {
-	HelloIDs            []ClientHelloID
+	HelloIDs            []_ClientHelloID
 	HelloIDMu           sync.Mutex
-	WorkingHelloID      *ClientHelloID
+	WorkingHelloID      *_ClientHelloID
 	TcpDialTimeout      time.Duration
 	TlsHandshakeTimeout time.Duration
 	r                   *prng
@@ -30,7 +30,7 @@ func NewRoller() (*Roller, error) {
 	tlsHandshakeTimeoutInc = 11 + tlsHandshakeTimeoutInc
 
 	return &Roller{
-		HelloIDs: []ClientHelloID{
+		HelloIDs: []_ClientHelloID{
 			HelloChrome_Auto,
 			HelloFirefox_Auto,
 			HelloIOS_Auto,
@@ -51,7 +51,7 @@ func NewRoller() (*Roller, error) {
 //	Dial("tcp4", "google.com:443", "google.com")
 //	Dial("tcp", "10.23.144.22:443", "mywebserver.org")
 func (c *Roller) Dial(network, addr, serverName string) (*UConn, error) {
-	helloIDs := make([]ClientHelloID, len(c.HelloIDs))
+	helloIDs := make([]_ClientHelloID, len(c.HelloIDs))
 	copy(helloIDs, c.HelloIDs)
 	c.r.rand.Shuffle(len(c.HelloIDs), func(i, j int) {
 		helloIDs[i], helloIDs[j] = helloIDs[j], helloIDs[i]
@@ -71,7 +71,7 @@ func (c *Roller) Dial(network, addr, serverName string) (*UConn, error) {
 			}
 		}
 		if !helloIDFound {
-			helloIDs = append([]ClientHelloID{*workingHelloId}, helloIDs...)
+			helloIDs = append([]_ClientHelloID{*workingHelloId}, helloIDs...)
 		}
 	}
 

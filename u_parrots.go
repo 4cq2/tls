@@ -14,7 +14,7 @@ import (
 	"strconv"
 )
 
-func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
+func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 	switch id {
 	case HelloChrome_58, HelloChrome_62:
 		return ClientHelloSpec{
@@ -525,11 +525,11 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 			},
 		}, nil
 	default:
-		return ClientHelloSpec{}, errors.New("ClientHello ID " + id.Str() + " is unknown")
+		return ClientHelloSpec{}, errors.New("ClientHello ID " + id._Str() + " is unknown")
 	}
 }
 
-func (uconn *UConn) applyPresetByID(id ClientHelloID) (err error) {
+func (uconn *UConn) applyPresetByID(id _ClientHelloID) (err error) {
 	var spec ClientHelloSpec
 	uconn.ClientHelloID = id
 	// choose/generate the spec
@@ -585,8 +585,8 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 		return errors.New("ClientHello expected length: 32 bytes. Got: " +
 			strconv.Itoa(len(hello.Random)) + " bytes")
 	}
-	if len(hello.CipherSuites) == 0 {
-		hello.CipherSuites = defaultCipherSuites()
+	if len(hello._CipherSuites) == 0 {
+		hello._CipherSuites = defaultCipherSuites()
 	}
 	if len(hello.CompressionMethods) == 0 {
 		hello.CompressionMethods = []uint8{compressionNone}
@@ -606,11 +606,11 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 		uconn.greaseSeed[ssl_grease_extension2] ^= 0x1010
 	}
 
-	hello.CipherSuites = make([]uint16, len(p.CipherSuites))
-	copy(hello.CipherSuites, p.CipherSuites)
-	for i := range hello.CipherSuites {
-		if hello.CipherSuites[i] == GREASE_PLACEHOLDER {
-			hello.CipherSuites[i] = GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_cipher)
+	hello._CipherSuites = make([]uint16, len(p.CipherSuites))
+	copy(hello._CipherSuites, p.CipherSuites)
+	for i := range hello._CipherSuites {
+		if hello._CipherSuites[i] == GREASE_PLACEHOLDER {
+			hello._CipherSuites[i] = GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_cipher)
 		}
 	}
 	uconn.GetSessionID = p.GetSessionID
@@ -699,15 +699,15 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 	p := ClientHelloSpec{}
 
-	if uconn.ClientHelloID.Seed == nil {
+	if uconn.ClientHelloID._Seed == nil {
 		seed, err := NewPRNGSeed()
 		if err != nil {
 			return p, err
 		}
-		uconn.ClientHelloID.Seed = seed
+		uconn.ClientHelloID._Seed = seed
 	}
 
-	r, err := newPRNGWithSeed(uconn.ClientHelloID.Seed)
+	r, err := newPRNGWithSeed(uconn.ClientHelloID._Seed)
 	if err != nil {
 		return p, err
 	}

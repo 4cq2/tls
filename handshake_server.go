@@ -802,20 +802,20 @@ func (hs *serverHandshakeState) setCipherSuite(id uint16, supportedCipherSuites 
 	return false
 }
 
-func clientHelloInfo(c *Conn, clientHello *clientHelloMsg) *ClientHelloInfo {
+func clientHelloInfo(c *Conn, clientHello *clientHelloMsg) *_ClientHelloInfo {
 	supportedVersions := clientHello.supportedVersions
 	if len(clientHello.supportedVersions) == 0 {
 		supportedVersions = supportedVersionsFromMax(clientHello.vers)
 	}
 
-	return &ClientHelloInfo{
-		CipherSuites:      clientHello.cipherSuites,
-		ServerName:        clientHello.serverName,
-		SupportedCurves:   clientHello.supportedCurves,
-		SupportedPoints:   clientHello.supportedPoints,
-		SignatureSchemes:  clientHello.supportedSignatureAlgorithms,
-		SupportedProtos:   clientHello.alpnProtocols,
-		SupportedVersions: supportedVersions,
-		Conn:              c.conn,
+	return &_ClientHelloInfo{
+		_CipherSuites:      clientHello.cipherSuites,
+		_ServerName:        clientHello.serverName,
+		_SupportedCurves:   clientHello.supportedCurves,
+		_SupportedPoints:   clientHello.supportedPoints,
+		_SignatureSchemes:  clientHello.supportedSignatureAlgorithms,
+		_SupportedProtos:   clientHello.alpnProtocols,
+		_SupportedVersions: supportedVersions,
+		_Conn:              c.conn,
 	}
 }
