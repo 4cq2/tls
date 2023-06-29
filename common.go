@@ -268,13 +268,13 @@ type ClientSessionState struct {
 	ageAdd uint32    // Random obfuscation factor for sending the ticket age
 }
 
-// ClientSessionCache is a cache of ClientSessionState objects that can be used
-// by a client to resume a TLS session with a given server. ClientSessionCache
+// _ClientSessionCache is a cache of ClientSessionState objects that can be used
+// by a client to resume a TLS session with a given server. _ClientSessionCache
 // implementations should expect to be called concurrently from different
 // goroutines. Up to TLS 1.2, only ticket-based resumption is supported, not
 // SessionID-based resumption. In TLS 1.3 they were merged into PSK modes, which
 // are supported via this interface.
-type ClientSessionCache interface {
+type _ClientSessionCache interface {
 	// Get searches for a ClientSessionState associated with the given key.
 	// On return, ok is true if one was found.
 	Get(sessionKey string) (session *ClientSessionState, ok bool)
@@ -551,7 +551,7 @@ type Config struct {
 
 	// ClientSessionCache is a cache of ClientSessionState entries for TLS
 	// session resumption. It is only used by clients.
-	ClientSessionCache ClientSessionCache
+	ClientSessionCache _ClientSessionCache
 
 	// MinVersion contains the minimum SSL/TLS version that is acceptable.
 	// If zero, then TLS 1.0 is taken as the minimum.
@@ -1005,7 +1005,7 @@ type lruSessionCacheEntry struct {
 // NewLRUClientSessionCache returns a ClientSessionCache with the given
 // capacity that uses an LRU strategy. If capacity is < 1, a default capacity
 // is used instead.
-func NewLRUClientSessionCache(capacity int) ClientSessionCache {
+func NewLRUClientSessionCache(capacity int) _ClientSessionCache {
 	const defaultSessionCacheCapacity = 64
 
 	if capacity < 1 {

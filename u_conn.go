@@ -141,7 +141,7 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 }
 
 // If you want session tickets to be reused - use same cache on following connections
-func (uconn *UConn) SetSessionCache(cache ClientSessionCache) {
+func (uconn *UConn) SetSessionCache(cache _ClientSessionCache) {
 	uconn.config.ClientSessionCache = cache
 	uconn.HandshakeState._Hello._TicketSupported = true
 }
