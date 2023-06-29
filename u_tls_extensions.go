@@ -305,7 +305,7 @@ func (e *SCTExtension) Read(b []byte) (int, error) {
 }
 
 type SessionTicketExtension struct {
-	Session *ClientSessionState
+	Session *_ClientSessionState
 }
 
 func (e *SessionTicketExtension) writeToUConn(uc *UConn) error {

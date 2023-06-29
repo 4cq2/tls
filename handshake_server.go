@@ -365,11 +365,11 @@ func (hs *serverHandshakeState) checkForResumption() bool {
 	}
 
 	sessionHasClientCerts := len(hs.sessionState.certificates) != 0
-	needClientCerts := requiresClientCert(c.config.ClientAuth)
+	needClientCerts := requiresClientCert(c.config._ClientAuth)
 	if needClientCerts && !sessionHasClientCerts {
 		return false
 	}
-	if sessionHasClientCerts && c.config.ClientAuth == NoClientCert {
+	if sessionHasClientCerts && c.config._ClientAuth == NoClientCert {
 		return false
 	}
 
@@ -414,7 +414,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 	hs.hello.cipherSuite = hs.suite.id
 
 	hs.finishedHash = newFinishedHash(hs.c.vers, hs.suite)
-	if c.config.ClientAuth == NoClientCert {
+	if c.config._ClientAuth == NoClientCert {
 		// No need to keep a full record of the handshake if client
 		// certificates won't be used.
 		hs.finishedHash.discardHandshakeBuffer()
@@ -454,7 +454,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 		}
 	}
 
-	if c.config.ClientAuth >= RequestClientCert {
+	if c.config._ClientAuth >= RequestClientCert {
 		// Request a client certificate
 		certReq := new(certificateRequestMsg)
 		certReq.certificateTypes = []byte{
@@ -471,8 +471,8 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 		// to our request. When we know the CAs we trust, then
 		// we can send them down, so that the client can choose
 		// an appropriate certificate to give to us.
-		if c.config.ClientCAs != nil {
-			certReq.certificateAuthorities = c.config.ClientCAs.Subjects()
+		if c.config._ClientCAs != nil {
+			certReq.certificateAuthorities = c.config._ClientCAs.Subjects()
 		}
 		hs.finishedHash.Write(certReq.marshal())
 		if _, err := c.writeRecord(recordTypeHandshake, certReq.marshal()); err != nil {
@@ -499,7 +499,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 
 	// If we requested a client certificate, then the client must send a
 	// certificate message, even if it's empty.
-	if c.config.ClientAuth >= RequestClientCert {
+	if c.config._ClientAuth >= RequestClientCert {
 		certMsg, ok := msg.(*certificateMsg)
 		if !ok {
 			c.sendAlert(alertUnexpectedMessage)
@@ -716,14 +716,14 @@ func (c *Conn) processCertsFromClient(certificate _Certificate) error {
 		}
 	}
 
-	if len(certs) == 0 && requiresClientCert(c.config.ClientAuth) {
+	if len(certs) == 0 && requiresClientCert(c.config._ClientAuth) {
 		c.sendAlert(alertBadCertificate)
 		return errors.New("tls: client didn't provide a certificate")
 	}
 
-	if c.config.ClientAuth >= VerifyClientCertIfGiven && len(certs) > 0 {
+	if c.config._ClientAuth >= VerifyClientCertIfGiven && len(certs) > 0 {
 		opts := x509.VerifyOptions{
-			Roots:         c.config.ClientCAs,
+			Roots:         c.config._ClientCAs,
 			CurrentTime:   c.config.time(),
 			Intermediates: x509.NewCertPool(),
 			KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},

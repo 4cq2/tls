@@ -77,7 +77,7 @@ func NewListener(inner net.Listener, config *Config) net.Listener {
 // The configuration config must be non-nil and must include
 // at least one certificate or else set GetCertificate.
 func Listen(network, laddr string, config *Config) (net.Listener, error) {
-	if config == nil || (len(config.Certificates) == 0 && config.GetCertificate == nil) {
+	if config == nil || (len(config._Certificates) == 0 && config.GetCertificate == nil) {
 		return nil, errors.New("tls: neither Certificates nor GetCertificate set in Config")
 	}
 	l, err := net.Listen(network, laddr)

@@ -251,9 +251,9 @@ func requiresClientCert(c _ClientAuthType) bool {
 	}
 }
 
-// ClientSessionState contains the state needed by clients to resume TLS
+// _ClientSessionState contains the state needed by clients to resume TLS
 // sessions.
-type ClientSessionState struct {
+type _ClientSessionState struct {
 	sessionTicket      []uint8               // Encrypted ticket used for session resumption with server
 	vers               uint16                // SSL/TLS version negotiated for the session
 	cipherSuite        uint16                // Ciphersuite negotiated for the session
@@ -277,13 +277,13 @@ type ClientSessionState struct {
 type _ClientSessionCache interface {
 	// Get searches for a ClientSessionState associated with the given key.
 	// On return, ok is true if one was found.
-	Get(sessionKey string) (session *ClientSessionState, ok bool)
+	Get(sessionKey string) (session *_ClientSessionState, ok bool)
 
 	// Put adds the ClientSessionState to the cache with the given key. It might
 	// get called multiple times in a connection if a TLS 1.3 server provides
 	// more than one session ticket. If called with a nil *ClientSessionState,
 	// it should remove the cache entry.
-	Put(sessionKey string, cs *ClientSessionState)
+	Put(sessionKey string, cs *_ClientSessionState)
 }
 
 // SignatureScheme identifies a signature algorithm supported by TLS. See
@@ -417,12 +417,12 @@ type Config struct {
 	// If Time is nil, TLS uses time.Now.
 	Time func() time.Time
 
-	// Certificates contains one or more certificate chains to present to
+	// _Certificates contains one or more certificate chains to present to
 	// the other side of the connection. Server configurations must include
 	// at least one certificate or else set GetCertificate. Clients doing
-	// client-authentication may set either Certificates or
+	// client-authentication may set either _Certificates or
 	// GetClientCertificate.
-	Certificates []_Certificate
+	_Certificates []_Certificate
 
 	// NameToCertificate maps from a certificate name to an element of
 	// Certificates. Note that a certificate name can be of the form
@@ -504,14 +504,14 @@ type Config struct {
 	// an IP address.
 	ServerName string
 
-	// ClientAuth determines the server's policy for
+	// _ClientAuth determines the server's policy for
 	// TLS Client Authentication. The default is NoClientCert.
-	ClientAuth _ClientAuthType
+	_ClientAuth _ClientAuthType
 
-	// ClientCAs defines the set of root certificate authorities
+	// _ClientCAs defines the set of root certificate authorities
 	// that servers use if required to verify a client certificate
 	// by the policy in ClientAuth.
-	ClientCAs *x509.CertPool
+	_ClientCAs *x509.CertPool
 
 	// InsecureSkipVerify controls whether a client verifies the
 	// server's certificate chain and host name.
@@ -521,12 +521,12 @@ type Config struct {
 	// This should be used only for testing.
 	InsecureSkipVerify bool
 
-	// CipherSuites is a list of supported cipher suites for TLS versions up to
-	// TLS 1.2. If CipherSuites is nil, a default list of secure cipher suites
+	// _CipherSuites is a list of supported cipher suites for TLS versions up to
+	// TLS 1.2. If _CipherSuites is nil, a default list of secure cipher suites
 	// is used, with a preference order based on hardware performance. The
 	// default cipher suites might change over Go versions. Note that TLS 1.3
 	// ciphersuites are not configurable.
-	CipherSuites []uint16
+	_CipherSuites []uint16
 
 	// PreferServerCipherSuites controls whether the server selects the
 	// client's most preferred ciphersuite, or the server's most preferred
@@ -549,9 +549,9 @@ type Config struct {
 	// connections using that key might be compromised.
 	SessionTicketKey [32]byte
 
-	// ClientSessionCache is a cache of ClientSessionState entries for TLS
+	// _ClientSessionCache is a cache of ClientSessionState entries for TLS
 	// session resumption. It is only used by clients.
-	ClientSessionCache _ClientSessionCache
+	_ClientSessionCache _ClientSessionCache
 
 	// MinVersion contains the minimum SSL/TLS version that is acceptable.
 	// If zero, then TLS 1.0 is taken as the minimum.
@@ -640,7 +640,7 @@ func (c *Config) Clone() *Config {
 	return &Config{
 		Rand:                        c.Rand,
 		Time:                        c.Time,
-		Certificates:                c.Certificates,
+		_Certificates:               c._Certificates,
 		NameToCertificate:           c.NameToCertificate,
 		GetCertificate:              c.GetCertificate,
 		GetClientCertificate:        c.GetClientCertificate,
@@ -649,14 +649,14 @@ func (c *Config) Clone() *Config {
 		RootCAs:                     c.RootCAs,
 		NextProtos:                  c.NextProtos,
 		ServerName:                  c.ServerName,
-		ClientAuth:                  c.ClientAuth,
-		ClientCAs:                   c.ClientCAs,
+		_ClientAuth:                 c._ClientAuth,
+		_ClientCAs:                  c._ClientCAs,
 		InsecureSkipVerify:          c.InsecureSkipVerify,
-		CipherSuites:                c.CipherSuites,
+		_CipherSuites:               c._CipherSuites,
 		PreferServerCipherSuites:    c.PreferServerCipherSuites,
 		SessionTicketsDisabled:      c.SessionTicketsDisabled,
 		SessionTicketKey:            c.SessionTicketKey,
-		ClientSessionCache:          c.ClientSessionCache,
+		_ClientSessionCache:         c._ClientSessionCache,
 		MinVersion:                  c.MinVersion,
 		MaxVersion:                  c.MaxVersion,
 		CurvePreferences:            c.CurvePreferences,
@@ -747,7 +747,7 @@ func (c *Config) time() time.Time {
 }
 
 func (c *Config) cipherSuites() []uint16 {
-	s := c.CipherSuites
+	s := c._CipherSuites
 	if s == nil {
 		s = defaultCipherSuites()
 	}
@@ -871,20 +871,20 @@ func (c *Config) mutualVersion(isClient bool, peerVersions []uint16) (uint16, bo
 // defaulting to the first element of c.Certificates.
 func (c *Config) getCertificate(clientHello *_ClientHelloInfo) (*_Certificate, error) {
 	if c.GetCertificate != nil &&
-		(len(c.Certificates) == 0 || len(clientHello._ServerName) > 0) {
+		(len(c._Certificates) == 0 || len(clientHello._ServerName) > 0) {
 		cert, err := c.GetCertificate(clientHello)
 		if cert != nil || err != nil {
 			return cert, err
 		}
 	}
 
-	if len(c.Certificates) == 0 {
+	if len(c._Certificates) == 0 {
 		return nil, errors.New("tls: no certificates configured")
 	}
 
-	if len(c.Certificates) == 1 || c.NameToCertificate == nil {
+	if len(c._Certificates) == 1 || c.NameToCertificate == nil {
 		// There's only one choice, so no point doing any work.
-		return &c.Certificates[0], nil
+		return &c._Certificates[0], nil
 	}
 
 	name := strings.ToLower(clientHello._ServerName)
@@ -908,31 +908,7 @@ func (c *Config) getCertificate(clientHello *_ClientHelloInfo) (*_Certificate, e
 	}
 
 	// If nothing matches, return the first certificate.
-	return &c.Certificates[0], nil
-}
-
-// BuildNameToCertificate parses c.Certificates and builds c.NameToCertificate
-// from the CommonName and SubjectAlternateName fields of each of the leaf
-// certificates.
-func (c *Config) BuildNameToCertificate() {
-	c.NameToCertificate = make(map[string]*_Certificate)
-	for i := range c.Certificates {
-		cert := &c.Certificates[i]
-		x509Cert := cert._Leaf
-		if x509Cert == nil {
-			var err error
-			x509Cert, err = x509.ParseCertificate(cert._Certificate[0])
-			if err != nil {
-				continue
-			}
-		}
-		if len(x509Cert.Subject.CommonName) > 0 {
-			c.NameToCertificate[x509Cert.Subject.CommonName] = cert
-		}
-		for _, san := range x509Cert.DNSNames {
-			c.NameToCertificate[san] = cert
-		}
-	}
+	return &c._Certificates[0], nil
 }
 
 const (
@@ -999,7 +975,7 @@ type lruSessionCache struct {
 
 type lruSessionCacheEntry struct {
 	sessionKey string
-	state      *ClientSessionState
+	state      *_ClientSessionState
 }
 
 // NewLRUClientSessionCache returns a ClientSessionCache with the given
@@ -1020,7 +996,7 @@ func NewLRUClientSessionCache(capacity int) _ClientSessionCache {
 
 // Put adds the provided (sessionKey, cs) pair to the cache. If cs is nil, the entry
 // corresponding to sessionKey is removed from the cache instead.
-func (c *lruSessionCache) Put(sessionKey string, cs *ClientSessionState) {
+func (c *lruSessionCache) Put(sessionKey string, cs *_ClientSessionState) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -1053,7 +1029,7 @@ func (c *lruSessionCache) Put(sessionKey string, cs *ClientSessionState) {
 
 // Get returns the ClientSessionState value associated with a given key. It
 // returns (nil, false) if no value is found.
-func (c *lruSessionCache) Get(sessionKey string) (*ClientSessionState, bool) {
+func (c *lruSessionCache) Get(sessionKey string) (*_ClientSessionState, bool) {
 	c.Lock()
 	defer c.Unlock()
 

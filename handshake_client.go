@@ -28,7 +28,7 @@ type clientHandshakeState struct {
 	suite        *cipherSuite
 	finishedHash finishedHash
 	masterSecret []byte
-	session      *ClientSessionState
+	session      *_ClientSessionState
 
 	uconn *UConn // [UTLS]
 }
@@ -160,7 +160,7 @@ func (c *Conn) clientHandshake() (err error) {
 			// does require servers to abort on invalid binders, so we need to
 			// delete tickets to recover from a corrupted PSK.
 			if err != nil {
-				c.config.ClientSessionCache.Put(cacheKey, nil)
+				c.config._ClientSessionCache.Put(cacheKey, nil)
 			}
 		}()
 	}
@@ -213,15 +213,15 @@ func (c *Conn) clientHandshake() (err error) {
 	// If we had a successful handshake and hs.session is different from
 	// the one already cached - cache a new one.
 	if cacheKey != "" && hs.session != nil && session != hs.session {
-		c.config.ClientSessionCache.Put(cacheKey, hs.session)
+		c.config._ClientSessionCache.Put(cacheKey, hs.session)
 	}
 
 	return nil
 }
 
 func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
-	session *ClientSessionState, earlySecret, binderKey []byte) {
-	if c.config.SessionTicketsDisabled || c.config.ClientSessionCache == nil {
+	session *_ClientSessionState, earlySecret, binderKey []byte) {
+	if c.config.SessionTicketsDisabled || c.config._ClientSessionCache == nil {
 		return "", nil, nil, nil
 	}
 
@@ -242,7 +242,7 @@ func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 
 	// Try to resume a previously negotiated TLS session, if available.
 	cacheKey = clientSessionCacheKey(c.conn.RemoteAddr(), c.config)
-	session, ok := c.config.ClientSessionCache.Get(cacheKey)
+	session, ok := c.config._ClientSessionCache.Get(cacheKey)
 	if !ok || session == nil {
 		return cacheKey, nil, nil, nil
 	}
@@ -270,7 +270,7 @@ func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 		serverCert := session.serverCertificates[0]
 		if c.config.time().After(serverCert.NotAfter) {
 			// Expired certificate, delete the entry.
-			c.config.ClientSessionCache.Put(cacheKey, nil)
+			c.config._ClientSessionCache.Put(cacheKey, nil)
 			return cacheKey, nil, nil, nil
 		}
 		if err := serverCert.VerifyHostname(c.config.ServerName); err != nil {
@@ -291,7 +291,7 @@ func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 
 	// Check that the session ticket is not expired.
 	if c.config.time().After(session.useBy) {
-		c.config.ClientSessionCache.Put(cacheKey, nil)
+		c.config._ClientSessionCache.Put(cacheKey, nil)
 		return cacheKey, nil, nil, nil
 	}
 
@@ -371,7 +371,7 @@ func (hs *clientHandshakeState) handshake() error {
 	// Otherwise, in a full handshake, if we don't have any certificates
 	// configured then we will never send a CertificateVerify message and
 	// thus no signatures are needed in that case either.
-	if isResume || (len(c.config.Certificates) == 0 && c.config.GetClientCertificate == nil) {
+	if isResume || (len(c.config._Certificates) == 0 && c.config.GetClientCertificate == nil) {
 		hs.finishedHash.discardHandshakeBuffer()
 	}
 
@@ -770,7 +770,7 @@ func (hs *clientHandshakeState) readSessionTicket() error {
 	}
 	hs.finishedHash.Write(sessionTicketMsg.marshal())
 
-	hs.session = &ClientSessionState{
+	hs.session = &_ClientSessionState{
 		sessionTicket:      sessionTicketMsg.ticket,
 		vers:               c.vers,
 		cipherSuite:        hs.suite.id,
@@ -933,7 +933,7 @@ func (c *Conn) getClientCertificate(cri *_CertificateRequestInfo) (*_Certificate
 	// We need to search our list of client certs for one
 	// where SignatureAlgorithm is acceptable to the server and the
 	// Issuer is in AcceptableCAs.
-	for i, chain := range c.config.Certificates {
+	for i, chain := range c.config._Certificates {
 		sigOK := false
 		for _, alg := range signatureSchemesForCertificate(c.vers, &chain) {
 			if isSupportedSignatureAlgorithm(alg, cri._SignatureSchemes) {

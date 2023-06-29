@@ -281,11 +281,11 @@ func (hs *serverHandshakeStateTLS13) checkForResumption() error {
 		// them over in the session ticket. Ensure the presence of client certs
 		// in the ticket is consistent with the configured requirements.
 		sessionHasClientCerts := len(sessionState.certificate._Certificate) != 0
-		needClientCerts := requiresClientCert(c.config.ClientAuth)
+		needClientCerts := requiresClientCert(c.config._ClientAuth)
 		if needClientCerts && !sessionHasClientCerts {
 			continue
 		}
-		if sessionHasClientCerts && c.config.ClientAuth == NoClientCert {
+		if sessionHasClientCerts && c.config._ClientAuth == NoClientCert {
 			continue
 		}
 
@@ -579,7 +579,7 @@ func (hs *serverHandshakeStateTLS13) sendServerParameters() error {
 }
 
 func (hs *serverHandshakeStateTLS13) requestClientCert() bool {
-	return hs.c.config.ClientAuth >= RequestClientCert && !hs.usingPSK
+	return hs.c.config._ClientAuth >= RequestClientCert && !hs.usingPSK
 }
 
 func (hs *serverHandshakeStateTLS13) sendServerCertificate() error {
@@ -596,8 +596,8 @@ func (hs *serverHandshakeStateTLS13) sendServerCertificate() error {
 		certReq.ocspStapling = true
 		certReq.scts = true
 		certReq.supportedSignatureAlgorithms = supportedSignatureAlgorithms
-		if c.config.ClientCAs != nil {
-			certReq.certificateAuthorities = c.config.ClientCAs.Subjects()
+		if c.config._ClientCAs != nil {
+			certReq.certificateAuthorities = c.config._ClientCAs.Subjects()
 		}
 
 		hs.transcript.Write(certReq.marshal())

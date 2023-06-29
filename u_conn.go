@@ -105,7 +105,7 @@ func (uconn *UConn) BuildHandshakeState() error {
 // If session is nil, the body of session ticket extension will be unset,
 // but the extension itself still MAY be present for mimicking purposes.
 // Session tickets to be reused - use same cache on following connections.
-func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
+func (uconn *UConn) SetSessionState(session *_ClientSessionState) error {
 	uconn.HandshakeState._Session = session
 	var sessionTicket []uint8
 	if session != nil {
@@ -121,9 +121,9 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 		}
 		st.Session = session
 		if session != nil {
-			if len(session.SessionTicket()) > 0 {
+			if len(session._SessionTicket()) > 0 {
 				if uconn.GetSessionID != nil {
-					sid := uconn.GetSessionID(session.SessionTicket())
+					sid := uconn.GetSessionID(session._SessionTicket())
 					uconn.HandshakeState._Hello._SessionId = sid[:]
 					return nil
 				}
@@ -142,7 +142,7 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 
 // If you want session tickets to be reused - use same cache on following connections
 func (uconn *UConn) SetSessionCache(cache _ClientSessionCache) {
-	uconn.config.ClientSessionCache = cache
+	uconn.config._ClientSessionCache = cache
 	uconn.HandshakeState._Hello._TicketSupported = true
 }
 
@@ -347,7 +347,7 @@ func (c *UConn) clientHandshake() (err error) {
 			// does require servers to abort on invalid binders, so we need to
 			// delete tickets to recover from a corrupted PSK.
 			if err != nil {
-				c.config.ClientSessionCache.Put(cacheKey, nil)
+				c.config._ClientSessionCache.Put(cacheKey, nil)
 			}
 		}()
 	}
@@ -409,7 +409,7 @@ func (c *UConn) clientHandshake() (err error) {
 	// If we had a successful handshake and hs.session is different from
 	// the one already cached - cache a new one.
 	if cacheKey != "" && hs12.session != nil && session != hs12.session {
-		c.config.ClientSessionCache.Put(cacheKey, hs12.session)
+		c.config._ClientSessionCache.Put(cacheKey, hs12.session)
 	}
 	return nil
 }

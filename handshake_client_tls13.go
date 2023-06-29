@@ -22,7 +22,7 @@ type clientHandshakeStateTLS13 struct {
 	hello       *clientHelloMsg
 	ecdheParams ecdheParameters
 
-	session     *ClientSessionState
+	session     *_ClientSessionState
 	earlySecret []byte
 	binderKey   []byte
 
@@ -682,7 +682,7 @@ func (hs *clientHandshakeStateTLS13) sendClientFinished() error {
 
 	c.out.setTrafficSecret(hs.suite, hs.trafficSecret)
 
-	if !c.config.SessionTicketsDisabled && c.config.ClientSessionCache != nil {
+	if !c.config.SessionTicketsDisabled && c.config._ClientSessionCache != nil {
 		c.resumptionSecret = hs.suite.deriveSecret(hs.masterSecret,
 			resumptionLabel, hs.transcript)
 	}
@@ -696,7 +696,7 @@ func (c *Conn) handleNewSessionTicket(msg *newSessionTicketMsgTLS13) error {
 		return errors.New("tls: received new session ticket from a client")
 	}
 
-	if c.config.SessionTicketsDisabled || c.config.ClientSessionCache == nil {
+	if c.config.SessionTicketsDisabled || c.config._ClientSessionCache == nil {
 		return nil
 	}
 
@@ -719,7 +719,7 @@ func (c *Conn) handleNewSessionTicket(msg *newSessionTicketMsgTLS13) error {
 	// to do the least amount of work on NewSessionTicket messages before we
 	// know if the ticket will be used. Forward secrecy of resumed connections
 	// is guaranteed by the requirement for pskModeDHE.
-	session := &ClientSessionState{
+	session := &_ClientSessionState{
 		sessionTicket:      msg.label,
 		vers:               c.vers,
 		cipherSuite:        c.cipherSuite,
@@ -733,7 +733,7 @@ func (c *Conn) handleNewSessionTicket(msg *newSessionTicketMsgTLS13) error {
 	}
 
 	cacheKey := clientSessionCacheKey(c.conn.RemoteAddr(), c.config)
-	c.config.ClientSessionCache.Put(cacheKey, session)
+	c.config._ClientSessionCache.Put(cacheKey, session)
 
 	return nil
 }

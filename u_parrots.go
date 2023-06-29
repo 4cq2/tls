@@ -639,9 +639,9 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 			}
 			grease_extensions_seen += 1
 		case *SessionTicketExtension:
-			if session == nil && uconn.config.ClientSessionCache != nil {
+			if session == nil && uconn.config._ClientSessionCache != nil {
 				cacheKey := clientSessionCacheKey(uconn.RemoteAddr(), uconn.config)
-				session, _ = uconn.config.ClientSessionCache.Get(cacheKey)
+				session, _ = uconn.config._ClientSessionCache.Get(cacheKey)
 				// TODO: use uconn.loadSession(hello.getPrivateObj()) to support TLS 1.3 PSK-style resumption
 			}
 			err := uconn.SetSessionState(session)
