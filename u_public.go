@@ -22,7 +22,7 @@ import (
 type _ClientHandshakeState struct {
 	_C            *Conn
 	_ServerHello  *ServerHelloMsg
-	_Hello        *ClientHelloMsg
+	_Hello        *_ClientHelloMsg
 	_MasterSecret []byte
 	_Session      *ClientSessionState
 
@@ -316,65 +316,65 @@ func (shm *serverHelloMsg) getPublicPtr() *ServerHelloMsg {
 	}
 }
 
-type ClientHelloMsg struct {
+type _ClientHelloMsg struct {
 	_Raw                          []byte
-	Vers                          uint16
+	_Vers                         uint16
 	_Random                       []byte
-	SessionId                     []byte
+	_SessionId                    []byte
 	_CipherSuites                 []uint16
 	_CompressionMethods           []uint8
 	_NextProtoNeg                 bool
-	ServerName                    string
+	_ServerName                   string
 	_OcspStapling                 bool
 	_Scts                         bool
 	_Ems                          bool // [UTLS] actually implemented due to its prevalence
-	SupportedCurves               []CurveID
-	SupportedPoints               []uint8
-	TicketSupported               bool
-	SessionTicket                 []uint8
-	SupportedSignatureAlgorithms  []SignatureScheme
+	_SupportedCurves              []CurveID
+	_SupportedPoints              []uint8
+	_TicketSupported              bool
+	_SessionTicket                []uint8
+	_SupportedSignatureAlgorithms []SignatureScheme
 	_SecureRenegotiation          []byte
 	_SecureRenegotiationSupported bool
 	_AlpnProtocols                []string
 
 	// 1.3
-	SupportedSignatureAlgorithmsCert []SignatureScheme
-	SupportedVersions                []uint16
-	_Cookie                          []byte
-	_KeyShares                       []KeyShare
-	_EarlyData                       bool
-	_PskModes                        []uint8
-	_PskIdentities                   []pskIdentity
-	_PskBinders                      [][]byte
+	_SupportedSignatureAlgorithmsCert []SignatureScheme
+	_SupportedVersions                []uint16
+	_Cookie                           []byte
+	_KeyShares                        []KeyShare
+	_EarlyData                        bool
+	_PskModes                         []uint8
+	_PskIdentities                    []pskIdentity
+	_PskBinders                       [][]byte
 }
 
-func (chm *ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
+func (chm *_ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
 	if chm == nil {
 		return nil
 	} else {
 		return &clientHelloMsg{
 			raw:                          chm._Raw,
-			vers:                         chm.Vers,
+			vers:                         chm._Vers,
 			random:                       chm._Random,
-			sessionId:                    chm.SessionId,
+			sessionId:                    chm._SessionId,
 			cipherSuites:                 chm._CipherSuites,
 			compressionMethods:           chm._CompressionMethods,
 			nextProtoNeg:                 chm._NextProtoNeg,
-			serverName:                   chm.ServerName,
+			serverName:                   chm._ServerName,
 			ocspStapling:                 chm._OcspStapling,
 			scts:                         chm._Scts,
 			ems:                          chm._Ems,
-			supportedCurves:              chm.SupportedCurves,
-			supportedPoints:              chm.SupportedPoints,
-			ticketSupported:              chm.TicketSupported,
-			sessionTicket:                chm.SessionTicket,
-			supportedSignatureAlgorithms: chm.SupportedSignatureAlgorithms,
+			supportedCurves:              chm._SupportedCurves,
+			supportedPoints:              chm._SupportedPoints,
+			ticketSupported:              chm._TicketSupported,
+			sessionTicket:                chm._SessionTicket,
+			supportedSignatureAlgorithms: chm._SupportedSignatureAlgorithms,
 			secureRenegotiation:          chm._SecureRenegotiation,
 			secureRenegotiationSupported: chm._SecureRenegotiationSupported,
 			alpnProtocols:                chm._AlpnProtocols,
 
-			supportedSignatureAlgorithmsCert: chm.SupportedSignatureAlgorithmsCert,
-			supportedVersions:                chm.SupportedVersions,
+			supportedSignatureAlgorithmsCert: chm._SupportedSignatureAlgorithmsCert,
+			supportedVersions:                chm._SupportedVersions,
 			cookie:                           chm._Cookie,
 			keyShares:                        KeyShares(chm._KeyShares).ToPrivate(),
 			earlyData:                        chm._EarlyData,
@@ -385,46 +385,46 @@ func (chm *ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
 	}
 }
 
-func (chm *clientHelloMsg) getPublicPtr() *ClientHelloMsg {
+func (chm *clientHelloMsg) getPublicPtr() *_ClientHelloMsg {
 	if chm == nil {
 		return nil
 	} else {
-		return &ClientHelloMsg{
+		return &_ClientHelloMsg{
 			_Raw:                          chm.raw,
-			Vers:                          chm.vers,
+			_Vers:                         chm.vers,
 			_Random:                       chm.random,
-			SessionId:                     chm.sessionId,
+			_SessionId:                    chm.sessionId,
 			_CipherSuites:                 chm.cipherSuites,
 			_CompressionMethods:           chm.compressionMethods,
 			_NextProtoNeg:                 chm.nextProtoNeg,
-			ServerName:                    chm.serverName,
+			_ServerName:                   chm.serverName,
 			_OcspStapling:                 chm.ocspStapling,
 			_Scts:                         chm.scts,
 			_Ems:                          chm.ems,
-			SupportedCurves:               chm.supportedCurves,
-			SupportedPoints:               chm.supportedPoints,
-			TicketSupported:               chm.ticketSupported,
-			SessionTicket:                 chm.sessionTicket,
-			SupportedSignatureAlgorithms:  chm.supportedSignatureAlgorithms,
+			_SupportedCurves:              chm.supportedCurves,
+			_SupportedPoints:              chm.supportedPoints,
+			_TicketSupported:              chm.ticketSupported,
+			_SessionTicket:                chm.sessionTicket,
+			_SupportedSignatureAlgorithms: chm.supportedSignatureAlgorithms,
 			_SecureRenegotiation:          chm.secureRenegotiation,
 			_SecureRenegotiationSupported: chm.secureRenegotiationSupported,
 			_AlpnProtocols:                chm.alpnProtocols,
 
-			SupportedSignatureAlgorithmsCert: chm.supportedSignatureAlgorithmsCert,
-			SupportedVersions:                chm.supportedVersions,
-			_Cookie:                          chm.cookie,
-			_KeyShares:                       keyShares(chm.keyShares).ToPublic(),
-			_EarlyData:                       chm.earlyData,
-			_PskModes:                        chm.pskModes,
-			_PskIdentities:                   chm.pskIdentities,
-			_PskBinders:                      chm.pskBinders,
+			_SupportedSignatureAlgorithmsCert: chm.supportedSignatureAlgorithmsCert,
+			_SupportedVersions:                chm.supportedVersions,
+			_Cookie:                           chm.cookie,
+			_KeyShares:                        keyShares(chm.keyShares).ToPublic(),
+			_EarlyData:                        chm.earlyData,
+			_PskModes:                         chm.pskModes,
+			_PskIdentities:                    chm.pskIdentities,
+			_PskBinders:                       chm.pskBinders,
 		}
 	}
 }
 
 // UnmarshalClientHello allows external code to parse raw client hellos.
 // It returns nil on failure.
-func UnmarshalClientHello(data []byte) *ClientHelloMsg {
+func UnmarshalClientHello(data []byte) *_ClientHelloMsg {
 	m := &clientHelloMsg{}
 	if m.unmarshal(data) {
 		return m.getPublicPtr()

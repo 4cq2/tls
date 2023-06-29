@@ -49,7 +49,7 @@ type SNIExtension struct {
 
 func (e *SNIExtension) writeToUConn(uc *UConn) error {
 	uc.config.ServerName = e.ServerName
-	uc.HandshakeState._Hello.ServerName = e.ServerName
+	uc.HandshakeState._Hello._ServerName = e.ServerName
 	return nil
 }
 
@@ -107,7 +107,7 @@ type SupportedCurvesExtension struct {
 
 func (e *SupportedCurvesExtension) writeToUConn(uc *UConn) error {
 	uc.config.CurvePreferences = e.Curves
-	uc.HandshakeState._Hello.SupportedCurves = e.Curves
+	uc.HandshakeState._Hello._SupportedCurves = e.Curves
 	return nil
 }
 
@@ -138,7 +138,7 @@ type SupportedPointsExtension struct {
 }
 
 func (e *SupportedPointsExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello.SupportedPoints = e.SupportedPoints
+	uc.HandshakeState._Hello._SupportedPoints = e.SupportedPoints
 	return nil
 }
 
@@ -167,7 +167,7 @@ type SignatureAlgorithmsExtension struct {
 }
 
 func (e *SignatureAlgorithmsExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello.SupportedSignatureAlgorithms = e.SupportedSignatureAlgorithms
+	uc.HandshakeState._Hello._SupportedSignatureAlgorithms = e.SupportedSignatureAlgorithms
 	return nil
 }
 
@@ -311,7 +311,7 @@ type SessionTicketExtension struct {
 func (e *SessionTicketExtension) writeToUConn(uc *UConn) error {
 	if e.Session != nil {
 		uc.HandshakeState._Session = e.Session
-		uc.HandshakeState._Hello.SessionTicket = e.Session.sessionTicket
+		uc.HandshakeState._Hello._SessionTicket = e.Session.sessionTicket
 	}
 	return nil
 }
@@ -603,7 +603,7 @@ type SupportedVersionsExtension struct {
 }
 
 func (e *SupportedVersionsExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello.SupportedVersions = e.Versions
+	uc.HandshakeState._Hello._SupportedVersions = e.Versions
 	return nil
 }
 

@@ -20,7 +20,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 		return ClientHelloSpec{
 			TLSVersMax: VersionTLS12,
 			TLSVersMin: VersionTLS10,
-			CipherSuites: []uint16{
+			_CipherSuites: []uint16{
 				GREASE_PLACEHOLDER,
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
@@ -36,7 +36,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
-			CompressionMethods: []byte{compressionNone},
+			_CompressionMethods: []byte{compressionNone},
 			Extensions: []TLSExtension{
 				&UtlsGREASEExtension{},
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
@@ -70,7 +70,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 		return ClientHelloSpec{
 			TLSVersMin: VersionTLS10,
 			TLSVersMax: VersionTLS13,
-			CipherSuites: []uint16{
+			_CipherSuites: []uint16{
 				GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
 				TLS_AES_256_GCM_SHA384,
@@ -89,7 +89,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
-			CompressionMethods: []byte{
+			_CompressionMethods: []byte{
 				compressionNone,
 			},
 			Extensions: []TLSExtension{
@@ -140,7 +140,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 		}, nil
 	case HelloChrome_72:
 		return ClientHelloSpec{
-			CipherSuites: []uint16{
+			_CipherSuites: []uint16{
 				GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
 				TLS_AES_256_GCM_SHA384,
@@ -159,7 +159,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
-			CompressionMethods: []byte{
+			_CompressionMethods: []byte{
 				0x00, // compressionNone
 			},
 			Extensions: []TLSExtension{
@@ -214,7 +214,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 		}, nil
 	case HelloChrome_83:
 		return ClientHelloSpec{
-			CipherSuites: []uint16{
+			_CipherSuites: []uint16{
 				GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
 				TLS_AES_256_GCM_SHA384,
@@ -232,7 +232,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 			},
-			CompressionMethods: []byte{
+			_CompressionMethods: []byte{
 				0x00, // compressionNone
 			},
 			Extensions: []TLSExtension{
@@ -288,7 +288,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 		return ClientHelloSpec{
 			TLSVersMax: VersionTLS12,
 			TLSVersMin: VersionTLS10,
-			CipherSuites: []uint16{
+			_CipherSuites: []uint16{
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
@@ -305,7 +305,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
-			CompressionMethods: []byte{compressionNone},
+			_CompressionMethods: []byte{compressionNone},
 			Extensions: []TLSExtension{
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
@@ -336,7 +336,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 		return ClientHelloSpec{
 			TLSVersMin: VersionTLS10,
 			TLSVersMax: VersionTLS13,
-			CipherSuites: []uint16{
+			_CipherSuites: []uint16{
 				TLS_AES_128_GCM_SHA256,
 				TLS_CHACHA20_POLY1305_SHA256,
 				TLS_AES_256_GCM_SHA384,
@@ -356,7 +356,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
-			CompressionMethods: []byte{
+			_CompressionMethods: []byte{
 				compressionNone,
 			},
 			Extensions: []TLSExtension{
@@ -407,7 +407,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 		return ClientHelloSpec{
 			TLSVersMax: VersionTLS12,
 			TLSVersMin: VersionTLS10,
-			CipherSuites: []uint16{
+			_CipherSuites: []uint16{
 				TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				DISABLED_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
@@ -429,7 +429,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 			},
-			CompressionMethods: []byte{
+			_CompressionMethods: []byte{
 				compressionNone,
 			},
 			Extensions: []TLSExtension{
@@ -464,7 +464,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 		}, nil
 	case HelloIOS_12_1:
 		return ClientHelloSpec{
-			CipherSuites: []uint16{
+			_CipherSuites: []uint16{
 				TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				DISABLED_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
@@ -489,7 +489,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
-			CompressionMethods: []byte{
+			_CompressionMethods: []byte{
 				compressionNone,
 			},
 			Extensions: []TLSExtension{
@@ -606,8 +606,8 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 		uconn.greaseSeed[ssl_grease_extension2] ^= 0x1010
 	}
 
-	hello._CipherSuites = make([]uint16, len(p.CipherSuites))
-	copy(hello._CipherSuites, p.CipherSuites)
+	hello._CipherSuites = make([]uint16, len(p._CipherSuites))
+	copy(hello._CipherSuites, p._CipherSuites)
 	for i := range hello._CipherSuites {
 		if hello._CipherSuites[i] == GREASE_PLACEHOLDER {
 			hello._CipherSuites[i] = GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_cipher)
@@ -730,8 +730,8 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 		return p, fmt.Errorf("using non-randomized ClientHelloID %v to generate randomized spec", id._Client)
 	}
 
-	p.CipherSuites = make([]uint16, len(defaultCipherSuites()))
-	copy(p.CipherSuites, defaultCipherSuites())
+	p._CipherSuites = make([]uint16, len(defaultCipherSuites()))
+	copy(p._CipherSuites, defaultCipherSuites())
 	shuffledSuites, err := shuffledCiphers(r)
 	if err != nil {
 		return p, err
@@ -755,7 +755,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 		p.TLSVersMax = VersionTLS12
 	}
 
-	p.CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
+	p._CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
 
 	sni := SNIExtension{uconn.config.ServerName}
 	sessionTicket := SessionTicketExtension{Session: uconn.HandshakeState._Session}

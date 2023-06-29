@@ -41,7 +41,7 @@ func UClient(conn net.Conn, config *Config, clientHelloID _ClientHelloID) *UConn
 		config = &Config{}
 	}
 	tlsConn := Conn{conn: conn, config: config, isClient: true}
-	handshakeState := _ClientHandshakeState{_C: &tlsConn, _Hello: &ClientHelloMsg{}}
+	handshakeState := _ClientHandshakeState{_C: &tlsConn, _Hello: &_ClientHelloMsg{}}
 	uconn := UConn{Conn: &tlsConn, ClientHelloID: clientHelloID, HandshakeState: handshakeState}
 	uconn.HandshakeState.uconn = &uconn
 	return &uconn
@@ -111,8 +111,8 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 	if session != nil {
 		sessionTicket = session.sessionTicket
 	}
-	uconn.HandshakeState._Hello.TicketSupported = true
-	uconn.HandshakeState._Hello.SessionTicket = sessionTicket
+	uconn.HandshakeState._Hello._TicketSupported = true
+	uconn.HandshakeState._Hello._SessionTicket = sessionTicket
 
 	for _, ext := range uconn.Extensions {
 		st, ok := ext.(*SessionTicketExtension)
@@ -124,7 +124,7 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 			if len(session.SessionTicket()) > 0 {
 				if uconn.GetSessionID != nil {
 					sid := uconn.GetSessionID(session.SessionTicket())
-					uconn.HandshakeState._Hello.SessionId = sid[:]
+					uconn.HandshakeState._Hello._SessionId = sid[:]
 					return nil
 				}
 			}
@@ -133,7 +133,7 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 			if err != nil {
 				return err
 			}
-			uconn.HandshakeState._Hello.SessionId = sessionID[:]
+			uconn.HandshakeState._Hello._SessionId = sessionID[:]
 		}
 		return nil
 	}
@@ -143,7 +143,7 @@ func (uconn *UConn) SetSessionState(session *ClientSessionState) error {
 // If you want session tickets to be reused - use same cache on following connections
 func (uconn *UConn) SetSessionCache(cache ClientSessionCache) {
 	uconn.config.ClientSessionCache = cache
-	uconn.HandshakeState._Hello.TicketSupported = true
+	uconn.HandshakeState._Hello._TicketSupported = true
 }
 
 // SetClientRandom sets client random explicitly.
@@ -426,7 +426,7 @@ func (uconn *UConn) ApplyConfig() error {
 
 func (uconn *UConn) MarshalClientHello() error {
 	hello := uconn.HandshakeState._Hello
-	headerLength := 2 + 32 + 1 + len(hello.SessionId) +
+	headerLength := 2 + 32 + 1 + len(hello._SessionId) +
 		2 + len(hello._CipherSuites)*2 +
 		1 + len(hello._CompressionMethods)
 
@@ -465,12 +465,12 @@ func (uconn *UConn) MarshalClientHello() error {
 	binary.Write(bufferedWriter, binary.BigEndian, typeClientHello)
 	helloLenBytes := []byte{byte(helloLen >> 16), byte(helloLen >> 8), byte(helloLen)} // poor man's uint24
 	binary.Write(bufferedWriter, binary.BigEndian, helloLenBytes)
-	binary.Write(bufferedWriter, binary.BigEndian, hello.Vers)
+	binary.Write(bufferedWriter, binary.BigEndian, hello._Vers)
 
 	binary.Write(bufferedWriter, binary.BigEndian, hello._Random)
 
-	binary.Write(bufferedWriter, binary.BigEndian, uint8(len(hello.SessionId)))
-	binary.Write(bufferedWriter, binary.BigEndian, hello.SessionId)
+	binary.Write(bufferedWriter, binary.BigEndian, uint8(len(hello._SessionId)))
+	binary.Write(bufferedWriter, binary.BigEndian, hello._SessionId)
 
 	binary.Write(bufferedWriter, binary.BigEndian, uint16(len(hello._CipherSuites)<<1))
 	for _, suite := range hello._CipherSuites {
@@ -572,7 +572,7 @@ func (uconn *UConn) SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []T
 		return fmt.Errorf("uTLS does not support 0x%X as max version", maxTLSVers)
 	}
 
-	uconn.HandshakeState._Hello.SupportedVersions = makeSupportedVersions(minTLSVers, maxTLSVers)
+	uconn.HandshakeState._Hello._SupportedVersions = makeSupportedVersions(minTLSVers, maxTLSVers)
 	uconn.config.MinVersion = minTLSVers
 	uconn.config.MaxVersion = maxTLSVers
 

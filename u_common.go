@@ -36,7 +36,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 var Android_API_26 = ClientHelloSpec{
-	CipherSuites: []uint16{
+	_CipherSuites: []uint16{
 		TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 		TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 		TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
@@ -239,9 +239,9 @@ const (
 )
 
 type ClientHelloSpec struct {
-	CipherSuites       []uint16       // nil => default
-	CompressionMethods []uint8        // nil => no compression
-	Extensions         []TLSExtension // nil => no extensions
+	_CipherSuites       []uint16       // nil => default
+	_CompressionMethods []uint8        // nil => no compression
+	Extensions          []TLSExtension // nil => no extensions
 
 	TLSVersMin uint16 // [1.0-1.3] default: parse from .Extensions, if SupportedVersions ext is not present => 1.0
 	TLSVersMax uint16 // [1.2-1.3] default: parse from .Extensions, if SupportedVersions ext is not present => 1.2

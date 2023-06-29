@@ -87,9 +87,9 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 		}
 		cipherSuites = append(cipherSuites, unGREASEUint16(suite))
 	}
-	clientHelloSpec.CipherSuites = cipherSuites
+	clientHelloSpec._CipherSuites = cipherSuites
 
-	if !readUint8LengthPrefixed(&s, &clientHelloSpec.CompressionMethods) {
+	if !readUint8LengthPrefixed(&s, &clientHelloSpec._CompressionMethods) {
 		return nil, errors.New("unable to read compression methods")
 	}
 
