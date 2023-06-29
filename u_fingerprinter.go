@@ -40,8 +40,8 @@ type Fingerprinter struct {
 // as well as the handshake type/length/version header
 // https://tools.ietf.org/html/rfc5246#section-6.2
 // https://tools.ietf.org/html/rfc5246#section-7.4
-func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, error) {
-	clientHelloSpec := &ClientHelloSpec{}
+func (f *Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec, error) {
+	clientHelloSpec := &_ClientHelloSpec{}
 	s := cryptobyte.String(data)
 
 	var contentType uint8
@@ -67,8 +67,8 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 		return nil, errors.New("handshake message is not a ClientHello")
 	}
 
-	clientHelloSpec.TLSVersMin = recordVersion
-	clientHelloSpec.TLSVersMax = handshakeVersion
+	clientHelloSpec._TLSVersMin = recordVersion
+	clientHelloSpec._TLSVersMax = handshakeVersion
 
 	var ignoredSessionID cryptobyte.String
 	if !s.ReadUint8LengthPrefixed(&ignoredSessionID) {
@@ -138,12 +138,12 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 					return nil, errors.New("SNI value may not include a trailing dot")
 				}
 
-				clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &SNIExtension{})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SNIExtension{})
 
 			}
 		case extensionNextProtoNeg:
 			// draft-agl-tls-nextprotoneg-04
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &NPNExtension{})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &NPNExtension{})
 
 		case extensionStatusRequest:
 			// RFC 4366, Section 3.6
@@ -156,7 +156,7 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 			}
 
 			if statusType == statusTypeOCSP {
-				clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &StatusRequestExtension{})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &StatusRequestExtension{})
 			} else {
 				return nil, errors.New("status request extension statusType is not statusTypeOCSP")
 			}
@@ -175,7 +175,7 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 				}
 				curves = append(curves, CurveID(unGREASEUint16(curve)))
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &SupportedCurvesExtension{curves})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SupportedCurvesExtension{curves})
 
 		case extensionSupportedPoints:
 			// RFC 4492, Section 5.1.2
@@ -184,11 +184,11 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 				len(supportedPoints) == 0 {
 				return nil, errors.New("unable to read supported points extension data")
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &SupportedPointsExtension{supportedPoints})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SupportedPointsExtension{supportedPoints})
 
 		case extensionSessionTicket:
 			// RFC 5077, Section 3.2
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &SessionTicketExtension{})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SessionTicketExtension{})
 
 		case extensionSignatureAlgorithms:
 			// RFC 5246, Section 7.4.1.4.1
@@ -205,19 +205,19 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 				supportedSignatureAlgorithms = append(
 					supportedSignatureAlgorithms, SignatureScheme(sigAndAlg))
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &SignatureAlgorithmsExtension{supportedSignatureAlgorithms})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SignatureAlgorithmsExtension{supportedSignatureAlgorithms})
 
 		case extensionSignatureAlgorithmsCert:
 			// RFC 8446, Section 4.2.3
 			if f.AllowBluntMimicry {
-				clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &GenericExtension{extension, extData})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &GenericExtension{extension, extData})
 			} else {
 				return nil, errors.New("unsupported extension SignatureAlgorithmsCert")
 			}
 
 		case extensionRenegotiationInfo:
 			// RFC 5746, Section 3.2
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &RenegotiationInfoExtension{RenegotiateOnceAsClient})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &RenegotiationInfoExtension{RenegotiateOnceAsClient})
 
 		case extensionALPN:
 			// RFC 7301, Section 3.1
@@ -234,11 +234,11 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 				alpnProtocols = append(alpnProtocols, string(proto))
 
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &ALPNExtension{alpnProtocols})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &ALPNExtension{alpnProtocols})
 
 		case extensionSCT:
 			// RFC 6962, Section 3.3.1
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &SCTExtension{})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SCTExtension{})
 
 		case extensionSupportedVersions:
 			// RFC 8446, Section 4.2.1
@@ -254,10 +254,10 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 				}
 				supportedVersions = append(supportedVersions, unGREASEUint16(vers))
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &SupportedVersionsExtension{supportedVersions})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SupportedVersionsExtension{supportedVersions})
 			// If SupportedVersionsExtension is present, use that instead of record+handshake versions
-			clientHelloSpec.TLSVersMin = 0
-			clientHelloSpec.TLSVersMax = 0
+			clientHelloSpec._TLSVersMin = 0
+			clientHelloSpec._TLSVersMax = 0
 
 		case extensionKeyShare:
 			// RFC 8446, Section 4.2.8
@@ -282,7 +282,7 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 				}
 				keyShares = append(keyShares, ks)
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &KeyShareExtension{keyShares})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &KeyShareExtension{keyShares})
 
 		case extensionPSKModes:
 			// RFC 8446, Section 4.2.9
@@ -294,22 +294,22 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 			if !readUint8LengthPrefixed(&extData, &pskModes) {
 				return nil, errors.New("unable to read PSK extension data")
 			}
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &PSKKeyExchangeModesExtension{pskModes})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &PSKKeyExchangeModesExtension{pskModes})
 
 		case utlsExtensionExtendedMasterSecret:
 			// https://tools.ietf.org/html/rfc7627
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsExtendedMasterSecretExtension{})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsExtendedMasterSecretExtension{})
 
 		case utlsExtensionPadding:
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle})
 
 		case fakeExtensionChannelID, fakeCertCompressionAlgs, fakeRecordSizeLimit:
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &GenericExtension{extension, extData})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &GenericExtension{extension, extData})
 
 		case extensionPreSharedKey:
 			// RFC 8446, Section 4.2.11
 			if f.KeepPSK {
-				clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &GenericExtension{extension, extData})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &GenericExtension{extension, extData})
 			} else {
 				return nil, errors.New("unsupported extension PreSharedKey")
 			}
@@ -317,7 +317,7 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 		case extensionCookie:
 			// RFC 8446, Section 4.2.2
 			if f.AllowBluntMimicry {
-				clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &GenericExtension{extension, extData})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &GenericExtension{extension, extData})
 			} else {
 				return nil, errors.New("unsupported extension Cookie")
 			}
@@ -325,16 +325,16 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 		case extensionEarlyData:
 			// RFC 8446, Section 4.2.10
 			if f.AllowBluntMimicry {
-				clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &GenericExtension{extension, extData})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &GenericExtension{extension, extData})
 			} else {
 				return nil, errors.New("unsupported extension EarlyData")
 			}
 
 		default:
 			if isGREASEUint16(extension) {
-				clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsGREASEExtension{unGREASEUint16(extension), extData})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsGREASEExtension{unGREASEUint16(extension), extData})
 			} else if f.AllowBluntMimicry {
-				clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &GenericExtension{extension, extData})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &GenericExtension{extension, extData})
 			} else {
 				return nil, fmt.Errorf("unsupported extension %#x", extension)
 			}
@@ -345,14 +345,14 @@ func (f *Fingerprinter) FingerprintClientHello(data []byte) (*ClientHelloSpec, e
 
 	if f.AlwaysAddPadding {
 		alreadyHasPadding := false
-		for _, ext := range clientHelloSpec.Extensions {
+		for _, ext := range clientHelloSpec._Extensions {
 			if _, ok := ext.(*UtlsPaddingExtension); ok {
 				alreadyHasPadding = true
 				break
 			}
 		}
 		if !alreadyHasPadding {
-			clientHelloSpec.Extensions = append(clientHelloSpec.Extensions, &UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle})
 		}
 	}
 

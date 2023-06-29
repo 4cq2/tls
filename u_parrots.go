@@ -14,12 +14,12 @@ import (
 	"strconv"
 )
 
-func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
+func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 	switch id {
 	case HelloChrome_58, HelloChrome_62:
-		return ClientHelloSpec{
-			TLSVersMax: VersionTLS12,
-			TLSVersMin: VersionTLS10,
+		return _ClientHelloSpec{
+			_TLSVersMax: VersionTLS12,
+			_TLSVersMin: VersionTLS10,
 			_CipherSuites: []uint16{
 				GREASE_PLACEHOLDER,
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
@@ -37,7 +37,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
 			_CompressionMethods: []byte{compressionNone},
-			Extensions: []TLSExtension{
+			_Extensions: []TLSExtension{
 				&UtlsGREASEExtension{},
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
 				&SNIExtension{},
@@ -64,12 +64,12 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
-			GetSessionID: sha256.Sum256,
+			_GetSessionID: sha256.Sum256,
 		}, nil
 	case HelloChrome_70:
-		return ClientHelloSpec{
-			TLSVersMin: VersionTLS10,
-			TLSVersMax: VersionTLS13,
+		return _ClientHelloSpec{
+			_TLSVersMin: VersionTLS10,
+			_TLSVersMax: VersionTLS13,
 			_CipherSuites: []uint16{
 				GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
@@ -92,7 +92,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			_CompressionMethods: []byte{
 				compressionNone,
 			},
-			Extensions: []TLSExtension{
+			_Extensions: []TLSExtension{
 				&UtlsGREASEExtension{},
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
 				&SNIExtension{},
@@ -139,7 +139,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			},
 		}, nil
 	case HelloChrome_72:
-		return ClientHelloSpec{
+		return _ClientHelloSpec{
 			_CipherSuites: []uint16{
 				GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
@@ -162,7 +162,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			_CompressionMethods: []byte{
 				0x00, // compressionNone
 			},
-			Extensions: []TLSExtension{
+			_Extensions: []TLSExtension{
 				&UtlsGREASEExtension{},
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
@@ -213,7 +213,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			},
 		}, nil
 	case HelloChrome_83:
-		return ClientHelloSpec{
+		return _ClientHelloSpec{
 			_CipherSuites: []uint16{
 				GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
@@ -235,7 +235,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			_CompressionMethods: []byte{
 				0x00, // compressionNone
 			},
-			Extensions: []TLSExtension{
+			_Extensions: []TLSExtension{
 				&UtlsGREASEExtension{},
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
@@ -285,9 +285,9 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			},
 		}, nil
 	case HelloFirefox_55, HelloFirefox_56:
-		return ClientHelloSpec{
-			TLSVersMax: VersionTLS12,
-			TLSVersMin: VersionTLS10,
+		return _ClientHelloSpec{
+			_TLSVersMax: VersionTLS12,
+			_TLSVersMin: VersionTLS10,
 			_CipherSuites: []uint16{
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
@@ -306,7 +306,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
 			_CompressionMethods: []byte{compressionNone},
-			Extensions: []TLSExtension{
+			_Extensions: []TLSExtension{
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
@@ -330,12 +330,12 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
-			GetSessionID: nil,
+			_GetSessionID: nil,
 		}, nil
 	case HelloFirefox_63, HelloFirefox_65:
-		return ClientHelloSpec{
-			TLSVersMin: VersionTLS10,
-			TLSVersMax: VersionTLS13,
+		return _ClientHelloSpec{
+			_TLSVersMin: VersionTLS10,
+			_TLSVersMax: VersionTLS13,
 			_CipherSuites: []uint16{
 				TLS_AES_128_GCM_SHA256,
 				TLS_CHACHA20_POLY1305_SHA256,
@@ -359,7 +359,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			_CompressionMethods: []byte{
 				compressionNone,
 			},
-			Extensions: []TLSExtension{
+			_Extensions: []TLSExtension{
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
@@ -404,9 +404,9 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			}}, nil
 	case HelloIOS_11_1:
-		return ClientHelloSpec{
-			TLSVersMax: VersionTLS12,
-			TLSVersMin: VersionTLS10,
+		return _ClientHelloSpec{
+			_TLSVersMax: VersionTLS12,
+			_TLSVersMin: VersionTLS10,
 			_CipherSuites: []uint16{
 				TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
@@ -432,7 +432,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			_CompressionMethods: []byte{
 				compressionNone,
 			},
-			Extensions: []TLSExtension{
+			_Extensions: []TLSExtension{
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
@@ -463,7 +463,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			},
 		}, nil
 	case HelloIOS_12_1:
-		return ClientHelloSpec{
+		return _ClientHelloSpec{
 			_CipherSuites: []uint16{
 				TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
@@ -492,7 +492,7 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			_CompressionMethods: []byte{
 				compressionNone,
 			},
-			Extensions: []TLSExtension{
+			_Extensions: []TLSExtension{
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
@@ -525,12 +525,12 @@ func utlsIdToSpec(id _ClientHelloID) (ClientHelloSpec, error) {
 			},
 		}, nil
 	default:
-		return ClientHelloSpec{}, errors.New("ClientHello ID " + id._Str() + " is unknown")
+		return _ClientHelloSpec{}, errors.New("ClientHello ID " + id._Str() + " is unknown")
 	}
 }
 
 func (uconn *UConn) applyPresetByID(id _ClientHelloID) (err error) {
-	var spec ClientHelloSpec
+	var spec _ClientHelloSpec
 	uconn.ClientHelloID = id
 	// choose/generate the spec
 	switch id._Client {
@@ -555,10 +555,10 @@ func (uconn *UConn) applyPresetByID(id _ClientHelloID) (err error) {
 // ApplyPreset should only be used in conjunction with HelloCustom to apply custom specs.
 // Fields of TLSExtensions that are slices/pointers are shared across different connections with
 // same ClientHelloSpec. It is advised to use different specs and avoid any shared state.
-func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
+func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 	var err error
 
-	err = uconn.SetTLSVers(p.TLSVersMin, p.TLSVersMax, p.Extensions)
+	err = uconn.SetTLSVers(p._TLSVersMin, p._TLSVersMax, p._Extensions)
 	if err != nil {
 		return err
 	}
@@ -613,9 +613,9 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 			hello._CipherSuites[i] = GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_cipher)
 		}
 	}
-	uconn.GetSessionID = p.GetSessionID
-	uconn.Extensions = make([]TLSExtension, len(p.Extensions))
-	copy(uconn.Extensions, p.Extensions)
+	uconn.GetSessionID = p._GetSessionID
+	uconn.Extensions = make([]TLSExtension, len(p._Extensions))
+	copy(uconn.Extensions, p._Extensions)
 
 	// Check whether NPN extension actually exists
 	var haveNPN bool
@@ -696,8 +696,8 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 	return nil
 }
 
-func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
-	p := ClientHelloSpec{}
+func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
+	p := _ClientHelloSpec{}
 
 	if uconn.ClientHelloID._Seed == nil {
 		seed, err := NewPRNGSeed()
@@ -738,8 +738,8 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 	}
 
 	if r.FlipWeightedCoin(0.4) {
-		p.TLSVersMin = VersionTLS10
-		p.TLSVersMax = VersionTLS13
+		p._TLSVersMin = VersionTLS10
+		p._TLSVersMax = VersionTLS13
 		tls13ciphers := make([]uint16, len(defaultCipherSuitesTLS13()))
 		copy(tls13ciphers, defaultCipherSuitesTLS13())
 		r.rand.Shuffle(len(tls13ciphers), func(i, j int) {
@@ -751,8 +751,8 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 		// TLS 1.3 forbids RC4 in any configurations
 		shuffledSuites = removeRC4Ciphers(shuffledSuites)
 	} else {
-		p.TLSVersMin = VersionTLS10
-		p.TLSVersMax = VersionTLS12
+		p._TLSVersMin = VersionTLS10
+		p._TLSVersMax = VersionTLS12
 	}
 
 	p._CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
@@ -775,7 +775,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 	if r.FlipWeightedCoin(0.59) {
 		sigAndHashAlgos = append(sigAndHashAlgos, ECDSAWithP521AndSHA512)
 	}
-	if r.FlipWeightedCoin(0.51) || p.TLSVersMax == VersionTLS13 {
+	if r.FlipWeightedCoin(0.51) || p._TLSVersMax == VersionTLS13 {
 		// https://tools.ietf.org/html/rfc8446 says "...RSASSA-PSS (which is mandatory in TLS 1.3)..."
 		sigAndHashAlgos = append(sigAndHashAlgos, PSSWithSHA256)
 		if r.FlipWeightedCoin(0.9) {
@@ -796,7 +796,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 	points := SupportedPointsExtension{SupportedPoints: []byte{pointFormatUncompressed}}
 
 	curveIDs := []CurveID{}
-	if r.FlipWeightedCoin(0.71) || p.TLSVersMax == VersionTLS13 {
+	if r.FlipWeightedCoin(0.71) || p._TLSVersMax == VersionTLS13 {
 		curveIDs = append(curveIDs, X25519)
 	}
 	curveIDs = append(curveIDs, CurveP256, CurveP384)
@@ -809,7 +809,7 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 	padding := UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle}
 	reneg := RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient}
 
-	p.Extensions = []TLSExtension{
+	p._Extensions = []TLSExtension{
 		&sni,
 		&sessionTicket,
 		&sigAndHash,
@@ -823,27 +823,27 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 			uconn.config.NextProtos = []string{"h2", "http/1.1"}
 		}
 		alpn := ALPNExtension{_AlpnProtocols: uconn.config.NextProtos}
-		p.Extensions = append(p.Extensions, &alpn)
+		p._Extensions = append(p._Extensions, &alpn)
 	}
 
-	if r.FlipWeightedCoin(0.62) || p.TLSVersMax == VersionTLS13 {
+	if r.FlipWeightedCoin(0.62) || p._TLSVersMax == VersionTLS13 {
 		// always include for TLS 1.3, since TLS 1.3 ClientHellos are often over 256 bytes
 		// and that's when padding is required to work around buggy middleboxes
-		p.Extensions = append(p.Extensions, &padding)
+		p._Extensions = append(p._Extensions, &padding)
 	}
 	if r.FlipWeightedCoin(0.74) {
-		p.Extensions = append(p.Extensions, &status)
+		p._Extensions = append(p._Extensions, &status)
 	}
 	if r.FlipWeightedCoin(0.46) {
-		p.Extensions = append(p.Extensions, &sct)
+		p._Extensions = append(p._Extensions, &sct)
 	}
 	if r.FlipWeightedCoin(0.75) {
-		p.Extensions = append(p.Extensions, &reneg)
+		p._Extensions = append(p._Extensions, &reneg)
 	}
 	if r.FlipWeightedCoin(0.77) {
-		p.Extensions = append(p.Extensions, &ems)
+		p._Extensions = append(p._Extensions, &ems)
 	}
-	if p.TLSVersMax == VersionTLS13 {
+	if p._TLSVersMax == VersionTLS13 {
 		ks := KeyShareExtension{[]KeyShare{
 			{Group: X25519}, // the key for the group will be generated later
 		}}
@@ -855,12 +855,12 @@ func (uconn *UConn) generateRandomizedSpec() (ClientHelloSpec, error) {
 		}
 		pskExchangeModes := PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}}
 		supportedVersionsExt := SupportedVersionsExtension{
-			Versions: makeSupportedVersions(p.TLSVersMin, p.TLSVersMax),
+			Versions: makeSupportedVersions(p._TLSVersMin, p._TLSVersMax),
 		}
-		p.Extensions = append(p.Extensions, &ks, &pskExchangeModes, &supportedVersionsExt)
+		p._Extensions = append(p._Extensions, &ks, &pskExchangeModes, &supportedVersionsExt)
 	}
-	r.rand.Shuffle(len(p.Extensions), func(i, j int) {
-		p.Extensions[i], p.Extensions[j] = p.Extensions[j], p.Extensions[i]
+	r.rand.Shuffle(len(p._Extensions), func(i, j int) {
+		p._Extensions[i], p._Extensions[j] = p._Extensions[j], p._Extensions[i]
 	})
 
 	return p, nil

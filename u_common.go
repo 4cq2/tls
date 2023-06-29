@@ -16,7 +16,7 @@ import (
 
 type Transport struct {
 	Conn *UConn
-	Spec ClientHelloSpec
+	Spec _ClientHelloSpec
 }
 
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -35,7 +35,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	return http.ReadResponse(bufio.NewReader(t.Conn), req)
 }
 
-var Android_API_26 = ClientHelloSpec{
+var Android_API_26 = _ClientHelloSpec{
 	_CipherSuites: []uint16{
 		TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 		TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
@@ -52,7 +52,7 @@ var Android_API_26 = ClientHelloSpec{
 		TLS_RSA_WITH_AES_128_CBC_SHA,
 		TLS_RSA_WITH_AES_256_CBC_SHA,
 	},
-	Extensions: []TLSExtension{
+	_Extensions: []TLSExtension{
 		&RenegotiationInfoExtension{},
 		&SNIExtension{},
 		&UtlsExtendedMasterSecretExtension{},
@@ -238,17 +238,17 @@ const (
 	helloAutoVers = "0"
 )
 
-type ClientHelloSpec struct {
+type _ClientHelloSpec struct {
 	_CipherSuites       []uint16       // nil => default
 	_CompressionMethods []uint8        // nil => no compression
-	Extensions          []TLSExtension // nil => no extensions
+	_Extensions         []TLSExtension // nil => no extensions
 
-	TLSVersMin uint16 // [1.0-1.3] default: parse from .Extensions, if SupportedVersions ext is not present => 1.0
-	TLSVersMax uint16 // [1.2-1.3] default: parse from .Extensions, if SupportedVersions ext is not present => 1.2
+	_TLSVersMin uint16 // [1.0-1.3] default: parse from .Extensions, if SupportedVersions ext is not present => 1.0
+	_TLSVersMax uint16 // [1.2-1.3] default: parse from .Extensions, if SupportedVersions ext is not present => 1.2
 
 	// GreaseStyle: currently only random
 	// sessionID may or may not depend on ticket; nil => random
-	GetSessionID func(ticket []byte) [32]byte
+	_GetSessionID func(ticket []byte) [32]byte
 
 	// TLSFingerprintLink string // ?? link to tlsfingerprint.io for informational purposes
 }
