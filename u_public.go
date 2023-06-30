@@ -33,21 +33,21 @@ type _ClientHandshakeState struct {
 
 // TLS 1.3 only
 type TLS13OnlyState struct {
-	_Suite        *_CipherSuiteTLS13
-	_EcdheParams  _EcdheParameters
-	_EarlySecret  []byte
-	_BinderKey    []byte
-	_CertReq      *_CertificateRequestMsgTLS13
-	_UsingPSK     bool
-	SentDummyCCS  bool
-	Transcript    hash.Hash
-	TrafficSecret []byte // client_application_traffic_secret_0
+	_Suite         *_CipherSuiteTLS13
+	_EcdheParams   _EcdheParameters
+	_EarlySecret   []byte
+	_BinderKey     []byte
+	_CertReq       *_CertificateRequestMsgTLS13
+	_UsingPSK      bool
+	_SentDummyCCS  bool
+	_Transcript    hash.Hash
+	_TrafficSecret []byte // client_application_traffic_secret_0
 }
 
 // TLS 1.2 and before only
 type TLS12OnlyState struct {
-	FinishedHash _FinishedHash
-	Suite        _CipherSuite
+	_FinishedHash _FinishedHash
+	_Suite        _CipherSuite
 }
 
 func (chs *_ClientHandshakeState) toPrivate13() *clientHandshakeStateTLS13 {
@@ -66,11 +66,11 @@ func (chs *_ClientHandshakeState) toPrivate13() *clientHandshakeStateTLS13 {
 
 			certReq:       chs._State13._CertReq.toPrivate(),
 			usingPSK:      chs._State13._UsingPSK,
-			sentDummyCCS:  chs._State13.SentDummyCCS,
+			sentDummyCCS:  chs._State13._SentDummyCCS,
 			suite:         chs._State13._Suite.toPrivate(),
-			transcript:    chs._State13.Transcript,
+			transcript:    chs._State13._Transcript,
 			masterSecret:  chs._MasterSecret,
-			trafficSecret: chs._State13.TrafficSecret,
+			trafficSecret: chs._State13._TrafficSecret,
 
 			uconn: chs.uconn,
 		}
@@ -82,15 +82,15 @@ func (chs13 *clientHandshakeStateTLS13) toPublic13() *_ClientHandshakeState {
 		return nil
 	} else {
 		tls13State := TLS13OnlyState{
-			_EcdheParams:  chs13.ecdheParams,
-			_EarlySecret:  chs13.earlySecret,
-			_BinderKey:    chs13.binderKey,
-			_CertReq:      chs13.certReq.toPublic(),
-			_UsingPSK:     chs13.usingPSK,
-			SentDummyCCS:  chs13.sentDummyCCS,
-			_Suite:        chs13.suite.toPublic(),
-			TrafficSecret: chs13.trafficSecret,
-			Transcript:    chs13.transcript,
+			_EcdheParams:   chs13.ecdheParams,
+			_EarlySecret:   chs13.earlySecret,
+			_BinderKey:     chs13.binderKey,
+			_CertReq:       chs13.certReq.toPublic(),
+			_UsingPSK:      chs13.usingPSK,
+			_SentDummyCCS:  chs13.sentDummyCCS,
+			_Suite:         chs13.suite.toPublic(),
+			_TrafficSecret: chs13.trafficSecret,
+			_Transcript:    chs13.transcript,
 		}
 		return &_ClientHandshakeState{
 			_C:           chs13.c,
@@ -116,12 +116,12 @@ func (chs *_ClientHandshakeState) toPrivate12() *clientHandshakeState {
 			c:           chs._C,
 			serverHello: chs._ServerHello.getPrivatePtr(),
 			hello:       chs._Hello.getPrivatePtr(),
-			suite:       chs._State12.Suite.getPrivatePtr(),
+			suite:       chs._State12._Suite.getPrivatePtr(),
 			session:     chs._Session,
 
 			masterSecret: chs._MasterSecret,
 
-			finishedHash: chs._State12.FinishedHash.getPrivateObj(),
+			finishedHash: chs._State12._FinishedHash.getPrivateObj(),
 
 			uconn: chs.uconn,
 		}
@@ -133,8 +133,8 @@ func (chs12 *clientHandshakeState) toPublic12() *_ClientHandshakeState {
 		return nil
 	} else {
 		tls12State := TLS12OnlyState{
-			Suite:        chs12.suite.getPublicObj(),
-			FinishedHash: chs12.finishedHash.getPublicObj(),
+			_Suite:        chs12.suite.getPublicObj(),
+			_FinishedHash: chs12.finishedHash.getPublicObj(),
 		}
 		return &_ClientHandshakeState{
 			_C:           chs12.c,
@@ -229,29 +229,29 @@ func (c *_CipherSuiteTLS13) toPrivate() *cipherSuiteTLS13 {
 }
 
 type ServerHelloMsg struct {
-	Raw                          []byte
-	Vers                         uint16
-	Random                       []byte
-	SessionId                    []byte
-	CipherSuite                  uint16
-	CompressionMethod            uint8
-	NextProtoNeg                 bool
-	NextProtos                   []string
-	OcspStapling                 bool
-	Scts                         [][]byte
-	Ems                          bool
-	TicketSupported              bool
-	SecureRenegotiation          []byte
-	SecureRenegotiationSupported bool
-	AlpnProtocol                 string
+	_Raw                          []byte
+	_Vers                         uint16
+	_Random                       []byte
+	_SessionId                    []byte
+	_CipherSuite                  uint16
+	_CompressionMethod            uint8
+	_NextProtoNeg                 bool
+	_NextProtos                   []string
+	_OcspStapling                 bool
+	_Scts                         [][]byte
+	_Ems                          bool
+	_TicketSupported              bool
+	_SecureRenegotiation          []byte
+	_SecureRenegotiationSupported bool
+	_AlpnProtocol                 string
 
 	// 1.3
-	SupportedVersion        uint16
-	ServerShare             keyShare
-	SelectedIdentityPresent bool
-	SelectedIdentity        uint16
-	Cookie                  []byte   // HelloRetryRequest extension
-	SelectedGroup           _CurveID // HelloRetryRequest extension
+	_SupportedVersion        uint16
+	_ServerShare             keyShare
+	_SelectedIdentityPresent bool
+	_SelectedIdentity        uint16
+	_Cookie                  []byte   // HelloRetryRequest extension
+	_SelectedGroup           _CurveID // HelloRetryRequest extension
 
 }
 
@@ -260,27 +260,27 @@ func (shm *ServerHelloMsg) getPrivatePtr() *serverHelloMsg {
 		return nil
 	} else {
 		return &serverHelloMsg{
-			raw:                          shm.Raw,
-			vers:                         shm.Vers,
-			random:                       shm.Random,
-			sessionId:                    shm.SessionId,
-			cipherSuite:                  shm.CipherSuite,
-			compressionMethod:            shm.CompressionMethod,
-			nextProtoNeg:                 shm.NextProtoNeg,
-			nextProtos:                   shm.NextProtos,
-			ocspStapling:                 shm.OcspStapling,
-			scts:                         shm.Scts,
-			ems:                          shm.Ems,
-			ticketSupported:              shm.TicketSupported,
-			secureRenegotiation:          shm.SecureRenegotiation,
-			secureRenegotiationSupported: shm.SecureRenegotiationSupported,
-			alpnProtocol:                 shm.AlpnProtocol,
-			supportedVersion:             shm.SupportedVersion,
-			serverShare:                  shm.ServerShare,
-			selectedIdentityPresent:      shm.SelectedIdentityPresent,
-			selectedIdentity:             shm.SelectedIdentity,
-			cookie:                       shm.Cookie,
-			selectedGroup:                shm.SelectedGroup,
+			raw:                          shm._Raw,
+			vers:                         shm._Vers,
+			random:                       shm._Random,
+			sessionId:                    shm._SessionId,
+			cipherSuite:                  shm._CipherSuite,
+			compressionMethod:            shm._CompressionMethod,
+			nextProtoNeg:                 shm._NextProtoNeg,
+			nextProtos:                   shm._NextProtos,
+			ocspStapling:                 shm._OcspStapling,
+			scts:                         shm._Scts,
+			ems:                          shm._Ems,
+			ticketSupported:              shm._TicketSupported,
+			secureRenegotiation:          shm._SecureRenegotiation,
+			secureRenegotiationSupported: shm._SecureRenegotiationSupported,
+			alpnProtocol:                 shm._AlpnProtocol,
+			supportedVersion:             shm._SupportedVersion,
+			serverShare:                  shm._ServerShare,
+			selectedIdentityPresent:      shm._SelectedIdentityPresent,
+			selectedIdentity:             shm._SelectedIdentity,
+			cookie:                       shm._Cookie,
+			selectedGroup:                shm._SelectedGroup,
 		}
 	}
 }
@@ -290,27 +290,27 @@ func (shm *serverHelloMsg) getPublicPtr() *ServerHelloMsg {
 		return nil
 	} else {
 		return &ServerHelloMsg{
-			Raw:                          shm.raw,
-			Vers:                         shm.vers,
-			Random:                       shm.random,
-			SessionId:                    shm.sessionId,
-			CipherSuite:                  shm.cipherSuite,
-			CompressionMethod:            shm.compressionMethod,
-			NextProtoNeg:                 shm.nextProtoNeg,
-			NextProtos:                   shm.nextProtos,
-			OcspStapling:                 shm.ocspStapling,
-			Scts:                         shm.scts,
-			Ems:                          shm.ems,
-			TicketSupported:              shm.ticketSupported,
-			SecureRenegotiation:          shm.secureRenegotiation,
-			SecureRenegotiationSupported: shm.secureRenegotiationSupported,
-			AlpnProtocol:                 shm.alpnProtocol,
-			SupportedVersion:             shm.supportedVersion,
-			ServerShare:                  shm.serverShare,
-			SelectedIdentityPresent:      shm.selectedIdentityPresent,
-			SelectedIdentity:             shm.selectedIdentity,
-			Cookie:                       shm.cookie,
-			SelectedGroup:                shm.selectedGroup,
+			_Raw:                          shm.raw,
+			_Vers:                         shm.vers,
+			_Random:                       shm.random,
+			_SessionId:                    shm.sessionId,
+			_CipherSuite:                  shm.cipherSuite,
+			_CompressionMethod:            shm.compressionMethod,
+			_NextProtoNeg:                 shm.nextProtoNeg,
+			_NextProtos:                   shm.nextProtos,
+			_OcspStapling:                 shm.ocspStapling,
+			_Scts:                         shm.scts,
+			_Ems:                          shm.ems,
+			_TicketSupported:              shm.ticketSupported,
+			_SecureRenegotiation:          shm.secureRenegotiation,
+			_SecureRenegotiationSupported: shm.secureRenegotiationSupported,
+			_AlpnProtocol:                 shm.alpnProtocol,
+			_SupportedVersion:             shm.supportedVersion,
+			_ServerShare:                  shm.serverShare,
+			_SelectedIdentityPresent:      shm.selectedIdentityPresent,
+			_SelectedIdentity:             shm.selectedIdentity,
+			_Cookie:                       shm.cookie,
+			_SelectedGroup:                shm.selectedGroup,
 		}
 	}
 }
@@ -486,8 +486,8 @@ func (cs *cipherSuite) getPublicObj() _CipherSuite {
 // A _FinishedHash calculates the hash of a set of handshake messages suitable
 // for including in a Finished message.
 type _FinishedHash struct {
-	Client hash.Hash
-	Server hash.Hash
+	_Client hash.Hash
+	Server  hash.Hash
 
 	// Prior to TLS 1.2, an additional MD5 hash is required.
 	ClientMD5 hash.Hash
@@ -505,7 +505,7 @@ func (fh *_FinishedHash) getPrivateObj() finishedHash {
 		return finishedHash{}
 	} else {
 		return finishedHash{
-			client:    fh.Client,
+			client:    fh._Client,
 			server:    fh.Server,
 			clientMD5: fh.ClientMD5,
 			serverMD5: fh.ServerMD5,
@@ -521,7 +521,7 @@ func (fh *finishedHash) getPublicObj() _FinishedHash {
 		return _FinishedHash{}
 	} else {
 		return _FinishedHash{
-			Client:    fh.client,
+			_Client:   fh.client,
 			Server:    fh.server,
 			ClientMD5: fh.clientMD5,
 			ServerMD5: fh.serverMD5,
