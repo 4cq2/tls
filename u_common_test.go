@@ -94,7 +94,7 @@ func Test_Builder(t *testing.T) {
 
 func Test_Fingerprint(t *testing.T) {
 	hello := []byte(Android_Hellos[0])
-	spec, err := new(_Fingerprinter).FingerprintClientHello(hello)
+	spec, err := new(_Fingerprinter)._FingerprintClientHello(hello)
 	if err != nil {
 		t.Fatal(err)
 	}

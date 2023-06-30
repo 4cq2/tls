@@ -240,15 +240,15 @@ type _ClientSessionState struct {
 // SessionID-based resumption. In TLS 1.3 they were merged into PSK modes, which
 // are supported via this interface.
 type _ClientSessionCache interface {
-	// Get searches for a ClientSessionState associated with the given key.
+	// _Get searches for a ClientSessionState associated with the given key.
 	// On return, ok is true if one was found.
-	Get(sessionKey string) (session *_ClientSessionState, ok bool)
+	_Get(sessionKey string) (session *_ClientSessionState, ok bool)
 
-	// Put adds the ClientSessionState to the cache with the given key. It might
+	// _Put adds the ClientSessionState to the cache with the given key. It might
 	// get called multiple times in a connection if a TLS 1.3 server provides
 	// more than one session ticket. If called with a nil *ClientSessionState,
 	// it should remove the cache entry.
-	Put(sessionKey string, cs *_ClientSessionState)
+	_Put(sessionKey string, cs *_ClientSessionState)
 }
 
 // SignatureScheme identifies a signature algorithm supported by TLS. See

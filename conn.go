@@ -114,34 +114,16 @@ type Conn struct {
 // Cannot just embed net.Conn because that would
 // export the struct field too.
 
-// LocalAddr returns the local network address.
-func (c *Conn) LocalAddr() net.Addr {
-	return c.conn.LocalAddr()
-}
-
-// RemoteAddr returns the remote network address.
-func (c *Conn) RemoteAddr() net.Addr {
+// _RemoteAddr returns the remote network address.
+func (c *Conn) _RemoteAddr() net.Addr {
 	return c.conn.RemoteAddr()
 }
 
-// SetDeadline sets the read and write deadlines associated with the connection.
+// _SetDeadline sets the read and write deadlines associated with the connection.
 // A zero value for t means Read and Write will not time out.
 // After a Write has timed out, the TLS state is corrupt and all future writes will return the same error.
-func (c *Conn) SetDeadline(t time.Time) error {
+func (c *Conn) _SetDeadline(t time.Time) error {
 	return c.conn.SetDeadline(t)
-}
-
-// SetReadDeadline sets the read deadline on the underlying connection.
-// A zero value for t means Read will not time out.
-func (c *Conn) SetReadDeadline(t time.Time) error {
-	return c.conn.SetReadDeadline(t)
-}
-
-// SetWriteDeadline sets the write deadline on the underlying connection.
-// A zero value for t means Write will not time out.
-// After a Write has timed out, the TLS state is corrupt and all future writes will return the same error.
-func (c *Conn) SetWriteDeadline(t time.Time) error {
-	return c.conn.SetWriteDeadline(t)
 }
 
 // A halfConn represents one direction of the record layer
@@ -312,7 +294,7 @@ func roundUp(a, b int) int {
 // cbcMode is an interface for block ciphers using cipher block chaining.
 type cbcMode interface {
 	cipher.BlockMode
-	SetIV([]byte)
+	_SetIV([]byte)
 }
 
 // decrypt authenticates and decrypts the record if protection is active at
@@ -371,7 +353,7 @@ func (hc *halfConn) decrypt(record []byte) ([]byte, recordType, error) {
 			}
 
 			if explicitNonceLen > 0 {
-				c.SetIV(payload[:explicitNonceLen])
+				c._SetIV(payload[:explicitNonceLen])
 				payload = payload[explicitNonceLen:]
 			}
 			c.CryptBlocks(payload, payload)
@@ -534,7 +516,7 @@ func (hc *halfConn) encrypt(record, payload []byte, rand io.Reader) ([]byte, err
 			dst[i] = byte(paddingLen - 1)
 		}
 		if len(explicitNonce) > 0 {
-			c.SetIV(explicitNonce)
+			c._SetIV(explicitNonce)
 		}
 		c.CryptBlocks(dst, dst)
 	default:
@@ -552,8 +534,8 @@ func (hc *halfConn) encrypt(record, payload []byte, rand io.Reader) ([]byte, err
 
 // _RecordHeaderError is returned when a TLS record header is invalid.
 type _RecordHeaderError struct {
-	// Msg contains a human readable string that describes the error.
-	Msg string
+	// _Msg contains a human readable string that describes the error.
+	_Msg string
 	// RecordHeader contains the five bytes of TLS record header that
 	// triggered the error.
 	RecordHeader [5]byte
@@ -564,10 +546,10 @@ type _RecordHeaderError struct {
 	Conn net.Conn
 }
 
-func (e _RecordHeaderError) Error() string { return "tls: " + e.Msg }
+func (e _RecordHeaderError) Error() string { return "tls: " + e._Msg }
 
 func (c *Conn) newRecordHeaderError(conn net.Conn, msg string) (err _RecordHeaderError) {
-	err.Msg = msg
+	err._Msg = msg
 	err.Conn = conn
 	copy(err.RecordHeader[:], c.rawInput.Bytes())
 	return err

@@ -88,11 +88,11 @@ func (uconn *UConn) _BuildHandshakeState() error {
 			}
 		}
 
-		err := uconn.ApplyConfig()
+		err := uconn._ApplyConfig()
 		if err != nil {
 			return err
 		}
-		err = uconn.MarshalClientHello()
+		err = uconn._MarshalClientHello()
 		if err != nil {
 			return err
 		}
@@ -140,26 +140,7 @@ func (uconn *UConn) _SetSessionState(session *_ClientSessionState) error {
 	return nil
 }
 
-// If you want session tickets to be reused - use same cache on following connections
-func (uconn *UConn) SetSessionCache(cache _ClientSessionCache) {
-	uconn.Conn.config._ClientSessionCache = cache
-	uconn._HandshakeState._Hello._TicketSupported = true
-}
-
-// SetClientRandom sets client random explicitly.
-// BuildHandshakeFirst() must be called before SetClientRandom.
-// r must to be 32 bytes long.
-func (uconn *UConn) SetClientRandom(r []byte) error {
-	if len(r) != 32 {
-		return errors.New("Incorrect client random length! Expected: 32, got: " + strconv.Itoa(len(r)))
-	} else {
-		uconn._HandshakeState._Hello._Random = make([]byte, 32)
-		copy(uconn._HandshakeState._Hello._Random, r)
-		return nil
-	}
-}
-
-func (uconn *UConn) SetSNI(sni string) {
+func (uconn *UConn) _SetSNI(sni string) {
 	hname := hostnameInSNI(sni)
 	uconn.Conn.config._ServerName = hname
 	for _, ext := range uconn._Extensions {
@@ -168,16 +149,6 @@ func (uconn *UConn) SetSNI(sni string) {
 			sniExt.ServerName = hname
 		}
 	}
-}
-
-// RemoveSNIExtension removes SNI from the list of extensions sent in ClientHello
-// It returns an error when used with HelloGolang ClientHelloID
-func (uconn *UConn) RemoveSNIExtension() error {
-	if uconn._ClientHelloID == _HelloGolang {
-		return fmt.Errorf("Cannot call RemoveSNIExtension on a UConn with a HelloGolang ClientHelloID")
-	}
-	uconn.omitSNIExtension = true
-	return nil
 }
 
 func (uconn *UConn) removeSNIExtension() {
@@ -190,9 +161,9 @@ func (uconn *UConn) removeSNIExtension() {
 	uconn._Extensions = filteredExts
 }
 
-// Handshake runs the client handshake using given clientHandshakeState
+// _Handshake runs the client handshake using given clientHandshakeState
 // Requires hs.hello, and, optionally, hs.session to be set.
-func (c *UConn) Handshake() error {
+func (c *UConn) _Handshake() error {
 	c.Conn.handshakeMutex.Lock()
 	defer c.Conn.handshakeMutex.Unlock()
 
@@ -248,7 +219,7 @@ func (c *UConn) Write(b []byte) (int, error) {
 		}
 	}
 
-	if err := c.Handshake(); err != nil {
+	if err := c._Handshake(); err != nil {
 		return 0, err
 	}
 
@@ -347,7 +318,7 @@ func (c *UConn) clientHandshake() (err error) {
 			// does require servers to abort on invalid binders, so we need to
 			// delete tickets to recover from a corrupted PSK.
 			if err != nil {
-				c.Conn.config._ClientSessionCache.Put(cacheKey, nil)
+				c.Conn.config._ClientSessionCache._Put(cacheKey, nil)
 			}
 		}()
 	}
@@ -409,12 +380,12 @@ func (c *UConn) clientHandshake() (err error) {
 	// If we had a successful handshake and hs.session is different from
 	// the one already cached - cache a new one.
 	if cacheKey != "" && hs12.session != nil && session != hs12.session {
-		c.Conn.config._ClientSessionCache.Put(cacheKey, hs12.session)
+		c.Conn.config._ClientSessionCache._Put(cacheKey, hs12.session)
 	}
 	return nil
 }
 
-func (uconn *UConn) ApplyConfig() error {
+func (uconn *UConn) _ApplyConfig() error {
 	for _, ext := range uconn._Extensions {
 		err := ext.writeToUConn(uconn)
 		if err != nil {
@@ -424,7 +395,7 @@ func (uconn *UConn) ApplyConfig() error {
 	return nil
 }
 
-func (uconn *UConn) MarshalClientHello() error {
+func (uconn *UConn) _MarshalClientHello() error {
 	hello := uconn._HandshakeState._Hello
 	headerLength := 2 + 32 + 1 + len(hello._SessionId) +
 		2 + len(hello._CipherSuites)*2 +
@@ -501,18 +472,7 @@ func (uconn *UConn) MarshalClientHello() error {
 	return nil
 }
 
-// get current state of cipher and encrypt zeros to get keystream
-func (uconn *UConn) GetOutKeystream(length int) ([]byte, error) {
-	zeros := make([]byte, length)
-
-	if outCipher, ok := uconn.Conn.out.cipher.(cipher.AEAD); ok {
-		// AEAD.Seal() does not mutate internal state, other ciphers might
-		return outCipher.Seal(nil, uconn.Conn.out.seq[:], zeros, nil), nil
-	}
-	return nil, errors.New("Could not convert OutCipher to cipher.AEAD")
-}
-
-// SetTLSVers sets min and max TLS version in all appropriate places.
+// _SetTLSVers sets min and max TLS version in all appropriate places.
 // Function will use first non-zero version parsed in following order:
 //  1. Provided minTLSVers, maxTLSVers
 //  2. specExtensions may have SupportedVersionsExtension
@@ -520,7 +480,7 @@ func (uconn *UConn) GetOutKeystream(length int) ([]byte, error) {
 //
 // Error is only returned if things are in clearly undesirable state
 // to help user fix them.
-func (uconn *UConn) SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []TLSExtension) error {
+func (uconn *UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []TLSExtension) error {
 	if minTLSVers == 0 && maxTLSVers == 0 {
 		// if version is not set explicitly in the ClientHelloSpec, check the SupportedVersions extension
 		supportedVersionsExtensionsPresent := 0
@@ -577,14 +537,6 @@ func (uconn *UConn) SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []T
 	uconn.Conn.config._MaxVersion = maxTLSVers
 
 	return nil
-}
-
-func (uconn *UConn) SetUnderlyingConn(c net.Conn) {
-	uconn.Conn.conn = c
-}
-
-func (uconn *UConn) GetUnderlyingConn() net.Conn {
-	return uconn.Conn.conn
 }
 
 func makeSupportedVersions(minVers, maxVers uint16) []uint16 {

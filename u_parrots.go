@@ -558,7 +558,7 @@ func (uconn *UConn) applyPresetByID(id _ClientHelloID) (err error) {
 func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 	var err error
 
-	err = uconn.SetTLSVers(p._TLSVersMin, p._TLSVersMax, p._Extensions)
+	err = uconn._SetTLSVers(p._TLSVersMin, p._TLSVersMax, p._Extensions)
 	if err != nil {
 		return err
 	}
@@ -640,8 +640,8 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 			grease_extensions_seen += 1
 		case *SessionTicketExtension:
 			if session == nil && uconn.Conn.config._ClientSessionCache != nil {
-				cacheKey := clientSessionCacheKey(uconn.Conn.RemoteAddr(), uconn.Conn.config)
-				session, _ = uconn.Conn.config._ClientSessionCache.Get(cacheKey)
+				cacheKey := clientSessionCacheKey(uconn.Conn._RemoteAddr(), uconn.Conn.config)
+				session, _ = uconn.Conn.config._ClientSessionCache._Get(cacheKey)
 				// TODO: use uconn.loadSession(hello.getPrivateObj()) to support TLS 1.3 PSK-style resumption
 			}
 			err := uconn._SetSessionState(session)

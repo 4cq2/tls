@@ -307,7 +307,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 							hs.uconn._Extensions[cookieIndex:]...)...)
 				}
 			}
-			if err = hs.uconn.MarshalClientHello(); err != nil {
+			if err = hs.uconn._MarshalClientHello(); err != nil {
 				return err
 			}
 			hs.hello.raw = hs.uconn._HandshakeState._Hello._Raw
@@ -733,7 +733,7 @@ func (c *Conn) handleNewSessionTicket(msg *newSessionTicketMsgTLS13) error {
 	}
 
 	cacheKey := clientSessionCacheKey(c.conn.RemoteAddr(), c.config)
-	c.config._ClientSessionCache.Put(cacheKey, session)
+	c.config._ClientSessionCache._Put(cacheKey, session)
 
 	return nil
 }

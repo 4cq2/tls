@@ -330,7 +330,7 @@ func (s ssl30MAC) MAC(seq, header, data, extra []byte) []byte {
 
 type constantTimeHash interface {
 	hash.Hash
-	ConstantTimeSum(b []byte) []byte
+	_ConstantTimeSum(b []byte) []byte
 }
 
 // cthWrapper wraps any hash.Hash that implements ConstantTimeSum, and replaces
@@ -343,7 +343,7 @@ func (c *cthWrapper) Size() int                   { return c.h.Size() }
 func (c *cthWrapper) BlockSize() int              { return c.h.BlockSize() }
 func (c *cthWrapper) Reset()                      { c.h.Reset() }
 func (c *cthWrapper) Write(p []byte) (int, error) { return c.h.Write(p) }
-func (c *cthWrapper) Sum(b []byte) []byte         { return c.h.ConstantTimeSum(b) }
+func (c *cthWrapper) Sum(b []byte) []byte         { return c.h._ConstantTimeSum(b) }
 
 func newConstantTimeHash(h func() hash.Hash) func() hash.Hash {
 	return func() hash.Hash {

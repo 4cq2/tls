@@ -14,23 +14,23 @@ import (
 
 // _Fingerprinter is a struct largely for holding options for the FingerprintClientHello func
 type _Fingerprinter struct {
-	// KeepPSK will ensure that the PreSharedKey extension is passed along into the resulting ClientHelloSpec as-is
-	KeepPSK bool
-	// AllowBluntMimicry will ensure that unknown extensions are
+	// _KeepPSK will ensure that the PreSharedKey extension is passed along into the resulting ClientHelloSpec as-is
+	_KeepPSK bool
+	// _AllowBluntMimicry will ensure that unknown extensions are
 	// passed along into the resulting ClientHelloSpec as-is
 	// It will not ensure that the PSK is passed along, if you require that, use KeepPSK
 	// WARNING: there could be numerous subtle issues with ClientHelloSpecs
 	// that are generated with this flag which could compromise security and/or mimicry
-	AllowBluntMimicry bool
-	// AlwaysAddPadding will always add a UtlsPaddingExtension with BoringPaddingStyle
+	_AllowBluntMimicry bool
+	// _AlwaysAddPadding will always add a UtlsPaddingExtension with BoringPaddingStyle
 	// at the end of the extensions list if it isn't found in the fingerprinted hello.
 	// This could be useful in scenarios where the hello you are fingerprinting does not
 	// have any padding, but you suspect that other changes you make to the final hello
 	// (including things like different SNI lengths) would cause padding to be necessary
-	AlwaysAddPadding bool
+	_AlwaysAddPadding bool
 }
 
-// FingerprintClientHello returns a ClientHelloSpec which is based on the
+// _FingerprintClientHello returns a ClientHelloSpec which is based on the
 // ClientHello that is passed in as the data argument
 //
 // If the ClientHello passed in has extensions that are not recognized or cannot be handled
@@ -40,7 +40,7 @@ type _Fingerprinter struct {
 // as well as the handshake type/length/version header
 // https://tools.ietf.org/html/rfc5246#section-6.2
 // https://tools.ietf.org/html/rfc5246#section-7.4
-func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec, error) {
+func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec, error) {
 	clientHelloSpec := &_ClientHelloSpec{}
 	s := cryptobyte.String(data)
 
@@ -209,7 +209,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 
 		case extensionSignatureAlgorithmsCert:
 			// RFC 8446, Section 4.2.3
-			if f.AllowBluntMimicry {
+			if f._AllowBluntMimicry {
 				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_GenericExtension{extension, extData})
 			} else {
 				return nil, errors.New("unsupported extension SignatureAlgorithmsCert")
@@ -308,7 +308,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 
 		case extensionPreSharedKey:
 			// RFC 8446, Section 4.2.11
-			if f.KeepPSK {
+			if f._KeepPSK {
 				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_GenericExtension{extension, extData})
 			} else {
 				return nil, errors.New("unsupported extension PreSharedKey")
@@ -316,7 +316,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 
 		case extensionCookie:
 			// RFC 8446, Section 4.2.2
-			if f.AllowBluntMimicry {
+			if f._AllowBluntMimicry {
 				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_GenericExtension{extension, extData})
 			} else {
 				return nil, errors.New("unsupported extension Cookie")
@@ -324,7 +324,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 
 		case extensionEarlyData:
 			// RFC 8446, Section 4.2.10
-			if f.AllowBluntMimicry {
+			if f._AllowBluntMimicry {
 				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_GenericExtension{extension, extData})
 			} else {
 				return nil, errors.New("unsupported extension EarlyData")
@@ -333,7 +333,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 		default:
 			if isGREASEUint16(extension) {
 				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsGREASEExtension{unGREASEUint16(extension), extData})
-			} else if f.AllowBluntMimicry {
+			} else if f._AllowBluntMimicry {
 				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_GenericExtension{extension, extData})
 			} else {
 				return nil, fmt.Errorf("unsupported extension %#x", extension)
@@ -343,7 +343,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 		}
 	}
 
-	if f.AlwaysAddPadding {
+	if f._AlwaysAddPadding {
 		alreadyHasPadding := false
 		for _, ext := range clientHelloSpec._Extensions {
 			if _, ok := ext.(*UtlsPaddingExtension); ok {
