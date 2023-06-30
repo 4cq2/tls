@@ -117,8 +117,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					pointFormatUncompressed,
 				}},
 				&_KeyShareExtension{[]_KeyShare{
-					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
-					{Group: X25519},
+					{_Group: _CurveID(_GREASE_PLACEHOLDER), _Data: []byte{0}},
+					{_Group: X25519},
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&SupportedVersionsExtension{[]uint16{
@@ -192,8 +192,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&SCTExtension{},
 				&_KeyShareExtension{[]_KeyShare{
-					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
-					{Group: X25519},
+					{_Group: _CurveID(_GREASE_PLACEHOLDER), _Data: []byte{0}},
+					{_Group: X25519},
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{
 					_PskModeDHE,
@@ -264,8 +264,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&SCTExtension{},
 				&_KeyShareExtension{[]_KeyShare{
-					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
-					{Group: X25519},
+					{_Group: _CurveID(_GREASE_PLACEHOLDER), _Data: []byte{0}},
+					{_Group: X25519},
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{
 					_PskModeDHE,
@@ -378,8 +378,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&_KeyShareExtension{[]_KeyShare{
-					{Group: X25519},
-					{Group: _CurveP256},
+					{_Group: X25519},
+					{_Group: _CurveP256},
 				}},
 				&SupportedVersionsExtension{[]uint16{
 					VersionTLS13,
@@ -657,12 +657,12 @@ func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 		case *_KeyShareExtension:
 			preferredCurveIsSet := false
 			for i := range ext.KeyShares {
-				curveID := ext.KeyShares[i].Group
+				curveID := ext.KeyShares[i]._Group
 				if curveID == _GREASE_PLACEHOLDER {
-					ext.KeyShares[i].Group = _CurveID(_GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
+					ext.KeyShares[i]._Group = _CurveID(_GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
 					continue
 				}
-				if len(ext.KeyShares[i].Data) > 1 {
+				if len(ext.KeyShares[i]._Data) > 1 {
 					continue
 				}
 
@@ -671,7 +671,7 @@ func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 					return fmt.Errorf("unsupported Curve in KeyShareExtension: %v."+
 						"To mimic it, fill the Data(key) field manually.", curveID)
 				}
-				ext.KeyShares[i].Data = ecdheParams.PublicKey()
+				ext.KeyShares[i]._Data = ecdheParams.PublicKey()
 				if !preferredCurveIsSet {
 					// only do this once for the first non-grease curve
 					uconn._HandshakeState._State13._EcdheParams = ecdheParams
@@ -845,13 +845,13 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	}
 	if p._TLSVersMax == VersionTLS13 {
 		ks := _KeyShareExtension{[]_KeyShare{
-			{Group: X25519}, // the key for the group will be generated later
+			{_Group: X25519}, // the key for the group will be generated later
 		}}
 		if r._FlipWeightedCoin(0.25) {
 			// do not ADD second keyShare because crypto/tls does not support multiple ecdheParams
 			// TODO: add it back when they implement multiple keyShares, or implement it oursevles
 			// ks.KeyShares = append(ks.KeyShares, KeyShare{Group: CurveP256})
-			ks.KeyShares[0].Group = _CurveP256
+			ks.KeyShares[0]._Group = _CurveP256
 		}
 		pskExchangeModes := _PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}}
 		supportedVersionsExt := SupportedVersionsExtension{

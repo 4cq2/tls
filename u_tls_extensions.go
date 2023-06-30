@@ -20,11 +20,11 @@ type TLSExtension interface {
 }
 
 type _NPNExtension struct {
-	NextProtos []string
+	_NextProtos []string
 }
 
 func (e *_NPNExtension) writeToUConn(uc *UConn) error {
-	uc.Conn.config._NextProtos = e.NextProtos
+	uc.Conn.config._NextProtos = e._NextProtos
 	uc._HandshakeState._Hello._NextProtoNeg = true
 	return nil
 }
@@ -525,7 +525,7 @@ func (e *_KeyShareExtension) Len() int {
 func (e *_KeyShareExtension) keySharesLen() int {
 	extLen := 0
 	for _, ks := range e.KeyShares {
-		extLen += 4 + len(ks.Data)
+		extLen += 4 + len(ks._Data)
 	}
 	return extLen
 }
@@ -545,12 +545,12 @@ func (e *_KeyShareExtension) Read(b []byte) (int, error) {
 
 	i := 6
 	for _, ks := range e.KeyShares {
-		b[i] = byte(ks.Group >> 8)
-		b[i+1] = byte(ks.Group)
-		b[i+2] = byte(len(ks.Data) >> 8)
-		b[i+3] = byte(len(ks.Data))
-		copy(b[i+4:], ks.Data)
-		i += 4 + len(ks.Data)
+		b[i] = byte(ks._Group >> 8)
+		b[i+1] = byte(ks._Group)
+		b[i+2] = byte(len(ks._Data) >> 8)
+		b[i+3] = byte(len(ks._Data))
+		copy(b[i+4:], ks._Data)
+		i += 4 + len(ks._Data)
 	}
 
 	return e.Len(), io.EOF

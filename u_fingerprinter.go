@@ -270,15 +270,15 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 				var ks _KeyShare
 				var group uint16
 				if !clientShares.ReadUint16(&group) ||
-					!readUint16LengthPrefixed(&clientShares, &ks.Data) ||
-					len(ks.Data) == 0 {
+					!readUint16LengthPrefixed(&clientShares, &ks._Data) ||
+					len(ks._Data) == 0 {
 					return nil, errors.New("unable to read key share extension data")
 				}
-				ks.Group = _CurveID(unGREASEUint16(group))
+				ks._Group = _CurveID(unGREASEUint16(group))
 				// if not GREASE, key share data will be discarded as it should
 				// be generated per connection
-				if ks.Group != _GREASE_PLACEHOLDER {
-					ks.Data = nil
+				if ks._Group != _GREASE_PLACEHOLDER {
+					ks._Data = nil
 				}
 				keyShares = append(keyShares, ks)
 			}

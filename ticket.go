@@ -173,7 +173,7 @@ func (c *Conn) encryptTicket(state []byte) ([]byte, error) {
 
 // [uTLS] changed to use exported DecryptTicketWith func below
 func (c *Conn) decryptTicket(encrypted []byte) (plaintext []byte, usedOldKey bool) {
-	tks := ticketKeys(c.config.ticketKeys()).ToPublic()
+	tks := ticketKeys(c.config.ticketKeys())._ToPublic()
 	return _DecryptTicketWith(encrypted, tks)
 }
 
@@ -196,7 +196,7 @@ func _DecryptTicketWith(encrypted []byte, tks TicketKeys) (plaintext []byte, use
 
 	// keys := c.config.ticketKeys() // [uTLS] keys are received as a function argument
 
-	keys := tks.ToPrivate()
+	keys := tks._ToPrivate()
 	keyIndex := -1
 	for i, candidateKey := range keys {
 		if bytes.Equal(keyName, candidateKey.keyName[:]) {

@@ -375,7 +375,7 @@ func (chm *_ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
 			supportedSignatureAlgorithmsCert: chm._SupportedSignatureAlgorithmsCert,
 			supportedVersions:                chm._SupportedVersions,
 			cookie:                           chm._Cookie,
-			keyShares:                        _KeyShares(chm._KeyShares).ToPrivate(),
+			keyShares:                        _KeyShares(chm._KeyShares)._ToPrivate(),
 			earlyData:                        chm._EarlyData,
 			pskModes:                         chm._PskModes,
 			pskIdentities:                    chm._PskIdentities,
@@ -412,7 +412,7 @@ func (chm *clientHelloMsg) getPublicPtr() *_ClientHelloMsg {
 			_SupportedSignatureAlgorithmsCert: chm.supportedSignatureAlgorithmsCert,
 			_SupportedVersions:                chm.supportedVersions,
 			_Cookie:                           chm.cookie,
-			_KeyShares:                        keyShares(chm.keyShares).ToPublic(),
+			_KeyShares:                        keyShares(chm.keyShares)._ToPublic(),
 			_EarlyData:                        chm.earlyData,
 			_PskModes:                         chm.pskModes,
 			_PskIdentities:                    chm.pskIdentities,
@@ -487,17 +487,17 @@ func (cs *cipherSuite) getPublicObj() _CipherSuite {
 // for including in a Finished message.
 type _FinishedHash struct {
 	_Client hash.Hash
-	Server  hash.Hash
+	_Server hash.Hash
 
 	// Prior to TLS 1.2, an additional MD5 hash is required.
-	ClientMD5 hash.Hash
-	ServerMD5 hash.Hash
+	_ClientMD5 hash.Hash
+	_ServerMD5 hash.Hash
 
 	// In TLS 1.2, a full buffer is sadly required.
-	Buffer []byte
+	_Buffer []byte
 
-	Version uint16
-	Prf     func(result, secret, label, seed []byte)
+	_Version uint16
+	_Prf     func(result, secret, label, seed []byte)
 }
 
 func (fh *_FinishedHash) getPrivateObj() finishedHash {
@@ -506,12 +506,12 @@ func (fh *_FinishedHash) getPrivateObj() finishedHash {
 	} else {
 		return finishedHash{
 			client:    fh._Client,
-			server:    fh.Server,
-			clientMD5: fh.ClientMD5,
-			serverMD5: fh.ServerMD5,
-			buffer:    fh.Buffer,
-			version:   fh.Version,
-			prf:       fh.Prf,
+			server:    fh._Server,
+			clientMD5: fh._ClientMD5,
+			serverMD5: fh._ServerMD5,
+			buffer:    fh._Buffer,
+			version:   fh._Version,
+			prf:       fh._Prf,
 		}
 	}
 }
@@ -521,36 +521,36 @@ func (fh *finishedHash) getPublicObj() _FinishedHash {
 		return _FinishedHash{}
 	} else {
 		return _FinishedHash{
-			_Client:   fh.client,
-			Server:    fh.server,
-			ClientMD5: fh.clientMD5,
-			ServerMD5: fh.serverMD5,
-			Buffer:    fh.buffer,
-			Version:   fh.version,
-			Prf:       fh.prf}
+			_Client:    fh.client,
+			_Server:    fh.server,
+			_ClientMD5: fh.clientMD5,
+			_ServerMD5: fh.serverMD5,
+			_Buffer:    fh.buffer,
+			_Version:   fh.version,
+			_Prf:       fh.prf}
 	}
 }
 
 // TLS 1.3 Key Share. See RFC 8446, Section 4.2.8.
 type _KeyShare struct {
-	Group _CurveID
-	Data  []byte
+	_Group _CurveID
+	_Data  []byte
 }
 
 type _KeyShares []_KeyShare
 type keyShares []keyShare
 
-func (kss keyShares) ToPublic() []_KeyShare {
+func (kss keyShares) _ToPublic() []_KeyShare {
 	var KSS []_KeyShare
 	for _, ks := range kss {
-		KSS = append(KSS, _KeyShare{Data: ks.data, Group: ks.group})
+		KSS = append(KSS, _KeyShare{_Data: ks.data, _Group: ks.group})
 	}
 	return KSS
 }
-func (KSS _KeyShares) ToPrivate() []keyShare {
+func (KSS _KeyShares) _ToPrivate() []keyShare {
 	var kss []keyShare
 	for _, KS := range KSS {
-		kss = append(kss, keyShare{data: KS.Data, group: KS.Group})
+		kss = append(kss, keyShare{data: KS._Data, group: KS._Group})
 	}
 	return kss
 }
@@ -564,11 +564,11 @@ func (css *_ClientSessionState) _SessionTicket() []uint8 {
 
 // TicketKey is the internal representation of a session ticket key.
 type TicketKey struct {
-	// KeyName is an opaque byte string that serves to identify the session
+	// _KeyName is an opaque byte string that serves to identify the session
 	// ticket key. It's exposed as plaintext in every session ticket.
-	KeyName [ticketKeyNameLen]byte
-	AesKey  [16]byte
-	HmacKey [16]byte
+	_KeyName [ticketKeyNameLen]byte
+	_AesKey  [16]byte
+	_HmacKey [16]byte
 }
 
 type TicketKeys []TicketKey
@@ -576,37 +576,37 @@ type ticketKeys []ticketKey
 
 func TicketKeyFromBytes(b [32]byte) TicketKey {
 	tk := ticketKeyFromBytes(b)
-	return tk.ToPublic()
+	return tk._ToPublic()
 }
 
-func (tk ticketKey) ToPublic() TicketKey {
+func (tk ticketKey) _ToPublic() TicketKey {
 	return TicketKey{
-		KeyName: tk.keyName,
-		AesKey:  tk.aesKey,
-		HmacKey: tk.hmacKey,
+		_KeyName: tk.keyName,
+		_AesKey:  tk.aesKey,
+		_HmacKey: tk.hmacKey,
 	}
 }
 
-func (TK TicketKey) ToPrivate() ticketKey {
+func (TK TicketKey) _ToPrivate() ticketKey {
 	return ticketKey{
-		keyName: TK.KeyName,
-		aesKey:  TK.AesKey,
-		hmacKey: TK.HmacKey,
+		keyName: TK._KeyName,
+		aesKey:  TK._AesKey,
+		hmacKey: TK._HmacKey,
 	}
 }
 
-func (tks ticketKeys) ToPublic() []TicketKey {
+func (tks ticketKeys) _ToPublic() []TicketKey {
 	var TKS []TicketKey
 	for _, ks := range tks {
-		TKS = append(TKS, ks.ToPublic())
+		TKS = append(TKS, ks._ToPublic())
 	}
 	return TKS
 }
 
-func (TKS TicketKeys) ToPrivate() []ticketKey {
+func (TKS TicketKeys) _ToPrivate() []ticketKey {
 	var tks []ticketKey
 	for _, TK := range TKS {
-		tks = append(tks, TK.ToPrivate())
+		tks = append(tks, TK._ToPrivate())
 	}
 	return tks
 }
