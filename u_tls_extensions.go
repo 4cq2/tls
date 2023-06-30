@@ -24,7 +24,7 @@ type _NPNExtension struct {
 }
 
 func (e *_NPNExtension) writeToUConn(uc *_UConn) error {
-	uc.Conn.config._NextProtos = e._NextProtos
+	uc._Conn.config._NextProtos = e._NextProtos
 	uc._HandshakeState._Hello._NextProtoNeg = true
 	return nil
 }
@@ -48,7 +48,7 @@ type _SNIExtension struct {
 }
 
 func (e *_SNIExtension) writeToUConn(uc *_UConn) error {
-	uc.Conn.config._ServerName = e._ServerName
+	uc._Conn.config._ServerName = e._ServerName
 	uc._HandshakeState._Hello._ServerName = e._ServerName
 	return nil
 }
@@ -106,7 +106,7 @@ type _SupportedCurvesExtension struct {
 }
 
 func (e *_SupportedCurvesExtension) writeToUConn(uc *_UConn) error {
-	uc.Conn.config._CurvePreferences = e._Curves
+	uc._Conn.config._CurvePreferences = e._Curves
 	uc._HandshakeState._Hello._SupportedCurves = e._Curves
 	return nil
 }
@@ -200,7 +200,7 @@ type _RenegotiationInfoExtension struct {
 }
 
 func (e *_RenegotiationInfoExtension) writeToUConn(uc *_UConn) error {
-	uc.Conn.config._Renegotiation = e._Renegotiation
+	uc._Conn.config._Renegotiation = e._Renegotiation
 	switch e._Renegotiation {
 	case _RenegotiateOnceAsClient:
 		fallthrough
@@ -240,7 +240,7 @@ type _ALPNExtension struct {
 }
 
 func (e *_ALPNExtension) writeToUConn(uc *_UConn) error {
-	uc.Conn.config._NextProtos = e._AlpnProtocols
+	uc._Conn.config._NextProtos = e._AlpnProtocols
 	uc._HandshakeState._Hello._AlpnProtocols = e._AlpnProtocols
 	return nil
 }

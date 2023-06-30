@@ -18,7 +18,7 @@ import (
 )
 
 type _UConn struct {
-	Conn *_Conn
+	_Conn *_Conn
 
 	_Extensions    []_TLSExtension
 	_ClientHelloID _ClientHelloID
@@ -42,7 +42,7 @@ func _UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *_UC
 	}
 	tlsConn := _Conn{conn: conn, config: config, isClient: true}
 	handshakeState := _ClientHandshakeState{_C: &tlsConn, _Hello: &_ClientHelloMsg{}}
-	uconn := _UConn{Conn: &tlsConn, _ClientHelloID: clientHelloID, _HandshakeState: handshakeState}
+	uconn := _UConn{_Conn: &tlsConn, _ClientHelloID: clientHelloID, _HandshakeState: handshakeState}
 	uconn._HandshakeState.uconn = &uconn
 	return &uconn
 }
@@ -69,14 +69,14 @@ func (uconn *_UConn) _BuildHandshakeState() error {
 		}
 
 		// use default Golang ClientHello.
-		hello, ecdheParams, err := uconn.Conn.makeClientHello()
+		hello, ecdheParams, err := uconn._Conn.makeClientHello()
 		if err != nil {
 			return err
 		}
 
 		uconn._HandshakeState._Hello = hello.getPublicPtr()
 		uconn._HandshakeState._State13._EcdheParams = ecdheParams
-		uconn._HandshakeState._C = uconn.Conn
+		uconn._HandshakeState._C = uconn._Conn
 	} else {
 		if !uconn._ClientHelloBuilt {
 			err := uconn.applyPresetByID(uconn._ClientHelloID)
@@ -129,7 +129,7 @@ func (uconn *_UConn) _SetSessionState(session *_ClientSessionState) error {
 				}
 			}
 			var sessionID [32]byte
-			_, err := io.ReadFull(uconn.Conn.config.rand(), sessionID[:])
+			_, err := io.ReadFull(uconn._Conn.config.rand(), sessionID[:])
 			if err != nil {
 				return err
 			}
@@ -153,20 +153,20 @@ func (uconn *_UConn) removeSNIExtension() {
 // _Handshake runs the client handshake using given clientHandshakeState
 // Requires hs.hello, and, optionally, hs.session to be set.
 func (c *_UConn) _Handshake() error {
-	c.Conn.handshakeMutex.Lock()
-	defer c.Conn.handshakeMutex.Unlock()
+	c._Conn.handshakeMutex.Lock()
+	defer c._Conn.handshakeMutex.Unlock()
 
-	if err := c.Conn.handshakeErr; err != nil {
+	if err := c._Conn.handshakeErr; err != nil {
 		return err
 	}
-	if c.Conn.handshakeComplete() {
+	if c._Conn.handshakeComplete() {
 		return nil
 	}
 
-	c.Conn.in._Mutex.Lock()
-	defer c.Conn.in._Mutex.Unlock()
+	c._Conn.in._Mutex.Lock()
+	defer c._Conn.in._Mutex.Unlock()
 
-	if c.Conn.isClient {
+	if c._Conn.isClient {
 		// [uTLS section begins]
 		err := c._BuildHandshakeState()
 		if err != nil {
@@ -174,23 +174,23 @@ func (c *_UConn) _Handshake() error {
 		}
 		// [uTLS section ends]
 
-		c.Conn.handshakeErr = c.clientHandshake()
+		c._Conn.handshakeErr = c.clientHandshake()
 	} else {
-		c.Conn.handshakeErr = c.Conn.serverHandshake()
+		c._Conn.handshakeErr = c._Conn.serverHandshake()
 	}
-	if c.Conn.handshakeErr == nil {
-		c.Conn.handshakes++
+	if c._Conn.handshakeErr == nil {
+		c._Conn.handshakes++
 	} else {
 		// If an error occurred during the hadshake try to flush the
 		// alert that might be left in the buffer.
-		c.Conn.flush()
+		c._Conn.flush()
 	}
 
-	if c.Conn.handshakeErr == nil && !c.Conn.handshakeComplete() {
-		c.Conn.handshakeErr = errors.New("tls: internal error: handshake should have had a result")
+	if c._Conn.handshakeErr == nil && !c._Conn.handshakeComplete() {
+		c._Conn.handshakeErr = errors.New("tls: internal error: handshake should have had a result")
 	}
 
-	return c.Conn.handshakeErr
+	return c._Conn.handshakeErr
 }
 
 // Copy-pasted from tls.Conn in its entirety. But c.Handshake() is now utls' one, not tls.
@@ -198,12 +198,12 @@ func (c *_UConn) _Handshake() error {
 func (c *_UConn) Write(b []byte) (int, error) {
 	// interlock with Close below
 	for {
-		x := atomic.LoadInt32(&c.Conn.activeCall)
+		x := atomic.LoadInt32(&c._Conn.activeCall)
 		if x&1 != 0 {
 			return 0, errClosed
 		}
-		if atomic.CompareAndSwapInt32(&c.Conn.activeCall, x, x+2) {
-			defer atomic.AddInt32(&c.Conn.activeCall, -2)
+		if atomic.CompareAndSwapInt32(&c._Conn.activeCall, x, x+2) {
+			defer atomic.AddInt32(&c._Conn.activeCall, -2)
 			break
 		}
 	}
@@ -212,18 +212,18 @@ func (c *_UConn) Write(b []byte) (int, error) {
 		return 0, err
 	}
 
-	c.Conn.out._Mutex.Lock()
-	defer c.Conn.out._Mutex.Unlock()
+	c._Conn.out._Mutex.Lock()
+	defer c._Conn.out._Mutex.Unlock()
 
-	if err := c.Conn.out.err; err != nil {
+	if err := c._Conn.out.err; err != nil {
 		return 0, err
 	}
 
-	if !c.Conn.handshakeComplete() {
+	if !c._Conn.handshakeComplete() {
 		return 0, alertInternalError
 	}
 
-	if c.Conn.closeNotifySent {
+	if c._Conn.closeNotifySent {
 		return 0, errShutdown
 	}
 
@@ -237,18 +237,18 @@ func (c *_UConn) Write(b []byte) (int, error) {
 	// https://www.imperialviolet.org/2012/01/15/beastfollowup.html
 
 	var m int
-	if len(b) > 1 && c.Conn.vers <= _VersionTLS10 {
-		if _, ok := c.Conn.out.cipher.(cipher.BlockMode); ok {
-			n, err := c.Conn.writeRecordLocked(recordTypeApplicationData, b[:1])
+	if len(b) > 1 && c._Conn.vers <= _VersionTLS10 {
+		if _, ok := c._Conn.out.cipher.(cipher.BlockMode); ok {
+			n, err := c._Conn.writeRecordLocked(recordTypeApplicationData, b[:1])
 			if err != nil {
-				return n, c.Conn.out.setErrorLocked(err)
+				return n, c._Conn.out.setErrorLocked(err)
 			}
 			m, b = 1, b[1:]
 		}
 	}
 
-	n, err := c.Conn.writeRecordLocked(recordTypeApplicationData, b)
-	return n + m, c.Conn.out.setErrorLocked(err)
+	n, err := c._Conn.writeRecordLocked(recordTypeApplicationData, b)
+	return n + m, c._Conn.out.setErrorLocked(err)
 }
 
 // clientHandshakeWithOneState checks that exactly one expected state is set (1.2 or 1.3)
@@ -264,23 +264,23 @@ func (c *_UConn) clientHandshake() (err error) {
 	// useTLS13 variable tells which pointer
 	// [uTLS section ends]
 
-	if c.Conn.config == nil {
-		c.Conn.config = defaultConfig()
+	if c._Conn.config == nil {
+		c._Conn.config = defaultConfig()
 	}
 
 	// This may be a renegotiation handshake, in which case some fields
 	// need to be reset.
-	c.Conn.didResume = false
+	c._Conn.didResume = false
 
 	// [uTLS section begins]
 	// don't make new ClientHello, use hs.hello
 	// preserve the checks from beginning and end of makeClientHello()
-	if len(c.Conn.config._ServerName) == 0 && !c.Conn.config._InsecureSkipVerify {
+	if len(c._Conn.config._ServerName) == 0 && !c._Conn.config._InsecureSkipVerify {
 		return errors.New("tls: either ServerName or InsecureSkipVerify must be specified in the tls.Config")
 	}
 
 	nextProtosLength := 0
-	for _, proto := range c.Conn.config._NextProtos {
+	for _, proto := range c._Conn.config._NextProtos {
 		if l := len(proto); l == 0 || l > 255 {
 			return errors.New("tls: invalid NextProtos value")
 		} else {
@@ -292,12 +292,12 @@ func (c *_UConn) clientHandshake() (err error) {
 		return errors.New("tls: NextProtos values too large")
 	}
 
-	if c.Conn.handshakes > 0 {
-		hello.secureRenegotiation = c.Conn.clientFinished[:]
+	if c._Conn.handshakes > 0 {
+		hello.secureRenegotiation = c._Conn.clientFinished[:]
 	}
 	// [uTLS section ends]
 
-	cacheKey, session, earlySecret, binderKey := c.Conn.loadSession(hello)
+	cacheKey, session, earlySecret, binderKey := c._Conn.loadSession(hello)
 	if cacheKey != "" && session != nil {
 		defer func() {
 			// If we got a handshake failure when resuming a session, throw away
@@ -307,7 +307,7 @@ func (c *_UConn) clientHandshake() (err error) {
 			// does require servers to abort on invalid binders, so we need to
 			// delete tickets to recover from a corrupted PSK.
 			if err != nil {
-				c.Conn.config._ClientSessionCache._Put(cacheKey, nil)
+				c._Conn.config._ClientSessionCache._Put(cacheKey, nil)
 			}
 		}()
 	}
@@ -319,27 +319,27 @@ func (c *_UConn) clientHandshake() (err error) {
 		}
 	}
 
-	if _, err := c.Conn.writeRecord(recordTypeHandshake, hello.marshal()); err != nil {
+	if _, err := c._Conn.writeRecord(recordTypeHandshake, hello.marshal()); err != nil {
 		return err
 	}
 
-	msg, err := c.Conn.readHandshake()
+	msg, err := c._Conn.readHandshake()
 	if err != nil {
 		return err
 	}
 
 	serverHello, ok := msg.(*serverHelloMsg)
 	if !ok {
-		c.Conn.sendAlert(alertUnexpectedMessage)
+		c._Conn.sendAlert(alertUnexpectedMessage)
 		return unexpectedMessageError(serverHello, msg)
 	}
 
-	if err := c.Conn.pickTLSVersion(serverHello); err != nil {
+	if err := c._Conn.pickTLSVersion(serverHello); err != nil {
 		return err
 	}
 
 	// uTLS: do not create new handshakeState, use existing one
-	if c.Conn.vers == _VersionTLS13 {
+	if c._Conn.vers == _VersionTLS13 {
 		hs13 := c._HandshakeState.toPrivate13()
 		hs13.serverHello = serverHello
 		hs13.hello = hello
@@ -369,7 +369,7 @@ func (c *_UConn) clientHandshake() (err error) {
 	// If we had a successful handshake and hs.session is different from
 	// the one already cached - cache a new one.
 	if cacheKey != "" && hs12.session != nil && session != hs12.session {
-		c.Conn.config._ClientSessionCache._Put(cacheKey, hs12.session)
+		c._Conn.config._ClientSessionCache._Put(cacheKey, hs12.session)
 	}
 	return nil
 }
@@ -522,8 +522,8 @@ func (uconn *_UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions [
 	}
 
 	uconn._HandshakeState._Hello._SupportedVersions = makeSupportedVersions(minTLSVers, maxTLSVers)
-	uconn.Conn.config._MinVersion = minTLSVers
-	uconn.Conn.config._MaxVersion = maxTLSVers
+	uconn._Conn.config._MinVersion = minTLSVers
+	uconn._Conn.config._MaxVersion = maxTLSVers
 
 	return nil
 }

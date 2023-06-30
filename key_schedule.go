@@ -195,7 +195,7 @@ func (c *cipherSuiteTLS13) exportKeyingMaterial(masterSecret []byte, transcript 
 type ecdheParameters interface {
 	_CurveID() _CurveID
 	_PublicKey() []byte
-	SharedKey(peerPublicKey []byte) []byte
+	_SharedKey(peerPublicKey []byte) []byte
 }
 
 func generateECDHEParameters(rand io.Reader, curveID _CurveID) (ecdheParameters, error) {
@@ -250,7 +250,7 @@ func (p *nistParameters) _PublicKey() []byte {
 	return elliptic.Marshal(curve, p.x, p.y)
 }
 
-func (p *nistParameters) SharedKey(peerPublicKey []byte) []byte {
+func (p *nistParameters) _SharedKey(peerPublicKey []byte) []byte {
 	curve, _ := curveForCurveID(p.curveID)
 	// Unmarshal also checks whether the given point is on the curve.
 	x, y := elliptic.Unmarshal(curve, peerPublicKey)
@@ -279,7 +279,7 @@ func (p *x25519Parameters) _PublicKey() []byte {
 	return p.publicKey[:]
 }
 
-func (p *x25519Parameters) SharedKey(peerPublicKey []byte) []byte {
+func (p *x25519Parameters) _SharedKey(peerPublicKey []byte) []byte {
 	if len(peerPublicKey) != 32 {
 		return nil
 	}

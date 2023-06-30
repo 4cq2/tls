@@ -30,7 +30,7 @@ func (t *_Transport) _RoundTrip(req *http.Request) (*http.Response, error) {
 	if err := req.Write(t._Conn); err != nil {
 		return nil, err
 	}
-	return http.ReadResponse(bufio.NewReader(t._Conn.Conn), req)
+	return http.ReadResponse(bufio.NewReader(t._Conn._Conn), req)
 }
 
 var _Android_API_26 = _ClientHelloSpec{

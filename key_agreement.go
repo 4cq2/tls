@@ -221,7 +221,7 @@ func (ka *ecdheKeyAgreement) processClientKeyExchange(config *_Config, cert *_Ce
 		return nil, errClientKeyExchange
 	}
 
-	preMasterSecret := ka.params.SharedKey(ckx.ciphertext[1:])
+	preMasterSecret := ka.params._SharedKey(ckx.ciphertext[1:])
 	if preMasterSecret == nil {
 		return nil, errClientKeyExchange
 	}
@@ -260,7 +260,7 @@ func (ka *ecdheKeyAgreement) processServerKeyExchange(config *_Config, clientHel
 	}
 	ka.params = params
 
-	ka.preMasterSecret = params.SharedKey(publicKey)
+	ka.preMasterSecret = params._SharedKey(publicKey)
 	if ka.preMasterSecret == nil {
 		return errServerKeyExchange
 	}
