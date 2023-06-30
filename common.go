@@ -402,20 +402,20 @@ const (
 	RenegotiateFreelyAsClient
 )
 
-// A Config structure is used to configure a TLS client or server.
+// A _Config structure is used to configure a TLS client or server.
 // After one has been passed to a TLS function it must not be
-// modified. A Config may be reused; the tls package will also not
+// modified. A _Config may be reused; the tls package will also not
 // modify it.
-type Config struct {
-	// Rand provides the source of entropy for nonces and RSA blinding.
-	// If Rand is nil, TLS uses the cryptographic random reader in package
+type _Config struct {
+	// _Rand provides the source of entropy for nonces and RSA blinding.
+	// If _Rand is nil, TLS uses the cryptographic random reader in package
 	// crypto/rand.
 	// The Reader must be safe for use by multiple goroutines.
-	Rand io.Reader
+	_Rand io.Reader
 
-	// Time returns the current time as the number of seconds since the epoch.
-	// If Time is nil, TLS uses time.Now.
-	Time func() time.Time
+	// _Time returns the current time as the number of seconds since the epoch.
+	// If _Time is nil, TLS uses time.Now.
+	_Time func() time.Time
 
 	// _Certificates contains one or more certificate chains to present to
 	// the other side of the connection. Server configurations must include
@@ -424,45 +424,45 @@ type Config struct {
 	// GetClientCertificate.
 	_Certificates []_Certificate
 
-	// NameToCertificate maps from a certificate name to an element of
+	// _NameToCertificate maps from a certificate name to an element of
 	// Certificates. Note that a certificate name can be of the form
 	// '*.example.com' and so doesn't have to be a domain name as such.
 	// See Config.BuildNameToCertificate
 	// The nil value causes the first element of Certificates to be used
 	// for all connections.
-	NameToCertificate map[string]*_Certificate
+	_NameToCertificate map[string]*_Certificate
 
-	// GetCertificate returns a Certificate based on the given
+	// _GetCertificate returns a Certificate based on the given
 	// ClientHelloInfo. It will only be called if the client supplies SNI
 	// information or if Certificates is empty.
 	//
-	// If GetCertificate is nil or returns nil, then the certificate is
+	// If _GetCertificate is nil or returns nil, then the certificate is
 	// retrieved from NameToCertificate. If NameToCertificate is nil, the
 	// first element of Certificates will be used.
-	GetCertificate func(*_ClientHelloInfo) (*_Certificate, error)
+	_GetCertificate func(*_ClientHelloInfo) (*_Certificate, error)
 
-	// GetClientCertificate, if not nil, is called when a server requests a
+	// _GetClientCertificate, if not nil, is called when a server requests a
 	// certificate from a client. If set, the contents of Certificates will
 	// be ignored.
 	//
-	// If GetClientCertificate returns an error, the handshake will be
+	// If _GetClientCertificate returns an error, the handshake will be
 	// aborted and that error will be returned. Otherwise
-	// GetClientCertificate must return a non-nil Certificate. If
+	// _GetClientCertificate must return a non-nil Certificate. If
 	// Certificate.Certificate is empty then no certificate will be sent to
 	// the server. If this is unacceptable to the server then it may abort
 	// the handshake.
 	//
-	// GetClientCertificate may be called multiple times for the same
+	// _GetClientCertificate may be called multiple times for the same
 	// connection if renegotiation occurs or if TLS 1.3 is in use.
-	GetClientCertificate func(*_CertificateRequestInfo) (*_Certificate, error)
+	_GetClientCertificate func(*_CertificateRequestInfo) (*_Certificate, error)
 
-	// GetConfigForClient, if not nil, is called after a ClientHello is
+	// _GetConfigForClient, if not nil, is called after a ClientHello is
 	// received from a client. It may return a non-nil Config in order to
 	// change the Config that will be used to handle this connection. If
 	// the returned Config is nil, the original Config will be used. The
 	// Config returned by this callback may not be subsequently modified.
 	//
-	// If GetConfigForClient is nil, the Config passed to Server() will be
+	// If _GetConfigForClient is nil, the Config passed to Server() will be
 	// used for all connections.
 	//
 	// Uniquely for the fields in the returned Config, session ticket keys
@@ -474,9 +474,9 @@ type Config struct {
 	// not in the returned config then it will be copied into the returned
 	// config before use. If neither of those cases applies then the key
 	// material from the returned config will be used for session tickets.
-	GetConfigForClient func(*_ClientHelloInfo) (*Config, error)
+	_GetConfigForClient func(*_ClientHelloInfo) (*_Config, error)
 
-	// VerifyPeerCertificate, if not nil, is called after normal
+	// _VerifyPeerCertificate, if not nil, is called after normal
 	// certificate verification by either a TLS client or server. It
 	// receives the raw ASN.1 certificates provided by the peer and also
 	// any verified chains that normal processing found. If it returns a
@@ -487,22 +487,22 @@ type Config struct {
 	// setting InsecureSkipVerify, or (for a server) when ClientAuth is
 	// RequestClientCert or RequireAnyClientCert, then this callback will
 	// be considered but the verifiedChains argument will always be nil.
-	VerifyPeerCertificate func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error
+	_VerifyPeerCertificate func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error
 
-	// RootCAs defines the set of root certificate authorities
+	// _RootCAs defines the set of root certificate authorities
 	// that clients use when verifying server certificates.
-	// If RootCAs is nil, TLS uses the host's root CA set.
-	RootCAs *x509.CertPool
+	// If _RootCAs is nil, TLS uses the host's root CA set.
+	_RootCAs *x509.CertPool
 
-	// NextProtos is a list of supported application level protocols, in
+	// _NextProtos is a list of supported application level protocols, in
 	// order of preference.
-	NextProtos []string
+	_NextProtos []string
 
-	// ServerName is used to verify the hostname on the returned
+	// _ServerName is used to verify the hostname on the returned
 	// certificates unless InsecureSkipVerify is given. It is also included
 	// in the client's handshake to support virtual hosting unless it is
 	// an IP address.
-	ServerName string
+	_ServerName string
 
 	// _ClientAuth determines the server's policy for
 	// TLS Client Authentication. The default is NoClientCert.
@@ -513,13 +513,13 @@ type Config struct {
 	// by the policy in ClientAuth.
 	_ClientCAs *x509.CertPool
 
-	// InsecureSkipVerify controls whether a client verifies the
+	// _InsecureSkipVerify controls whether a client verifies the
 	// server's certificate chain and host name.
-	// If InsecureSkipVerify is true, TLS accepts any certificate
+	// If _InsecureSkipVerify is true, TLS accepts any certificate
 	// presented by the server and any host name in that certificate.
 	// In this mode, TLS is susceptible to man-in-the-middle attacks.
 	// This should be used only for testing.
-	InsecureSkipVerify bool
+	_InsecureSkipVerify bool
 
 	// _CipherSuites is a list of supported cipher suites for TLS versions up to
 	// TLS 1.2. If _CipherSuites is nil, a default list of secure cipher suites
@@ -528,63 +528,63 @@ type Config struct {
 	// ciphersuites are not configurable.
 	_CipherSuites []uint16
 
-	// PreferServerCipherSuites controls whether the server selects the
+	// _PreferServerCipherSuites controls whether the server selects the
 	// client's most preferred ciphersuite, or the server's most preferred
 	// ciphersuite. If true then the server's preference, as expressed in
 	// the order of elements in CipherSuites, is used.
-	PreferServerCipherSuites bool
+	_PreferServerCipherSuites bool
 
-	// SessionTicketsDisabled may be set to true to disable session ticket and
+	// _SessionTicketsDisabled may be set to true to disable session ticket and
 	// PSK (resumption) support. Note that on clients, session ticket support is
 	// also disabled if ClientSessionCache is nil.
-	SessionTicketsDisabled bool
+	_SessionTicketsDisabled bool
 
-	// SessionTicketKey is used by TLS servers to provide session resumption.
+	// _SessionTicketKey is used by TLS servers to provide session resumption.
 	// See RFC 5077 and the PSK mode of RFC 8446. If zero, it will be filled
 	// with random data before the first server handshake.
 	//
 	// If multiple servers are terminating connections for the same host
-	// they should all have the same SessionTicketKey. If the
-	// SessionTicketKey leaks, previously recorded and future TLS
+	// they should all have the same _SessionTicketKey. If the
+	// _SessionTicketKey leaks, previously recorded and future TLS
 	// connections using that key might be compromised.
-	SessionTicketKey [32]byte
+	_SessionTicketKey [32]byte
 
 	// _ClientSessionCache is a cache of ClientSessionState entries for TLS
 	// session resumption. It is only used by clients.
 	_ClientSessionCache _ClientSessionCache
 
-	// MinVersion contains the minimum SSL/TLS version that is acceptable.
+	// _MinVersion contains the minimum SSL/TLS version that is acceptable.
 	// If zero, then TLS 1.0 is taken as the minimum.
-	MinVersion uint16
+	_MinVersion uint16
 
-	// MaxVersion contains the maximum SSL/TLS version that is acceptable.
+	// _MaxVersion contains the maximum SSL/TLS version that is acceptable.
 	// If zero, then the maximum version supported by this package is used,
 	// which is currently TLS 1.3.
-	MaxVersion uint16
+	_MaxVersion uint16
 
-	// CurvePreferences contains the elliptic curves that will be used in
+	// _CurvePreferences contains the elliptic curves that will be used in
 	// an ECDHE handshake, in preference order. If empty, the default will
 	// be used. The client will use the first preference as the type for
 	// its key share in TLS 1.3. This may change in the future.
-	CurvePreferences []CurveID
+	_CurvePreferences []CurveID
 
-	// DynamicRecordSizingDisabled disables adaptive sizing of TLS records.
+	// _DynamicRecordSizingDisabled disables adaptive sizing of TLS records.
 	// When true, the largest possible TLS record size is always used. When
 	// false, the size of TLS records may be adjusted in an attempt to
 	// improve latency.
-	DynamicRecordSizingDisabled bool
+	_DynamicRecordSizingDisabled bool
 
-	// Renegotiation controls what types of renegotiation are supported.
+	// _Renegotiation controls what types of renegotiation are supported.
 	// The default, none, is correct for the vast majority of applications.
-	Renegotiation RenegotiationSupport
+	_Renegotiation RenegotiationSupport
 
-	// KeyLogWriter optionally specifies a destination for TLS master secrets
+	// _KeyLogWriter optionally specifies a destination for TLS master secrets
 	// in NSS key log format that can be used to allow external programs
 	// such as Wireshark to decrypt TLS connections.
 	// See https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/Key_Log_Format.
-	// Use of KeyLogWriter compromises security and should only be
+	// Use of _KeyLogWriter compromises security and should only be
 	// used for debugging.
-	KeyLogWriter io.Writer
+	_KeyLogWriter io.Writer
 
 	serverInitOnce sync.Once // guards calling (*Config).serverInit
 
@@ -625,9 +625,9 @@ func ticketKeyFromBytes(b [32]byte) (key ticketKey) {
 // ticket, and the lifetime we set for tickets we send.
 const maxSessionTicketLifetime = 7 * 24 * time.Hour
 
-// Clone returns a shallow clone of c. It is safe to clone a Config that is
+// _Clone returns a shallow clone of c. It is safe to clone a Config that is
 // being used concurrently by a TLS client or server.
-func (c *Config) Clone() *Config {
+func (c *_Config) _Clone() *_Config {
 	// Running serverInit ensures that it's safe to read
 	// SessionTicketsDisabled.
 	c.serverInitOnce.Do(func() { c.serverInit(nil) })
@@ -637,46 +637,46 @@ func (c *Config) Clone() *Config {
 	sessionTicketKeys = c.sessionTicketKeys
 	c.mutex.RUnlock()
 
-	return &Config{
-		Rand:                        c.Rand,
-		Time:                        c.Time,
-		_Certificates:               c._Certificates,
-		NameToCertificate:           c.NameToCertificate,
-		GetCertificate:              c.GetCertificate,
-		GetClientCertificate:        c.GetClientCertificate,
-		GetConfigForClient:          c.GetConfigForClient,
-		VerifyPeerCertificate:       c.VerifyPeerCertificate,
-		RootCAs:                     c.RootCAs,
-		NextProtos:                  c.NextProtos,
-		ServerName:                  c.ServerName,
-		_ClientAuth:                 c._ClientAuth,
-		_ClientCAs:                  c._ClientCAs,
-		InsecureSkipVerify:          c.InsecureSkipVerify,
-		_CipherSuites:               c._CipherSuites,
-		PreferServerCipherSuites:    c.PreferServerCipherSuites,
-		SessionTicketsDisabled:      c.SessionTicketsDisabled,
-		SessionTicketKey:            c.SessionTicketKey,
-		_ClientSessionCache:         c._ClientSessionCache,
-		MinVersion:                  c.MinVersion,
-		MaxVersion:                  c.MaxVersion,
-		CurvePreferences:            c.CurvePreferences,
-		DynamicRecordSizingDisabled: c.DynamicRecordSizingDisabled,
-		Renegotiation:               c.Renegotiation,
-		KeyLogWriter:                c.KeyLogWriter,
-		sessionTicketKeys:           sessionTicketKeys,
+	return &_Config{
+		_Rand:                        c._Rand,
+		_Time:                        c._Time,
+		_Certificates:                c._Certificates,
+		_NameToCertificate:           c._NameToCertificate,
+		_GetCertificate:              c._GetCertificate,
+		_GetClientCertificate:        c._GetClientCertificate,
+		_GetConfigForClient:          c._GetConfigForClient,
+		_VerifyPeerCertificate:       c._VerifyPeerCertificate,
+		_RootCAs:                     c._RootCAs,
+		_NextProtos:                  c._NextProtos,
+		_ServerName:                  c._ServerName,
+		_ClientAuth:                  c._ClientAuth,
+		_ClientCAs:                   c._ClientCAs,
+		_InsecureSkipVerify:          c._InsecureSkipVerify,
+		_CipherSuites:                c._CipherSuites,
+		_PreferServerCipherSuites:    c._PreferServerCipherSuites,
+		_SessionTicketsDisabled:      c._SessionTicketsDisabled,
+		_SessionTicketKey:            c._SessionTicketKey,
+		_ClientSessionCache:          c._ClientSessionCache,
+		_MinVersion:                  c._MinVersion,
+		_MaxVersion:                  c._MaxVersion,
+		_CurvePreferences:            c._CurvePreferences,
+		_DynamicRecordSizingDisabled: c._DynamicRecordSizingDisabled,
+		_Renegotiation:               c._Renegotiation,
+		_KeyLogWriter:                c._KeyLogWriter,
+		sessionTicketKeys:            sessionTicketKeys,
 	}
 }
 
 // serverInit is run under c.serverInitOnce to do initialization of c. If c was
 // returned by a GetConfigForClient callback then the argument should be the
 // Config that was passed to Server, otherwise it should be nil.
-func (c *Config) serverInit(originalConfig *Config) {
-	if c.SessionTicketsDisabled || len(c.ticketKeys()) != 0 {
+func (c *_Config) serverInit(originalConfig *_Config) {
+	if c._SessionTicketsDisabled || len(c.ticketKeys()) != 0 {
 		return
 	}
 
 	alreadySet := false
-	for _, b := range c.SessionTicketKey {
+	for _, b := range c._SessionTicketKey {
 		if b != 0 {
 			alreadySet = true
 			break
@@ -685,9 +685,9 @@ func (c *Config) serverInit(originalConfig *Config) {
 
 	if !alreadySet {
 		if originalConfig != nil {
-			copy(c.SessionTicketKey[:], originalConfig.SessionTicketKey[:])
-		} else if _, err := io.ReadFull(c.rand(), c.SessionTicketKey[:]); err != nil {
-			c.SessionTicketsDisabled = true
+			copy(c._SessionTicketKey[:], originalConfig._SessionTicketKey[:])
+		} else if _, err := io.ReadFull(c.rand(), c._SessionTicketKey[:]); err != nil {
+			c._SessionTicketsDisabled = true
 			return
 		}
 	}
@@ -697,11 +697,11 @@ func (c *Config) serverInit(originalConfig *Config) {
 		c.sessionTicketKeys = originalConfig.sessionTicketKeys
 		originalConfig.mutex.RUnlock()
 	} else {
-		c.sessionTicketKeys = []ticketKey{ticketKeyFromBytes(c.SessionTicketKey)}
+		c.sessionTicketKeys = []ticketKey{ticketKeyFromBytes(c._SessionTicketKey)}
 	}
 }
 
-func (c *Config) ticketKeys() []ticketKey {
+func (c *_Config) ticketKeys() []ticketKey {
 	c.mutex.RLock()
 	// c.sessionTicketKeys is constant once created. SetSessionTicketKeys
 	// will only update it by replacing it with a new value.
@@ -710,43 +710,23 @@ func (c *Config) ticketKeys() []ticketKey {
 	return ret
 }
 
-// SetSessionTicketKeys updates the session ticket keys for a server. The first
-// key will be used when creating new tickets, while all keys can be used for
-// decrypting tickets. It is safe to call this function while the server is
-// running in order to rotate the session ticket keys. The function will panic
-// if keys is empty.
-func (c *Config) SetSessionTicketKeys(keys [][32]byte) {
-	if len(keys) == 0 {
-		panic("tls: keys must have at least one key")
-	}
-
-	newKeys := make([]ticketKey, len(keys))
-	for i, bytes := range keys {
-		newKeys[i] = ticketKeyFromBytes(bytes)
-	}
-
-	c.mutex.Lock()
-	c.sessionTicketKeys = newKeys
-	c.mutex.Unlock()
-}
-
-func (c *Config) rand() io.Reader {
-	r := c.Rand
+func (c *_Config) rand() io.Reader {
+	r := c._Rand
 	if r == nil {
 		return rand.Reader
 	}
 	return r
 }
 
-func (c *Config) time() time.Time {
-	t := c.Time
+func (c *_Config) time() time.Time {
+	t := c._Time
 	if t == nil {
 		t = time.Now
 	}
 	return t()
 }
 
-func (c *Config) cipherSuites() []uint16 {
+func (c *_Config) cipherSuites() []uint16 {
 	s := c._CipherSuites
 	if s == nil {
 		s = defaultCipherSuites()
@@ -762,13 +742,13 @@ var supportedVersions = []uint16{
 	VersionSSL30,
 }
 
-func (c *Config) supportedVersions(isClient bool) []uint16 {
+func (c *_Config) supportedVersions(isClient bool) []uint16 {
 	versions := make([]uint16, 0, len(supportedVersions))
 	for _, v := range supportedVersions {
-		if c != nil && c.MinVersion != 0 && v < c.MinVersion {
+		if c != nil && c._MinVersion != 0 && v < c._MinVersion {
 			continue
 		}
-		if c != nil && c.MaxVersion != 0 && v > c.MaxVersion {
+		if c != nil && c._MaxVersion != 0 && v > c._MaxVersion {
 			continue
 		}
 		// TLS 1.0 is the minimum version supported as a client.
@@ -822,7 +802,7 @@ func goDebugString(key string) string {
 	return ""
 }
 
-func (c *Config) maxSupportedVersion(isClient bool) uint16 {
+func (c *_Config) maxSupportedVersion(isClient bool) uint16 {
 	supportedVersions := c.supportedVersions(isClient)
 	if len(supportedVersions) == 0 {
 		return 0
@@ -846,16 +826,16 @@ func supportedVersionsFromMax(maxVersion uint16) []uint16 {
 
 var defaultCurvePreferences = []CurveID{X25519, CurveP256, CurveP384, CurveP521}
 
-func (c *Config) curvePreferences() []CurveID {
-	if c == nil || len(c.CurvePreferences) == 0 {
+func (c *_Config) curvePreferences() []CurveID {
+	if c == nil || len(c._CurvePreferences) == 0 {
 		return defaultCurvePreferences
 	}
-	return c.CurvePreferences
+	return c._CurvePreferences
 }
 
 // mutualVersion returns the protocol version to use given the advertised
 // versions of the peer. Priority is given to the peer preference order.
-func (c *Config) mutualVersion(isClient bool, peerVersions []uint16) (uint16, bool) {
+func (c *_Config) mutualVersion(isClient bool, peerVersions []uint16) (uint16, bool) {
 	supportedVersions := c.supportedVersions(isClient)
 	for _, peerVersion := range peerVersions {
 		for _, v := range supportedVersions {
@@ -869,10 +849,10 @@ func (c *Config) mutualVersion(isClient bool, peerVersions []uint16) (uint16, bo
 
 // getCertificate returns the best certificate for the given ClientHelloInfo,
 // defaulting to the first element of c.Certificates.
-func (c *Config) getCertificate(clientHello *_ClientHelloInfo) (*_Certificate, error) {
-	if c.GetCertificate != nil &&
+func (c *_Config) getCertificate(clientHello *_ClientHelloInfo) (*_Certificate, error) {
+	if c._GetCertificate != nil &&
 		(len(c._Certificates) == 0 || len(clientHello._ServerName) > 0) {
-		cert, err := c.GetCertificate(clientHello)
+		cert, err := c._GetCertificate(clientHello)
 		if cert != nil || err != nil {
 			return cert, err
 		}
@@ -882,7 +862,7 @@ func (c *Config) getCertificate(clientHello *_ClientHelloInfo) (*_Certificate, e
 		return nil, errors.New("tls: no certificates configured")
 	}
 
-	if len(c._Certificates) == 1 || c.NameToCertificate == nil {
+	if len(c._Certificates) == 1 || c._NameToCertificate == nil {
 		// There's only one choice, so no point doing any work.
 		return &c._Certificates[0], nil
 	}
@@ -892,7 +872,7 @@ func (c *Config) getCertificate(clientHello *_ClientHelloInfo) (*_Certificate, e
 		name = name[:len(name)-1]
 	}
 
-	if cert, ok := c.NameToCertificate[name]; ok {
+	if cert, ok := c._NameToCertificate[name]; ok {
 		return cert, nil
 	}
 
@@ -902,7 +882,7 @@ func (c *Config) getCertificate(clientHello *_ClientHelloInfo) (*_Certificate, e
 	for i := range labels {
 		labels[i] = "*"
 		candidate := strings.Join(labels, ".")
-		if cert, ok := c.NameToCertificate[candidate]; ok {
+		if cert, ok := c._NameToCertificate[candidate]; ok {
 			return cert, nil
 		}
 	}
@@ -919,15 +899,15 @@ const (
 	keyLogLabelServerTraffic   = "SERVER_TRAFFIC_SECRET_0"
 )
 
-func (c *Config) writeKeyLog(label string, clientRandom, secret []byte) error {
-	if c.KeyLogWriter == nil {
+func (c *_Config) writeKeyLog(label string, clientRandom, secret []byte) error {
+	if c._KeyLogWriter == nil {
 		return nil
 	}
 
 	logLine := []byte(fmt.Sprintf("%s %x %x\n", label, clientRandom, secret))
 
 	writerMutex.Lock()
-	_, err := c.KeyLogWriter.Write(logLine)
+	_, err := c._KeyLogWriter.Write(logLine)
 	writerMutex.Unlock()
 
 	return err
@@ -1047,9 +1027,9 @@ type dsaSignature struct {
 
 type ecdsaSignature dsaSignature
 
-var emptyConfig Config
+var emptyConfig _Config
 
-func defaultConfig() *Config {
+func defaultConfig() *_Config {
 	return &emptyConfig
 }
 

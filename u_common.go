@@ -20,7 +20,7 @@ type Transport struct {
 }
 
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	conf := Config{ServerName: req.URL.Host}
+	conf := _Config{_ServerName: req.URL.Host}
 	conn, err := net.Dial("tcp", req.URL.Host+":443")
 	if err != nil {
 		return nil, err

@@ -33,7 +33,7 @@ import (
 // using conn as the underlying transport.
 // The configuration config must be non-nil and must include
 // at least one certificate or else set GetCertificate.
-func Server(conn net.Conn, config *Config) *Conn {
+func Server(conn net.Conn, config *_Config) *Conn {
 	return &Conn{conn: conn, config: config}
 }
 
@@ -41,14 +41,14 @@ func Server(conn net.Conn, config *Config) *Conn {
 // using conn as the underlying transport.
 // The config cannot be nil: users must set either ServerName or
 // InsecureSkipVerify in the config.
-func _Client(conn net.Conn, config *Config) *Conn {
+func _Client(conn net.Conn, config *_Config) *Conn {
 	return &Conn{conn: conn, config: config, isClient: true}
 }
 
 // A listener implements a network listener (net.Listener) for TLS connections.
 type listener struct {
 	net.Listener
-	config *Config
+	config *_Config
 }
 
 // Accept waits for and returns the next incoming TLS connection.
@@ -65,7 +65,7 @@ func (l *listener) Accept() (net.Conn, error) {
 // Listener and wraps each connection with Server.
 // The configuration config must be non-nil and must include
 // at least one certificate or else set GetCertificate.
-func NewListener(inner net.Listener, config *Config) net.Listener {
+func NewListener(inner net.Listener, config *_Config) net.Listener {
 	l := new(listener)
 	l.Listener = inner
 	l.config = config
@@ -76,8 +76,8 @@ func NewListener(inner net.Listener, config *Config) net.Listener {
 // given network address using net.Listen.
 // The configuration config must be non-nil and must include
 // at least one certificate or else set GetCertificate.
-func Listen(network, laddr string, config *Config) (net.Listener, error) {
-	if config == nil || (len(config._Certificates) == 0 && config.GetCertificate == nil) {
+func Listen(network, laddr string, config *_Config) (net.Listener, error) {
+	if config == nil || (len(config._Certificates) == 0 && config._GetCertificate == nil) {
 		return nil, errors.New("tls: neither Certificates nor GetCertificate set in Config")
 	}
 	l, err := net.Listen(network, laddr)
@@ -100,7 +100,7 @@ func (timeoutError) Temporary() bool { return true }
 //
 // DialWithDialer interprets a nil configuration as equivalent to the zero
 // configuration; see the documentation of Config for the defaults.
-func DialWithDialer(dialer *net.Dialer, network, addr string, config *Config) (*Conn, error) {
+func DialWithDialer(dialer *net.Dialer, network, addr string, config *_Config) (*Conn, error) {
 	// We want the Timeout and Deadline values from dialer to cover the
 	// whole process: TCP connection and TLS handshake. This means that we
 	// also need to start our own timers now.
@@ -138,10 +138,10 @@ func DialWithDialer(dialer *net.Dialer, network, addr string, config *Config) (*
 	}
 	// If no ServerName is set, infer the ServerName
 	// from the hostname we're connecting to.
-	if config.ServerName == "" {
+	if config._ServerName == "" {
 		// Make a copy to avoid polluting argument or default.
-		c := config.Clone()
-		c.ServerName = hostname
+		c := config._Clone()
+		c._ServerName = hostname
 		config = c
 	}
 
@@ -171,7 +171,7 @@ func DialWithDialer(dialer *net.Dialer, network, addr string, config *Config) (*
 // Dial interprets a nil configuration as equivalent to
 // the zero configuration; see the documentation of Config
 // for the defaults.
-func Dial(network, addr string, config *Config) (*Conn, error) {
+func Dial(network, addr string, config *_Config) (*Conn, error) {
 	return DialWithDialer(new(net.Dialer), network, addr, config)
 }
 

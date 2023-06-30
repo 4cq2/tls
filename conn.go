@@ -33,10 +33,10 @@ type Conn struct {
 	handshakeStatus uint32
 	// constant after handshake; protected by handshakeMutex
 	handshakeMutex sync.Mutex
-	handshakeErr   error   // error resulting from handshake
-	vers           uint16  // TLS version
-	haveVers       bool    // version has been negotiated
-	config         *Config // configuration passed to constructor
+	handshakeErr   error    // error resulting from handshake
+	vers           uint16   // TLS version
+	haveVers       bool     // version has been negotiated
+	config         *_Config // configuration passed to constructor
 	// handshakes counts the number of handshakes performed on the
 	// connection so far. If renegotiation is disabled then this is either
 	// zero or one.
@@ -862,7 +862,7 @@ const (
 // In the interests of simplicity and determinism, this code does not attempt
 // to reset the record size once the connection is idle, however.
 func (c *Conn) maxPayloadSizeForWrite(typ recordType) int {
-	if c.config.DynamicRecordSizingDisabled || typ != recordTypeApplicationData {
+	if c.config._DynamicRecordSizingDisabled || typ != recordTypeApplicationData {
 		return maxPlaintext
 	}
 
@@ -1157,7 +1157,7 @@ func (c *Conn) handleRenegotiation() error {
 		return c.sendAlert(alertNoRenegotiation)
 	}
 
-	switch c.config.Renegotiation {
+	switch c.config._Renegotiation {
 	case RenegotiateNever:
 		return c.sendAlert(alertNoRenegotiation)
 	case RenegotiateOnceAsClient:
@@ -1406,7 +1406,7 @@ func (c *Conn) ConnectionState() ConnectionState {
 				state.TLSUnique = c.serverFinished[:]
 			}
 		}
-		if c.config.Renegotiation != RenegotiateNever {
+		if c.config._Renegotiation != RenegotiateNever {
 			state.ekm = noExportedKeyingMaterial
 		} else {
 			state.ekm = c.ekm

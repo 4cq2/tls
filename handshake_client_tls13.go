@@ -682,7 +682,7 @@ func (hs *clientHandshakeStateTLS13) sendClientFinished() error {
 
 	c.out.setTrafficSecret(hs.suite, hs.trafficSecret)
 
-	if !c.config.SessionTicketsDisabled && c.config._ClientSessionCache != nil {
+	if !c.config._SessionTicketsDisabled && c.config._ClientSessionCache != nil {
 		c.resumptionSecret = hs.suite.deriveSecret(hs.masterSecret,
 			resumptionLabel, hs.transcript)
 	}
@@ -696,7 +696,7 @@ func (c *Conn) handleNewSessionTicket(msg *newSessionTicketMsgTLS13) error {
 		return errors.New("tls: received new session ticket from a client")
 	}
 
-	if c.config.SessionTicketsDisabled || c.config._ClientSessionCache == nil {
+	if c.config._SessionTicketsDisabled || c.config._ClientSessionCache == nil {
 		return nil
 	}
 

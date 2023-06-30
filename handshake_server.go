@@ -141,9 +141,9 @@ func (c *Conn) readClientHello() (*clientHelloMsg, error) {
 		return nil, unexpectedMessageError(clientHello, msg)
 	}
 
-	if c.config.GetConfigForClient != nil {
+	if c.config._GetConfigForClient != nil {
 		chi := clientHelloInfo(c, clientHello)
-		if newConfig, err := c.config.GetConfigForClient(chi); err != nil {
+		if newConfig, err := c.config._GetConfigForClient(chi); err != nil {
 			c.sendAlert(alertInternalError)
 			return nil, err
 		} else if newConfig != nil {
@@ -239,7 +239,7 @@ Curves:
 	}
 
 	if len(hs.clientHello.alpnProtocols) > 0 {
-		if selectedProto, fallback := mutualProtocol(hs.clientHello.alpnProtocols, c.config.NextProtos); !fallback {
+		if selectedProto, fallback := mutualProtocol(hs.clientHello.alpnProtocols, c.config._NextProtos); !fallback {
 			hs.hello.alpnProtocol = selectedProto
 			c.clientProtocol = selectedProto
 		}
@@ -248,9 +248,9 @@ Curves:
 		// had a bug around this. Best to send nothing at all if
 		// c.config.NextProtos is empty. See
 		// https://golang.org/issue/5445.
-		if hs.clientHello.nextProtoNeg && len(c.config.NextProtos) > 0 {
+		if hs.clientHello.nextProtoNeg && len(c.config._NextProtos) > 0 {
 			hs.hello.nextProtoNeg = true
-			hs.hello.nextProtos = c.config.NextProtos
+			hs.hello.nextProtos = c.config._NextProtos
 		}
 	}
 
@@ -291,7 +291,7 @@ func (hs *serverHandshakeState) pickCipherSuite() error {
 	c := hs.c
 
 	var preferenceList, supportedList []uint16
-	if c.config.PreferServerCipherSuites {
+	if c.config._PreferServerCipherSuites {
 		preferenceList = c.config.cipherSuites()
 		supportedList = hs.clientHello.cipherSuites
 	} else {
@@ -328,7 +328,7 @@ func (hs *serverHandshakeState) pickCipherSuite() error {
 func (hs *serverHandshakeState) checkForResumption() bool {
 	c := hs.c
 
-	if c.config.SessionTicketsDisabled {
+	if c.config._SessionTicketsDisabled {
 		return false
 	}
 
@@ -410,7 +410,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 		hs.hello.ocspStapling = true
 	}
 
-	hs.hello.ticketSupported = hs.clientHello.ticketSupported && !c.config.SessionTicketsDisabled
+	hs.hello.ticketSupported = hs.clientHello.ticketSupported && !c.config._SessionTicketsDisabled
 	hs.hello.cipherSuite = hs.suite.id
 
 	hs.finishedHash = newFinishedHash(hs.c.vers, hs.suite)
@@ -742,8 +742,8 @@ func (c *Conn) processCertsFromClient(certificate _Certificate) error {
 		c.verifiedChains = chains
 	}
 
-	if c.config.VerifyPeerCertificate != nil {
-		if err := c.config.VerifyPeerCertificate(certificates, c.verifiedChains); err != nil {
+	if c.config._VerifyPeerCertificate != nil {
+		if err := c.config._VerifyPeerCertificate(certificates, c.verifiedChains); err != nil {
 			c.sendAlert(alertBadCertificate)
 			return err
 		}

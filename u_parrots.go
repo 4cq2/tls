@@ -625,7 +625,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 		switch ext := e.(type) {
 		case *SNIExtension:
 			if ext.ServerName == "" {
-				ext.ServerName = uconn.config.ServerName
+				ext.ServerName = uconn.config._ServerName
 			}
 		case *UtlsGREASEExtension:
 			switch grease_extensions_seen {
@@ -757,7 +757,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 
 	p._CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
 
-	sni := SNIExtension{uconn.config.ServerName}
+	sni := SNIExtension{uconn.config._ServerName}
 	sessionTicket := SessionTicketExtension{Session: uconn.HandshakeState._Session}
 
 	sigAndHashAlgos := []SignatureScheme{
@@ -818,11 +818,11 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	}
 
 	if WithALPN {
-		if len(uconn.config.NextProtos) == 0 {
+		if len(uconn.config._NextProtos) == 0 {
 			// if user didn't specify alpn yet, choose something popular
-			uconn.config.NextProtos = []string{"h2", "http/1.1"}
+			uconn.config._NextProtos = []string{"h2", "http/1.1"}
 		}
-		alpn := ALPNExtension{_AlpnProtocols: uconn.config.NextProtos}
+		alpn := ALPNExtension{_AlpnProtocols: uconn.config._NextProtos}
 		p._Extensions = append(p._Extensions, &alpn)
 	}
 

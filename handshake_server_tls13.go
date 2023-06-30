@@ -148,7 +148,7 @@ func (hs *serverHandshakeStateTLS13) processClientHello() error {
 	hs.hello.compressionMethod = compressionNone
 
 	var preferenceList, supportedList []uint16
-	if c.config.PreferServerCipherSuites {
+	if c.config._PreferServerCipherSuites {
 		preferenceList = defaultCipherSuitesTLS13()
 		supportedList = hs.clientHello.cipherSuites
 	} else {
@@ -226,7 +226,7 @@ GroupSelection:
 func (hs *serverHandshakeStateTLS13) checkForResumption() error {
 	c := hs.c
 
-	if c.config.SessionTicketsDisabled {
+	if c.config._SessionTicketsDisabled {
 		return nil
 	}
 
@@ -564,7 +564,7 @@ func (hs *serverHandshakeStateTLS13) sendServerParameters() error {
 	encryptedExtensions := new(encryptedExtensionsMsg)
 
 	if len(hs.clientHello.alpnProtocols) > 0 {
-		if selectedProto, fallback := mutualProtocol(hs.clientHello.alpnProtocols, c.config.NextProtos); !fallback {
+		if selectedProto, fallback := mutualProtocol(hs.clientHello.alpnProtocols, c.config._NextProtos); !fallback {
 			encryptedExtensions.alpnProtocol = selectedProto
 			c.clientProtocol = selectedProto
 		}
@@ -703,7 +703,7 @@ func (hs *serverHandshakeStateTLS13) sendServerFinished() error {
 }
 
 func (hs *serverHandshakeStateTLS13) shouldSendSessionTickets() bool {
-	if hs.c.config.SessionTicketsDisabled {
+	if hs.c.config._SessionTicketsDisabled {
 		return false
 	}
 

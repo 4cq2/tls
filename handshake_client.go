@@ -35,12 +35,12 @@ type clientHandshakeState struct {
 
 func (c *Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
 	config := c.config
-	if len(config.ServerName) == 0 && !config.InsecureSkipVerify {
+	if len(config._ServerName) == 0 && !config._InsecureSkipVerify {
 		return nil, nil, errors.New("tls: either ServerName or InsecureSkipVerify must be specified in the tls.Config")
 	}
 
 	nextProtosLength := 0
-	for _, proto := range config.NextProtos {
+	for _, proto := range config._NextProtos {
 		if l := len(proto); l == 0 || l > 255 {
 			return nil, nil, errors.New("tls: invalid NextProtos value")
 		} else {
@@ -71,12 +71,12 @@ func (c *Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
 		sessionId:                    make([]byte, 32),
 		ocspStapling:                 true,
 		scts:                         true,
-		serverName:                   hostnameInSNI(config.ServerName),
+		serverName:                   hostnameInSNI(config._ServerName),
 		supportedCurves:              config.curvePreferences(),
 		supportedPoints:              []uint8{pointFormatUncompressed},
-		nextProtoNeg:                 len(config.NextProtos) > 0,
+		nextProtoNeg:                 len(config._NextProtos) > 0,
 		secureRenegotiationSupported: true,
-		alpnProtocols:                config.NextProtos,
+		alpnProtocols:                config._NextProtos,
 		supportedVersions:            supportedVersions,
 	}
 
@@ -221,7 +221,7 @@ func (c *Conn) clientHandshake() (err error) {
 
 func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 	session *_ClientSessionState, earlySecret, binderKey []byte) {
-	if c.config.SessionTicketsDisabled || c.config._ClientSessionCache == nil {
+	if c.config._SessionTicketsDisabled || c.config._ClientSessionCache == nil {
 		return "", nil, nil, nil
 	}
 
@@ -262,7 +262,7 @@ func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 	// Check that the cached server certificate is not expired, and that it's
 	// valid for the ServerName. This should be ensured by the cache key, but
 	// protect the application from a faulty ClientSessionCache implementation.
-	if !c.config.InsecureSkipVerify {
+	if !c.config._InsecureSkipVerify {
 		if len(session.verifiedChains) == 0 {
 			// The original connection had InsecureSkipVerify, while this doesn't.
 			return cacheKey, nil, nil, nil
@@ -273,7 +273,7 @@ func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 			c.config._ClientSessionCache.Put(cacheKey, nil)
 			return cacheKey, nil, nil, nil
 		}
-		if err := serverCert.VerifyHostname(c.config.ServerName); err != nil {
+		if err := serverCert.VerifyHostname(c.config._ServerName); err != nil {
 			return cacheKey, nil, nil, nil
 		}
 	}
@@ -371,7 +371,7 @@ func (hs *clientHandshakeState) handshake() error {
 	// Otherwise, in a full handshake, if we don't have any certificates
 	// configured then we will never send a CertificateVerify message and
 	// thus no signatures are needed in that case either.
-	if isResume || (len(c.config._Certificates) == 0 && c.config.GetClientCertificate == nil) {
+	if isResume || (len(c.config._Certificates) == 0 && c.config._GetClientCertificate == nil) {
 		hs.finishedHash.discardHandshakeBuffer()
 	}
 
@@ -791,7 +791,7 @@ func (hs *clientHandshakeState) sendFinished(out []byte) error {
 	}
 	if hs.serverHello.nextProtoNeg {
 		nextProto := new(nextProtoMsg)
-		proto, fallback := mutualProtocol(c.config.NextProtos, hs.serverHello.nextProtos)
+		proto, fallback := mutualProtocol(c.config._NextProtos, hs.serverHello.nextProtos)
 		nextProto.proto = proto
 		c.clientProtocol = proto
 		c.clientProtocolFallback = fallback
@@ -825,11 +825,11 @@ func (c *Conn) verifyServerCertificate(certificates [][]byte) error {
 		certs[i] = cert
 	}
 
-	if !c.config.InsecureSkipVerify {
+	if !c.config._InsecureSkipVerify {
 		opts := x509.VerifyOptions{
-			Roots:         c.config.RootCAs,
+			Roots:         c.config._RootCAs,
 			CurrentTime:   c.config.time(),
-			DNSName:       c.config.ServerName,
+			DNSName:       c.config._ServerName,
 			Intermediates: x509.NewCertPool(),
 		}
 		for _, cert := range certs[1:] {
@@ -843,8 +843,8 @@ func (c *Conn) verifyServerCertificate(certificates [][]byte) error {
 		}
 	}
 
-	if c.config.VerifyPeerCertificate != nil {
-		if err := c.config.VerifyPeerCertificate(certificates, c.verifiedChains); err != nil {
+	if c.config._VerifyPeerCertificate != nil {
+		if err := c.config._VerifyPeerCertificate(certificates, c.verifiedChains); err != nil {
 			c.sendAlert(alertBadCertificate)
 			return err
 		}
@@ -926,8 +926,8 @@ func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *_Certificate
 }
 
 func (c *Conn) getClientCertificate(cri *_CertificateRequestInfo) (*_Certificate, error) {
-	if c.config.GetClientCertificate != nil {
-		return c.config.GetClientCertificate(cri)
+	if c.config._GetClientCertificate != nil {
+		return c.config._GetClientCertificate(cri)
 	}
 
 	// We need to search our list of client certs for one
@@ -975,9 +975,9 @@ func (c *Conn) getClientCertificate(cri *_CertificateRequestInfo) (*_Certificate
 
 // clientSessionCacheKey returns a key used to cache sessionTickets that could
 // be used to resume previously negotiated TLS sessions with a server.
-func clientSessionCacheKey(serverAddr net.Addr, config *Config) string {
-	if len(config.ServerName) > 0 {
-		return config.ServerName
+func clientSessionCacheKey(serverAddr net.Addr, config *_Config) string {
+	if len(config._ServerName) > 0 {
+		return config._ServerName
 	}
 	return serverAddr.String()
 }

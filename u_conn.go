@@ -36,9 +36,9 @@ type UConn struct {
 
 // UClient returns a new uTLS client, with behavior depending on clientHelloID.
 // Config CAN be nil, but make sure to eventually specify ServerName.
-func UClient(conn net.Conn, config *Config, clientHelloID _ClientHelloID) *UConn {
+func UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *UConn {
 	if config == nil {
-		config = &Config{}
+		config = &_Config{}
 	}
 	tlsConn := Conn{conn: conn, config: config, isClient: true}
 	handshakeState := _ClientHandshakeState{_C: &tlsConn, _Hello: &_ClientHelloMsg{}}
@@ -161,7 +161,7 @@ func (uconn *UConn) SetClientRandom(r []byte) error {
 
 func (uconn *UConn) SetSNI(sni string) {
 	hname := hostnameInSNI(sni)
-	uconn.config.ServerName = hname
+	uconn.config._ServerName = hname
 	for _, ext := range uconn.Extensions {
 		sniExt, ok := ext.(*SNIExtension)
 		if ok {
@@ -315,12 +315,12 @@ func (c *UConn) clientHandshake() (err error) {
 	// [uTLS section begins]
 	// don't make new ClientHello, use hs.hello
 	// preserve the checks from beginning and end of makeClientHello()
-	if len(c.config.ServerName) == 0 && !c.config.InsecureSkipVerify {
+	if len(c.config._ServerName) == 0 && !c.config._InsecureSkipVerify {
 		return errors.New("tls: either ServerName or InsecureSkipVerify must be specified in the tls.Config")
 	}
 
 	nextProtosLength := 0
-	for _, proto := range c.config.NextProtos {
+	for _, proto := range c.config._NextProtos {
 		if l := len(proto); l == 0 || l > 255 {
 			return errors.New("tls: invalid NextProtos value")
 		} else {
@@ -573,8 +573,8 @@ func (uconn *UConn) SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []T
 	}
 
 	uconn.HandshakeState._Hello._SupportedVersions = makeSupportedVersions(minTLSVers, maxTLSVers)
-	uconn.config.MinVersion = minTLSVers
-	uconn.config.MaxVersion = maxTLSVers
+	uconn.config._MinVersion = minTLSVers
+	uconn.config._MaxVersion = maxTLSVers
 
 	return nil
 }
@@ -590,7 +590,7 @@ func (uconn *UConn) GetUnderlyingConn() net.Conn {
 // MakeConnWithCompleteHandshake allows to forge both server and client side TLS connections.
 // Major Hack Alert.
 func MakeConnWithCompleteHandshake(tcpConn net.Conn, version uint16, cipherSuite uint16, masterSecret []byte, clientRandom []byte, serverRandom []byte, isClient bool) *Conn {
-	tlsConn := &Conn{conn: tcpConn, config: &Config{}, isClient: isClient}
+	tlsConn := &Conn{conn: tcpConn, config: &_Config{}, isClient: isClient}
 	cs := cipherSuiteByID(cipherSuite)
 	if cs == nil {
 		return nil
