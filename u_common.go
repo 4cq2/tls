@@ -53,8 +53,8 @@ var _Android_API_26 = _ClientHelloSpec{
 	_Extensions: []_TLSExtension{
 		&_RenegotiationInfoExtension{},
 		&_SNIExtension{},
-		&UtlsExtendedMasterSecretExtension{},
-		&SessionTicketExtension{},
+		&_UtlsExtendedMasterSecretExtension{},
+		&_SessionTicketExtension{},
 		&_SignatureAlgorithmsExtension{
 			_SupportedSignatureAlgorithms: []_SignatureScheme{
 				_ECDSAWithP256AndSHA256,

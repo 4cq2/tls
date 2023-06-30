@@ -281,19 +281,19 @@ func (e *_ALPNExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type SCTExtension struct {
+type _SCTExtension struct {
 }
 
-func (e *SCTExtension) writeToUConn(uc *_UConn) error {
+func (e *_SCTExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._Scts = true
 	return nil
 }
 
-func (e *SCTExtension) Len() int {
+func (e *_SCTExtension) Len() int {
 	return 4
 }
 
-func (e *SCTExtension) Read(b []byte) (int, error) {
+func (e *_SCTExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -304,11 +304,11 @@ func (e *SCTExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type SessionTicketExtension struct {
+type _SessionTicketExtension struct {
 	_Session *_ClientSessionState
 }
 
-func (e *SessionTicketExtension) writeToUConn(uc *_UConn) error {
+func (e *_SessionTicketExtension) writeToUConn(uc *_UConn) error {
 	if e._Session != nil {
 		uc._HandshakeState._Session = e._Session
 		uc._HandshakeState._Hello._SessionTicket = e._Session.sessionTicket
@@ -316,14 +316,14 @@ func (e *SessionTicketExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *SessionTicketExtension) Len() int {
+func (e *_SessionTicketExtension) Len() int {
 	if e._Session != nil {
 		return 4 + len(e._Session.sessionTicket)
 	}
 	return 4
 }
 
-func (e *SessionTicketExtension) Read(b []byte) (int, error) {
+func (e *_SessionTicketExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -369,21 +369,21 @@ func (e *_GenericExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type UtlsExtendedMasterSecretExtension struct {
+type _UtlsExtendedMasterSecretExtension struct {
 }
 
 // TODO: update when this extension is implemented in crypto/tls
 // but we probably won't have to enable it in Config
-func (e *UtlsExtendedMasterSecretExtension) writeToUConn(uc *_UConn) error {
+func (e *_UtlsExtendedMasterSecretExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._Ems = true
 	return nil
 }
 
-func (e *UtlsExtendedMasterSecretExtension) Len() int {
+func (e *_UtlsExtendedMasterSecretExtension) Len() int {
 	return 4
 }
 
-func (e *UtlsExtendedMasterSecretExtension) Read(b []byte) (int, error) {
+func (e *_UtlsExtendedMasterSecretExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -418,12 +418,12 @@ const (
 )
 
 // it is responsibility of user not to generate multiple grease extensions with same value
-type UtlsGREASEExtension struct {
+type _UtlsGREASEExtension struct {
 	_Value uint16
 	_Body  []byte // in Chrome first grease has empty body, second grease has a single zero byte
 }
 
-func (e *UtlsGREASEExtension) writeToUConn(uc *_UConn) error {
+func (e *_UtlsGREASEExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
@@ -438,11 +438,11 @@ func _GetBoringGREASEValue(greaseSeed [ssl_grease_last_index]uint16, index int) 
 	return ret
 }
 
-func (e *UtlsGREASEExtension) Len() int {
+func (e *_UtlsGREASEExtension) Len() int {
 	return 4 + len(e._Body)
 }
 
-func (e *UtlsGREASEExtension) Read(b []byte) (int, error) {
+func (e *_UtlsGREASEExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -457,7 +457,7 @@ func (e *UtlsGREASEExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type UtlsPaddingExtension struct {
+type _UtlsPaddingExtension struct {
 	_PaddingLen int
 	_WillPad    bool // set to false to disable extension
 
@@ -466,11 +466,11 @@ type UtlsPaddingExtension struct {
 	_GetPaddingLen func(clientHelloUnpaddedLen int) (paddingLen int, willPad bool)
 }
 
-func (e *UtlsPaddingExtension) writeToUConn(uc *_UConn) error {
+func (e *_UtlsPaddingExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *UtlsPaddingExtension) Len() int {
+func (e *_UtlsPaddingExtension) Len() int {
 	if e._WillPad {
 		return 4 + e._PaddingLen
 	} else {
@@ -478,13 +478,13 @@ func (e *UtlsPaddingExtension) Len() int {
 	}
 }
 
-func (e *UtlsPaddingExtension) _Update(clientHelloUnpaddedLen int) {
+func (e *_UtlsPaddingExtension) _Update(clientHelloUnpaddedLen int) {
 	if e._GetPaddingLen != nil {
 		e._PaddingLen, e._WillPad = e._GetPaddingLen(clientHelloUnpaddedLen)
 	}
 }
 
-func (e *UtlsPaddingExtension) Read(b []byte) (int, error) {
+func (e *_UtlsPaddingExtension) Read(b []byte) (int, error) {
 	if !e._WillPad {
 		return 0, io.EOF
 	}
@@ -598,20 +598,20 @@ func (e *_PSKKeyExchangeModesExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-type SupportedVersionsExtension struct {
+type _SupportedVersionsExtension struct {
 	_Versions []uint16
 }
 
-func (e *SupportedVersionsExtension) writeToUConn(uc *_UConn) error {
+func (e *_SupportedVersionsExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._SupportedVersions = e._Versions
 	return nil
 }
 
-func (e *SupportedVersionsExtension) Len() int {
+func (e *_SupportedVersionsExtension) Len() int {
 	return 4 + 1 + (2 * len(e._Versions))
 }
 
-func (e *SupportedVersionsExtension) Read(b []byte) (int, error) {
+func (e *_SupportedVersionsExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}

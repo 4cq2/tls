@@ -115,7 +115,7 @@ func (uconn *_UConn) _SetSessionState(session *_ClientSessionState) error {
 	uconn._HandshakeState._Hello._SessionTicket = sessionTicket
 
 	for _, ext := range uconn._Extensions {
-		st, ok := ext.(*SessionTicketExtension)
+		st, ok := ext.(*_SessionTicketExtension)
 		if !ok {
 			continue
 		}
@@ -391,9 +391,9 @@ func (uconn *_UConn) _MarshalClientHello() error {
 		1 + len(hello._CompressionMethods)
 
 	extensionsLen := 0
-	var paddingExt *UtlsPaddingExtension
+	var paddingExt *_UtlsPaddingExtension
 	for _, ext := range uconn._Extensions {
-		if pe, ok := ext.(*UtlsPaddingExtension); !ok {
+		if pe, ok := ext.(*_UtlsPaddingExtension); !ok {
 			// If not padding - just add length of extension to total length
 			extensionsLen += ext.Len()
 		} else {
@@ -475,7 +475,7 @@ func (uconn *_UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions [
 		supportedVersionsExtensionsPresent := 0
 		for _, e := range specExtensions {
 			switch ext := e.(type) {
-			case *SupportedVersionsExtension:
+			case *_SupportedVersionsExtension:
 				findVersionsInSupportedVersionsExtensions := func(versions []uint16) (uint16, uint16) {
 					// returns (minVers, maxVers)
 					minVers := uint16(0)

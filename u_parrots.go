@@ -38,11 +38,11 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 			},
 			_CompressionMethods: []byte{compressionNone},
 			_Extensions: []_TLSExtension{
-				&UtlsGREASEExtension{},
+				&_UtlsGREASEExtension{},
 				&_RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient},
 				&_SNIExtension{},
-				&UtlsExtendedMasterSecretExtension{},
-				&SessionTicketExtension{},
+				&_UtlsExtendedMasterSecretExtension{},
+				&_SessionTicketExtension{},
 				&_SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
@@ -55,14 +55,14 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_PKCS1WithSHA1},
 				},
 				&_StatusRequestExtension{},
-				&SCTExtension{},
+				&_SCTExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&_FakeChannelIDExtension{},
 				&_SupportedPointsExtension{_SupportedPoints: []byte{pointFormatUncompressed}},
 				&_SupportedCurvesExtension{[]_CurveID{_CurveID(_GREASE_PLACEHOLDER),
 					_X25519, _CurveP256, _CurveP384}},
-				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
+				&_UtlsGREASEExtension{},
+				&_UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 			_GetSessionID: sha256.Sum256,
 		}, nil
@@ -93,11 +93,11 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				compressionNone,
 			},
 			_Extensions: []_TLSExtension{
-				&UtlsGREASEExtension{},
+				&_UtlsGREASEExtension{},
 				&_RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient},
 				&_SNIExtension{},
-				&UtlsExtendedMasterSecretExtension{},
-				&SessionTicketExtension{},
+				&_UtlsExtendedMasterSecretExtension{},
+				&_SessionTicketExtension{},
 				&_SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
@@ -110,7 +110,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_PKCS1WithSHA1,
 				}},
 				&_StatusRequestExtension{},
-				&SCTExtension{},
+				&_SCTExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&_FakeChannelIDExtension{},
 				&_SupportedPointsExtension{_SupportedPoints: []byte{
@@ -121,7 +121,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					{_Group: _X25519},
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
-				&SupportedVersionsExtension{[]uint16{
+				&_SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
 					_VersionTLS13,
 					_VersionTLS12,
@@ -134,8 +134,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_CurveP384,
 				}},
 				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{_CertCompressionBrotli}},
-				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
+				&_UtlsGREASEExtension{},
+				&_UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case _HelloChrome_72:
@@ -163,9 +163,9 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				0x00, // compressionNone
 			},
 			_Extensions: []_TLSExtension{
-				&UtlsGREASEExtension{},
+				&_UtlsGREASEExtension{},
 				&_SNIExtension{},
-				&UtlsExtendedMasterSecretExtension{},
+				&_UtlsExtendedMasterSecretExtension{},
 				&_RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient},
 				&_SupportedCurvesExtension{[]_CurveID{
 					_CurveID(_GREASE_PLACEHOLDER),
@@ -176,7 +176,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_SupportedPointsExtension{_SupportedPoints: []byte{
 					0x00, // pointFormatUncompressed
 				}},
-				&SessionTicketExtension{},
+				&_SessionTicketExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&_StatusRequestExtension{},
 				&_SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
@@ -190,7 +190,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_PKCS1WithSHA512,
 					_PKCS1WithSHA1,
 				}},
-				&SCTExtension{},
+				&_SCTExtension{},
 				&_KeyShareExtension{[]_KeyShare{
 					{_Group: _CurveID(_GREASE_PLACEHOLDER), _Data: []byte{0}},
 					{_Group: _X25519},
@@ -198,7 +198,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_PSKKeyExchangeModesExtension{[]uint8{
 					_PskModeDHE,
 				}},
-				&SupportedVersionsExtension{[]uint16{
+				&_SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
 					_VersionTLS13,
 					_VersionTLS12,
@@ -208,8 +208,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
 					_CertCompressionBrotli,
 				}},
-				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
+				&_UtlsGREASEExtension{},
+				&_UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case _HelloChrome_83:
@@ -236,9 +236,9 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				0x00, // compressionNone
 			},
 			_Extensions: []_TLSExtension{
-				&UtlsGREASEExtension{},
+				&_UtlsGREASEExtension{},
 				&_SNIExtension{},
-				&UtlsExtendedMasterSecretExtension{},
+				&_UtlsExtendedMasterSecretExtension{},
 				&_RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient},
 				&_SupportedCurvesExtension{[]_CurveID{
 					_CurveID(_GREASE_PLACEHOLDER),
@@ -249,7 +249,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_SupportedPointsExtension{_SupportedPoints: []byte{
 					0x00, // pointFormatUncompressed
 				}},
-				&SessionTicketExtension{},
+				&_SessionTicketExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&_StatusRequestExtension{},
 				&_SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
@@ -262,7 +262,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_PSSWithSHA512,
 					_PKCS1WithSHA512,
 				}},
-				&SCTExtension{},
+				&_SCTExtension{},
 				&_KeyShareExtension{[]_KeyShare{
 					{_Group: _CurveID(_GREASE_PLACEHOLDER), _Data: []byte{0}},
 					{_Group: _X25519},
@@ -270,7 +270,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_PSKKeyExchangeModesExtension{[]uint8{
 					_PskModeDHE,
 				}},
-				&SupportedVersionsExtension{[]uint16{
+				&_SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
 					_VersionTLS13,
 					_VersionTLS12,
@@ -280,8 +280,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
 					_CertCompressionBrotli,
 				}},
-				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
+				&_UtlsGREASEExtension{},
+				&_UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case _HelloFirefox_55, _HelloFirefox_56:
@@ -308,11 +308,11 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 			_CompressionMethods: []byte{compressionNone},
 			_Extensions: []_TLSExtension{
 				&_SNIExtension{},
-				&UtlsExtendedMasterSecretExtension{},
+				&_UtlsExtendedMasterSecretExtension{},
 				&_RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient},
 				&_SupportedCurvesExtension{[]_CurveID{_X25519, _CurveP256, _CurveP384, _CurveP521}},
 				&_SupportedPointsExtension{_SupportedPoints: []byte{pointFormatUncompressed}},
-				&SessionTicketExtension{},
+				&_SessionTicketExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&_StatusRequestExtension{},
 				&_SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
@@ -328,7 +328,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_ECDSAWithSHA1,
 					_PKCS1WithSHA1},
 				},
-				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
+				&_UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 			_GetSessionID: nil,
 		}, nil
@@ -361,7 +361,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 			},
 			_Extensions: []_TLSExtension{
 				&_SNIExtension{},
-				&UtlsExtendedMasterSecretExtension{},
+				&_UtlsExtendedMasterSecretExtension{},
 				&_RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient},
 				&_SupportedCurvesExtension{[]_CurveID{
 					_X25519,
@@ -374,14 +374,14 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_SupportedPointsExtension{_SupportedPoints: []byte{
 					pointFormatUncompressed,
 				}},
-				&SessionTicketExtension{},
+				&_SessionTicketExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&_StatusRequestExtension{},
 				&_KeyShareExtension{[]_KeyShare{
 					{_Group: _X25519},
 					{_Group: _CurveP256},
 				}},
-				&SupportedVersionsExtension{[]uint16{
+				&_SupportedVersionsExtension{[]uint16{
 					_VersionTLS13,
 					_VersionTLS12,
 					_VersionTLS11,
@@ -401,7 +401,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&_FakeRecordSizeLimitExtension{0x4001},
-				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
+				&_UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			}}, nil
 	case _HelloIOS_11_1:
 		return _ClientHelloSpec{
@@ -435,7 +435,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 			_Extensions: []_TLSExtension{
 				&_RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient},
 				&_SNIExtension{},
-				&UtlsExtendedMasterSecretExtension{},
+				&_UtlsExtendedMasterSecretExtension{},
 				&_SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
@@ -449,7 +449,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&_StatusRequestExtension{},
 				&_NPNExtension{},
-				&SCTExtension{},
+				&_SCTExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
 				&_SupportedPointsExtension{_SupportedPoints: []byte{
 					pointFormatUncompressed,
@@ -495,7 +495,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 			_Extensions: []_TLSExtension{
 				&_RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient},
 				&_SNIExtension{},
-				&UtlsExtendedMasterSecretExtension{},
+				&_UtlsExtendedMasterSecretExtension{},
 				&_SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
@@ -511,7 +511,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&_StatusRequestExtension{},
 				&_NPNExtension{},
-				&SCTExtension{},
+				&_SCTExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
 				&_SupportedPointsExtension{_SupportedPoints: []byte{
 					pointFormatUncompressed,
@@ -627,7 +627,7 @@ func (uconn *_UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 			if ext._ServerName == "" {
 				ext._ServerName = uconn.Conn.config._ServerName
 			}
-		case *UtlsGREASEExtension:
+		case *_UtlsGREASEExtension:
 			switch grease_extensions_seen {
 			case 0:
 				ext._Value = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension1)
@@ -638,7 +638,7 @@ func (uconn *_UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 				return errors.New("at most 2 grease extensions are supported")
 			}
 			grease_extensions_seen += 1
-		case *SessionTicketExtension:
+		case *_SessionTicketExtension:
 			if session == nil && uconn.Conn.config._ClientSessionCache != nil {
 				cacheKey := clientSessionCacheKey(uconn.Conn._RemoteAddr(), uconn.Conn.config)
 				session, _ = uconn.Conn.config._ClientSessionCache._Get(cacheKey)
@@ -678,7 +678,7 @@ func (uconn *_UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 					preferredCurveIsSet = true
 				}
 			}
-		case *SupportedVersionsExtension:
+		case *_SupportedVersionsExtension:
 			for i := range ext._Versions {
 				if ext._Versions[i] == _GREASE_PLACEHOLDER {
 					ext._Versions[i] = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_version)
@@ -758,7 +758,7 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	p._CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
 
 	sni := _SNIExtension{uconn.Conn.config._ServerName}
-	sessionTicket := SessionTicketExtension{_Session: uconn._HandshakeState._Session}
+	sessionTicket := _SessionTicketExtension{_Session: uconn._HandshakeState._Session}
 
 	sigAndHashAlgos := []_SignatureScheme{
 		_ECDSAWithP256AndSHA256,
@@ -791,8 +791,8 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	sigAndHash := _SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: sigAndHashAlgos}
 
 	status := _StatusRequestExtension{}
-	sct := SCTExtension{}
-	ems := UtlsExtendedMasterSecretExtension{}
+	sct := _SCTExtension{}
+	ems := _UtlsExtendedMasterSecretExtension{}
 	points := _SupportedPointsExtension{_SupportedPoints: []byte{pointFormatUncompressed}}
 
 	curveIDs := []_CurveID{}
@@ -806,7 +806,7 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 
 	curves := _SupportedCurvesExtension{curveIDs}
 
-	padding := UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle}
+	padding := _UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle}
 	reneg := _RenegotiationInfoExtension{_Renegotiation: _RenegotiateOnceAsClient}
 
 	p._Extensions = []_TLSExtension{
@@ -854,7 +854,7 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 			ks._KeyShares[0]._Group = _CurveP256
 		}
 		pskExchangeModes := _PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}}
-		supportedVersionsExt := SupportedVersionsExtension{
+		supportedVersionsExt := _SupportedVersionsExtension{
 			_Versions: makeSupportedVersions(p._TLSVersMin, p._TLSVersMax),
 		}
 		p._Extensions = append(p._Extensions, &ks, &pskExchangeModes, &supportedVersionsExt)
