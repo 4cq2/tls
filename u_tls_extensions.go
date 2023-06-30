@@ -19,21 +19,21 @@ type TLSExtension interface {
 	Read(p []byte) (n int, err error) // implements io.Reader
 }
 
-type NPNExtension struct {
+type _NPNExtension struct {
 	NextProtos []string
 }
 
-func (e *NPNExtension) writeToUConn(uc *UConn) error {
+func (e *_NPNExtension) writeToUConn(uc *UConn) error {
 	uc.config._NextProtos = e.NextProtos
 	uc.HandshakeState._Hello._NextProtoNeg = true
 	return nil
 }
 
-func (e *NPNExtension) Len() int {
+func (e *_NPNExtension) Len() int {
 	return 4
 }
 
-func (e *NPNExtension) Read(b []byte) (int, error) {
+func (e *_NPNExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -514,15 +514,15 @@ func _BoringPaddingStyle(unpaddedLen int) (int, bool) {
 }
 
 /* TLS 1.3 */
-type KeyShareExtension struct {
-	KeyShares []KeyShare
+type _KeyShareExtension struct {
+	KeyShares []_KeyShare
 }
 
-func (e *KeyShareExtension) Len() int {
+func (e *_KeyShareExtension) Len() int {
 	return 4 + 2 + e.keySharesLen()
 }
 
-func (e *KeyShareExtension) keySharesLen() int {
+func (e *_KeyShareExtension) keySharesLen() int {
 	extLen := 0
 	for _, ks := range e.KeyShares {
 		extLen += 4 + len(ks.Data)
@@ -530,7 +530,7 @@ func (e *KeyShareExtension) keySharesLen() int {
 	return extLen
 }
 
-func (e *KeyShareExtension) Read(b []byte) (int, error) {
+func (e *_KeyShareExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -556,7 +556,7 @@ func (e *KeyShareExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-func (e *KeyShareExtension) writeToUConn(uc *UConn) error {
+func (e *_KeyShareExtension) writeToUConn(uc *UConn) error {
 	uc.HandshakeState._Hello._KeyShares = e.KeyShares
 	return nil
 }

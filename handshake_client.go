@@ -866,7 +866,7 @@ func (c *Conn) verifyServerCertificate(certificates [][]byte) error {
 // tls11SignatureSchemes contains the signature schemes that we synthesise for
 // a TLS <= 1.1 connection, based on the supported certificate types.
 var (
-	tls11SignatureSchemes      = []SignatureScheme{_ECDSAWithP256AndSHA256, _ECDSAWithP384AndSHA384, _ECDSAWithP521AndSHA512, PKCS1WithSHA256, PKCS1WithSHA384, PKCS1WithSHA512, PKCS1WithSHA1}
+	tls11SignatureSchemes      = []SignatureScheme{_ECDSAWithP256AndSHA256, _ECDSAWithP384AndSHA384, _ECDSAWithP521AndSHA512, PKCS1WithSHA256, PKCS1WithSHA384, PKCS1WithSHA512, _PKCS1WithSHA1}
 	tls11SignatureSchemesECDSA = tls11SignatureSchemes[:3]
 	tls11SignatureSchemesRSA   = tls11SignatureSchemes[3:]
 )

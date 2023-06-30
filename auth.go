@@ -34,7 +34,7 @@ func pickSignatureAlgorithm(pubkey crypto.PublicKey, peerSigAlgs, ourSigAlgs []S
 			if tlsVersion < VersionTLS12 {
 				return 0, signaturePKCS1v15, crypto.MD5SHA1, nil
 			} else {
-				return PKCS1WithSHA1, signaturePKCS1v15, crypto.SHA1, nil
+				return _PKCS1WithSHA1, signaturePKCS1v15, crypto.SHA1, nil
 			}
 		case *ecdsa.PublicKey:
 			return _ECDSAWithSHA1, signatureECDSA, crypto.SHA1, nil
@@ -174,7 +174,7 @@ func signatureSchemesForCertificate(version uint16, cert *_Certificate) []Signat
 				PKCS1WithSHA256,
 				PKCS1WithSHA384,
 				PKCS1WithSHA512,
-				PKCS1WithSHA1,
+				_PKCS1WithSHA1,
 			}
 		}
 		// RSA keys with RSA-PSS OID are not supported by crypto/x509.

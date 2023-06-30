@@ -369,7 +369,7 @@ func (hs *serverHandshakeState) checkForResumption() bool {
 	if needClientCerts && !sessionHasClientCerts {
 		return false
 	}
-	if sessionHasClientCerts && c.config._ClientAuth == NoClientCert {
+	if sessionHasClientCerts && c.config._ClientAuth == _NoClientCert {
 		return false
 	}
 
@@ -414,7 +414,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 	hs.hello.cipherSuite = hs.suite.id
 
 	hs.finishedHash = newFinishedHash(hs.c.vers, hs.suite)
-	if c.config._ClientAuth == NoClientCert {
+	if c.config._ClientAuth == _NoClientCert {
 		// No need to keep a full record of the handshake if client
 		// certificates won't be used.
 		hs.finishedHash.discardHandshakeBuffer()

@@ -29,8 +29,8 @@ const (
 // PRNGSeed is a PRNG seed.
 type PRNGSeed [PRNGSeedLength]byte
 
-// NewPRNGSeed creates a new PRNG seed using crypto/rand.Read.
-func NewPRNGSeed() (*PRNGSeed, error) {
+// _NewPRNGSeed creates a new PRNG seed using crypto/rand.Read.
+func _NewPRNGSeed() (*PRNGSeed, error) {
 	seed := new(PRNGSeed)
 	_, err := crypto_rand.Read(seed[:])
 	if err != nil {
@@ -57,7 +57,7 @@ type prng struct {
 
 // newPRNG generates a seed and creates a PRNG with that seed.
 func newPRNG() (*prng, error) {
-	seed, err := NewPRNGSeed()
+	seed, err := _NewPRNGSeed()
 	if err != nil {
 		return nil, err
 	}

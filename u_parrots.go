@@ -52,7 +52,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					PKCS1WithSHA384,
 					PSSWithSHA512,
 					PKCS1WithSHA512,
-					PKCS1WithSHA1},
+					_PKCS1WithSHA1},
 				},
 				&StatusRequestExtension{},
 				&SCTExtension{},
@@ -107,7 +107,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					PKCS1WithSHA384,
 					PSSWithSHA512,
 					PKCS1WithSHA512,
-					PKCS1WithSHA1,
+					_PKCS1WithSHA1,
 				}},
 				&StatusRequestExtension{},
 				&SCTExtension{},
@@ -116,7 +116,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
 				}},
-				&KeyShareExtension{[]KeyShare{
+				&_KeyShareExtension{[]_KeyShare{
 					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
@@ -188,10 +188,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					PKCS1WithSHA384,
 					PSSWithSHA512,
 					PKCS1WithSHA512,
-					PKCS1WithSHA1,
+					_PKCS1WithSHA1,
 				}},
 				&SCTExtension{},
-				&KeyShareExtension{[]KeyShare{
+				&_KeyShareExtension{[]_KeyShare{
 					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
@@ -263,7 +263,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					PKCS1WithSHA512,
 				}},
 				&SCTExtension{},
-				&KeyShareExtension{[]KeyShare{
+				&_KeyShareExtension{[]_KeyShare{
 					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
@@ -326,7 +326,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					PKCS1WithSHA384,
 					PKCS1WithSHA512,
 					_ECDSAWithSHA1,
-					PKCS1WithSHA1},
+					_PKCS1WithSHA1},
 				},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
@@ -377,7 +377,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SessionTicketExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
-				&KeyShareExtension{[]KeyShare{
+				&_KeyShareExtension{[]_KeyShare{
 					{Group: X25519},
 					{Group: _CurveP256},
 				}},
@@ -397,13 +397,13 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					PKCS1WithSHA384,
 					PKCS1WithSHA512,
 					_ECDSAWithSHA1,
-					PKCS1WithSHA1,
+					_PKCS1WithSHA1,
 				}},
 				&PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&_FakeRecordSizeLimitExtension{0x4001},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			}}, nil
-	case HelloIOS_11_1:
+	case _HelloIOS_11_1:
 		return _ClientHelloSpec{
 			_TLSVersMax: VersionTLS12,
 			_TLSVersMin: VersionTLS10,
@@ -445,10 +445,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					PKCS1WithSHA384,
 					PSSWithSHA512,
 					PKCS1WithSHA512,
-					PKCS1WithSHA1,
+					_PKCS1WithSHA1,
 				}},
 				&StatusRequestExtension{},
-				&NPNExtension{},
+				&_NPNExtension{},
 				&SCTExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
 				&SupportedPointsExtension{SupportedPoints: []byte{
@@ -462,7 +462,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 			},
 		}, nil
-	case HelloIOS_12_1:
+	case _HelloIOS_12_1:
 		return _ClientHelloSpec{
 			_CipherSuites: []uint16{
 				TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
@@ -507,10 +507,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					PKCS1WithSHA384,
 					PSSWithSHA512,
 					PKCS1WithSHA512,
-					PKCS1WithSHA1,
+					_PKCS1WithSHA1,
 				}},
 				&StatusRequestExtension{},
-				&NPNExtension{},
+				&_NPNExtension{},
 				&SCTExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "h2-16", "h2-15", "h2-14", "spdy/3.1", "spdy/3", "http/1.1"}},
 				&SupportedPointsExtension{SupportedPoints: []byte{
@@ -654,7 +654,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 					ext.Curves[i] = _CurveID(_GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
 				}
 			}
-		case *KeyShareExtension:
+		case *_KeyShareExtension:
 			preferredCurveIsSet := false
 			for i := range ext.KeyShares {
 				curveID := ext.KeyShares[i].Group
@@ -684,7 +684,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 					ext.Versions[i] = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_version)
 				}
 			}
-		case *NPNExtension:
+		case *_NPNExtension:
 			haveNPN = true
 		}
 	}
@@ -700,7 +700,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	p := _ClientHelloSpec{}
 
 	if uconn.ClientHelloID._Seed == nil {
-		seed, err := NewPRNGSeed()
+		seed, err := _NewPRNGSeed()
 		if err != nil {
 			return p, err
 		}
@@ -765,7 +765,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 		PKCS1WithSHA256,
 		_ECDSAWithP384AndSHA384,
 		PKCS1WithSHA384,
-		PKCS1WithSHA1,
+		_PKCS1WithSHA1,
 		PKCS1WithSHA512,
 	}
 
@@ -844,7 +844,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 		p._Extensions = append(p._Extensions, &ems)
 	}
 	if p._TLSVersMax == VersionTLS13 {
-		ks := KeyShareExtension{[]KeyShare{
+		ks := _KeyShareExtension{[]_KeyShare{
 			{Group: X25519}, // the key for the group will be generated later
 		}}
 		if r.FlipWeightedCoin(0.25) {

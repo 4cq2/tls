@@ -285,7 +285,7 @@ func (hs *serverHandshakeStateTLS13) checkForResumption() error {
 		if needClientCerts && !sessionHasClientCerts {
 			continue
 		}
-		if sessionHasClientCerts && c.config._ClientAuth == NoClientCert {
+		if sessionHasClientCerts && c.config._ClientAuth == _NoClientCert {
 			continue
 		}
 

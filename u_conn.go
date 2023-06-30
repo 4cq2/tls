@@ -587,57 +587,6 @@ func (uconn *UConn) GetUnderlyingConn() net.Conn {
 	return uconn.Conn.conn
 }
 
-// MakeConnWithCompleteHandshake allows to forge both server and client side TLS connections.
-// Major Hack Alert.
-func MakeConnWithCompleteHandshake(tcpConn net.Conn, version uint16, cipherSuite uint16, masterSecret []byte, clientRandom []byte, serverRandom []byte, isClient bool) *Conn {
-	tlsConn := &Conn{conn: tcpConn, config: &_Config{}, isClient: isClient}
-	cs := cipherSuiteByID(cipherSuite)
-	if cs == nil {
-		return nil
-	}
-
-	// This is mostly borrowed from establishKeys()
-	clientMAC, serverMAC, clientKey, serverKey, clientIV, serverIV :=
-		keysFromMasterSecret(version, cs, masterSecret, clientRandom, serverRandom,
-			cs.macLen, cs.keyLen, cs.ivLen)
-
-	var clientCipher, serverCipher interface{}
-	var clientHash, serverHash macFunction
-	if cs.cipher != nil {
-		clientCipher = cs.cipher(clientKey, clientIV, true /* for reading */)
-		clientHash = cs.mac(version, clientMAC)
-		serverCipher = cs.cipher(serverKey, serverIV, false /* not for reading */)
-		serverHash = cs.mac(version, serverMAC)
-	} else {
-		clientCipher = cs.aead(clientKey, clientIV)
-		serverCipher = cs.aead(serverKey, serverIV)
-	}
-
-	if isClient {
-		tlsConn.in.prepareCipherSpec(version, serverCipher, serverHash)
-		tlsConn.out.prepareCipherSpec(version, clientCipher, clientHash)
-	} else {
-		tlsConn.in.prepareCipherSpec(version, clientCipher, clientHash)
-		tlsConn.out.prepareCipherSpec(version, serverCipher, serverHash)
-	}
-
-	// skip the handshake states
-	tlsConn.handshakeStatus = 1
-	tlsConn.cipherSuite = cipherSuite
-	tlsConn.haveVers = true
-	tlsConn.vers = version
-
-	// Update to the new cipher specs
-	// and consume the finished messages
-	tlsConn.in.changeCipherSpec()
-	tlsConn.out.changeCipherSpec()
-
-	tlsConn.in.incSeq()
-	tlsConn.out.incSeq()
-
-	return tlsConn
-}
-
 func makeSupportedVersions(minVers, maxVers uint16) []uint16 {
 	a := make([]uint16, maxVers-minVers+1)
 	for i := range a {

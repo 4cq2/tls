@@ -179,7 +179,7 @@ func keysFromMasterSecret(version uint16, suite *cipherSuite, masterSecret, clie
 // hash from a TLS SignatureScheme.
 func hashFromSignatureScheme(signatureAlgorithm SignatureScheme) (crypto.Hash, error) {
 	switch signatureAlgorithm {
-	case PKCS1WithSHA1, _ECDSAWithSHA1:
+	case _PKCS1WithSHA1, _ECDSAWithSHA1:
 		return crypto.SHA1, nil
 	case PKCS1WithSHA256, PSSWithSHA256, _ECDSAWithP256AndSHA256:
 		return crypto.SHA256, nil

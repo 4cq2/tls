@@ -6,7 +6,6 @@ package tls
 
 import (
 	"crypto"
-	"crypto/x509"
 	"hash"
 )
 
@@ -341,7 +340,7 @@ type _ClientHelloMsg struct {
 	_SupportedSignatureAlgorithmsCert []SignatureScheme
 	_SupportedVersions                []uint16
 	_Cookie                           []byte
-	_KeyShares                        []KeyShare
+	_KeyShares                        []_KeyShare
 	_EarlyData                        bool
 	_PskModes                         []uint8
 	_PskIdentities                    []pskIdentity
@@ -376,7 +375,7 @@ func (chm *_ClientHelloMsg) getPrivatePtr() *clientHelloMsg {
 			supportedSignatureAlgorithmsCert: chm._SupportedSignatureAlgorithmsCert,
 			supportedVersions:                chm._SupportedVersions,
 			cookie:                           chm._Cookie,
-			keyShares:                        KeyShares(chm._KeyShares).ToPrivate(),
+			keyShares:                        _KeyShares(chm._KeyShares).ToPrivate(),
 			earlyData:                        chm._EarlyData,
 			pskModes:                         chm._PskModes,
 			pskIdentities:                    chm._PskIdentities,
@@ -533,22 +532,22 @@ func (fh *finishedHash) getPublicObj() _FinishedHash {
 }
 
 // TLS 1.3 Key Share. See RFC 8446, Section 4.2.8.
-type KeyShare struct {
+type _KeyShare struct {
 	Group _CurveID
 	Data  []byte
 }
 
-type KeyShares []KeyShare
+type _KeyShares []_KeyShare
 type keyShares []keyShare
 
-func (kss keyShares) ToPublic() []KeyShare {
-	var KSS []KeyShare
+func (kss keyShares) ToPublic() []_KeyShare {
+	var KSS []_KeyShare
 	for _, ks := range kss {
-		KSS = append(KSS, KeyShare{Data: ks.data, Group: ks.group})
+		KSS = append(KSS, _KeyShare{Data: ks.data, Group: ks.group})
 	}
 	return KSS
 }
-func (KSS KeyShares) ToPrivate() []keyShare {
+func (KSS _KeyShares) ToPrivate() []keyShare {
 	var kss []keyShare
 	for _, KS := range KSS {
 		kss = append(kss, keyShare{data: KS.Data, group: KS.Group})
@@ -557,23 +556,6 @@ func (KSS KeyShares) ToPrivate() []keyShare {
 }
 
 // ClientSessionState is public, but all its fields are private. Let's add setters, getters and constructor
-
-// ClientSessionState contains the state needed by clients to resume TLS sessions.
-func MakeClientSessionState(
-	SessionTicket []uint8,
-	Vers uint16,
-	CipherSuite uint16,
-	MasterSecret []byte,
-	ServerCertificates []*x509.Certificate,
-	VerifiedChains [][]*x509.Certificate) *_ClientSessionState {
-	css := _ClientSessionState{sessionTicket: SessionTicket,
-		vers:               Vers,
-		cipherSuite:        CipherSuite,
-		masterSecret:       MasterSecret,
-		serverCertificates: ServerCertificates,
-		verifiedChains:     VerifiedChains}
-	return &css
-}
 
 // Encrypted ticket used for session resumption with server
 func (css *_ClientSessionState) _SessionTicket() []uint8 {

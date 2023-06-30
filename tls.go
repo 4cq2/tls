@@ -23,7 +23,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"strings"
 )
@@ -34,65 +33,6 @@ import (
 // at least one certificate or else set GetCertificate.
 func Server(conn net.Conn, config *_Config) *Conn {
 	return &Conn{conn: conn, config: config}
-}
-
-// A listener implements a network listener (net.Listener) for TLS connections.
-type listener struct {
-	net.Listener
-	config *_Config
-}
-
-// Accept waits for and returns the next incoming TLS connection.
-// The returned connection is of type *Conn.
-func (l *listener) Accept() (net.Conn, error) {
-	c, err := l.Listener.Accept()
-	if err != nil {
-		return nil, err
-	}
-	return Server(c, l.config), nil
-}
-
-// NewListener creates a Listener which accepts connections from an inner
-// Listener and wraps each connection with Server.
-// The configuration config must be non-nil and must include
-// at least one certificate or else set GetCertificate.
-func NewListener(inner net.Listener, config *_Config) net.Listener {
-	l := new(listener)
-	l.Listener = inner
-	l.config = config
-	return l
-}
-
-// Listen creates a TLS listener accepting connections on the
-// given network address using net.Listen.
-// The configuration config must be non-nil and must include
-// at least one certificate or else set GetCertificate.
-func Listen(network, laddr string, config *_Config) (net.Listener, error) {
-	if config == nil || (len(config._Certificates) == 0 && config._GetCertificate == nil) {
-		return nil, errors.New("tls: neither Certificates nor GetCertificate set in Config")
-	}
-	l, err := net.Listen(network, laddr)
-	if err != nil {
-		return nil, err
-	}
-	return NewListener(l, config), nil
-}
-
-// LoadX509KeyPair reads and parses a public/private key pair from a pair
-// of files. The files must contain PEM encoded data. The certificate file
-// may contain intermediate certificates following the leaf certificate to
-// form a certificate chain. On successful return, Certificate.Leaf will
-// be nil because the parsed form of the certificate is not retained.
-func LoadX509KeyPair(certFile, keyFile string) (_Certificate, error) {
-	certPEMBlock, err := ioutil.ReadFile(certFile)
-	if err != nil {
-		return _Certificate{}, err
-	}
-	keyPEMBlock, err := ioutil.ReadFile(keyFile)
-	if err != nil {
-		return _Certificate{}, err
-	}
-	return X509KeyPair(certPEMBlock, keyPEMBlock)
 }
 
 // X509KeyPair parses a public/private key pair from a pair of

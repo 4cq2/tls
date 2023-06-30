@@ -15,33 +15,6 @@ type Roller struct {
 	r                   *prng
 }
 
-// NewRoller creates Roller object with default range of HelloIDs to cycle through until a
-// working/unblocked one is found.
-func NewRoller() (*Roller, error) {
-	r, err := newPRNG()
-	if err != nil {
-		return nil, err
-	}
-
-	tcpDialTimeoutInc := r.Intn(14)
-	tcpDialTimeoutInc = 7 + tcpDialTimeoutInc
-
-	tlsHandshakeTimeoutInc := r.Intn(20)
-	tlsHandshakeTimeoutInc = 11 + tlsHandshakeTimeoutInc
-
-	return &Roller{
-		HelloIDs: []_ClientHelloID{
-			_HelloChrome_Auto,
-			_HelloFirefox_Auto,
-			HelloIOS_Auto,
-			HelloRandomized,
-		},
-		TcpDialTimeout:      time.Second * time.Duration(tcpDialTimeoutInc),
-		TlsHandshakeTimeout: time.Second * time.Duration(tlsHandshakeTimeoutInc),
-		r:                   r,
-	}, nil
-}
-
 // Dial attempts to establish connection to given address using different HelloIDs.
 // If a working HelloID is found, it is used again for subsequent Dials.
 // If tcp connection fails or all HelloIDs are tried, returns with last error.

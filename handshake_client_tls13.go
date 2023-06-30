@@ -269,7 +269,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 			keyShareExtFound := false
 			for _, ext := range hs.uconn.Extensions {
 				// new ks seems to be generated either way
-				if ks, ok := ext.(*KeyShareExtension); ok {
+				if ks, ok := ext.(*_KeyShareExtension); ok {
 					ks.KeyShares = keyShares(hs.hello.keyShares).ToPublic()
 					keyShareExtFound = true
 				}

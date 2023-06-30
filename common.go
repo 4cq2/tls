@@ -5,7 +5,6 @@
 package tls
 
 import (
-	"container/list"
 	"crypto"
 	"crypto/rand"
 	"crypto/sha512"
@@ -173,7 +172,7 @@ var supportedSignatureAlgorithms = []SignatureScheme{
 	_ECDSAWithP384AndSHA384,
 	PKCS1WithSHA512,
 	_ECDSAWithP521AndSHA512,
-	PKCS1WithSHA1,
+	_PKCS1WithSHA1,
 	_ECDSAWithSHA1,
 }
 
@@ -199,7 +198,7 @@ const (
 type _ClientAuthType int
 
 const (
-	NoClientCert _ClientAuthType = iota
+	_NoClientCert _ClientAuthType = iota
 	RequestClientCert
 	RequireAnyClientCert
 	VerifyClientCertIfGiven
@@ -273,7 +272,7 @@ const (
 	_ECDSAWithP521AndSHA512 SignatureScheme = 0x0603
 
 	// Legacy signature and hash algorithms for TLS 1.2.
-	PKCS1WithSHA1  SignatureScheme = 0x0201
+	_PKCS1WithSHA1 SignatureScheme = 0x0201
 	_ECDSAWithSHA1 SignatureScheme = 0x0203
 )
 
@@ -867,83 +866,6 @@ type handshakeMessage interface {
 	unmarshal([]byte) bool
 }
 
-// lruSessionCache is a ClientSessionCache implementation that uses an LRU
-// caching strategy.
-type lruSessionCache struct {
-	sync.Mutex
-
-	m        map[string]*list.Element
-	q        *list.List
-	capacity int
-}
-
-type lruSessionCacheEntry struct {
-	sessionKey string
-	state      *_ClientSessionState
-}
-
-// NewLRUClientSessionCache returns a ClientSessionCache with the given
-// capacity that uses an LRU strategy. If capacity is < 1, a default capacity
-// is used instead.
-func NewLRUClientSessionCache(capacity int) _ClientSessionCache {
-	const defaultSessionCacheCapacity = 64
-
-	if capacity < 1 {
-		capacity = defaultSessionCacheCapacity
-	}
-	return &lruSessionCache{
-		m:        make(map[string]*list.Element),
-		q:        list.New(),
-		capacity: capacity,
-	}
-}
-
-// Put adds the provided (sessionKey, cs) pair to the cache. If cs is nil, the entry
-// corresponding to sessionKey is removed from the cache instead.
-func (c *lruSessionCache) Put(sessionKey string, cs *_ClientSessionState) {
-	c.Lock()
-	defer c.Unlock()
-
-	if elem, ok := c.m[sessionKey]; ok {
-		if cs == nil {
-			c.q.Remove(elem)
-			delete(c.m, sessionKey)
-		} else {
-			entry := elem.Value.(*lruSessionCacheEntry)
-			entry.state = cs
-			c.q.MoveToFront(elem)
-		}
-		return
-	}
-
-	if c.q.Len() < c.capacity {
-		entry := &lruSessionCacheEntry{sessionKey, cs}
-		c.m[sessionKey] = c.q.PushFront(entry)
-		return
-	}
-
-	elem := c.q.Back()
-	entry := elem.Value.(*lruSessionCacheEntry)
-	delete(c.m, entry.sessionKey)
-	entry.sessionKey = sessionKey
-	entry.state = cs
-	c.q.MoveToFront(elem)
-	c.m[sessionKey] = elem
-}
-
-// Get returns the ClientSessionState value associated with a given key. It
-// returns (nil, false) if no value is found.
-func (c *lruSessionCache) Get(sessionKey string) (*_ClientSessionState, bool) {
-	c.Lock()
-	defer c.Unlock()
-
-	if elem, ok := c.m[sessionKey]; ok {
-		c.q.MoveToFront(elem)
-		return elem.Value.(*lruSessionCacheEntry).state, true
-	}
-	return nil, false
-}
-
 // TODO(jsing): Make these available to both crypto/x509 and crypto/tls.
 type dsaSignature struct {
 	R, S *big.Int
@@ -1024,7 +946,7 @@ func isSupportedSignatureAlgorithm(sigAlg SignatureScheme, supportedSignatureAlg
 // signature method (without hash function).
 func signatureFromSignatureScheme(signatureAlgorithm SignatureScheme) uint8 {
 	switch signatureAlgorithm {
-	case PKCS1WithSHA1, PKCS1WithSHA256, PKCS1WithSHA384, PKCS1WithSHA512:
+	case _PKCS1WithSHA1, PKCS1WithSHA256, PKCS1WithSHA384, PKCS1WithSHA512:
 		return signaturePKCS1v15
 	case PSSWithSHA256, PSSWithSHA384, PSSWithSHA512:
 		return signatureRSAPSS

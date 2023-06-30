@@ -143,7 +143,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 			}
 		case extensionNextProtoNeg:
 			// draft-agl-tls-nextprotoneg-04
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &NPNExtension{})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_NPNExtension{})
 
 		case extensionStatusRequest:
 			// RFC 4366, Section 3.6
@@ -265,9 +265,9 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 			if !extData.ReadUint16LengthPrefixed(&clientShares) {
 				return nil, errors.New("unable to read key share extension data")
 			}
-			keyShares := []KeyShare{}
+			keyShares := []_KeyShare{}
 			for !clientShares.Empty() {
-				var ks KeyShare
+				var ks _KeyShare
 				var group uint16
 				if !clientShares.ReadUint16(&group) ||
 					!readUint16LengthPrefixed(&clientShares, &ks.Data) ||
@@ -282,7 +282,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 				}
 				keyShares = append(keyShares, ks)
 			}
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &KeyShareExtension{keyShares})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_KeyShareExtension{keyShares})
 
 		case extensionPSKModes:
 			// RFC 8446, Section 4.2.9
