@@ -139,7 +139,7 @@ type ecdheKeyAgreement struct {
 func (ka *ecdheKeyAgreement) generateServerKeyExchange(config *_Config, cert *_Certificate, clientHello *clientHelloMsg, hello *serverHelloMsg) (*serverKeyExchangeMsg, error) {
 	preferredCurves := config.curvePreferences()
 
-	var curveID CurveID
+	var curveID _CurveID
 NextCandidate:
 	for _, candidate := range preferredCurves {
 		for _, c := range clientHello.supportedCurves {
@@ -236,7 +236,7 @@ func (ka *ecdheKeyAgreement) processServerKeyExchange(config *_Config, clientHel
 	if skx.key[0] != 3 { // named curve
 		return errors.New("tls: server selected unsupported curve")
 	}
-	curveID := CurveID(skx.key[1])<<8 | CurveID(skx.key[2])
+	curveID := _CurveID(skx.key[1])<<8 | _CurveID(skx.key[2])
 
 	publicLen := int(skx.key[3])
 	if publicLen+4 > len(skx.key) {

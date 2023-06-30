@@ -174,17 +174,17 @@ func (c *Conn) encryptTicket(state []byte) ([]byte, error) {
 // [uTLS] changed to use exported DecryptTicketWith func below
 func (c *Conn) decryptTicket(encrypted []byte) (plaintext []byte, usedOldKey bool) {
 	tks := ticketKeys(c.config.ticketKeys()).ToPublic()
-	return DecryptTicketWith(encrypted, tks)
+	return _DecryptTicketWith(encrypted, tks)
 }
 
-// DecryptTicketWith decrypts an encrypted session ticket
+// _DecryptTicketWith decrypts an encrypted session ticket
 // using a TicketKeys (ie []TicketKey) struct
 //
 // usedOldKey will be true if the key used for decryption is
 // not the first in the []TicketKey slice
 //
 // [uTLS] changed to be made public and take a TicketKeys instead of use a Conn receiver
-func DecryptTicketWith(encrypted []byte, tks TicketKeys) (plaintext []byte, usedOldKey bool) {
+func _DecryptTicketWith(encrypted []byte, tks TicketKeys) (plaintext []byte, usedOldKey bool) {
 	if len(encrypted) < ticketKeyNameLen+aes.BlockSize+sha256.Size {
 		return nil, false
 	}

@@ -171,7 +171,7 @@ func (hs *serverHandshakeStateTLS13) processClientHello() error {
 
 	// Pick the ECDHE group in server preference order, but give priority to
 	// groups with a key share, to avoid a HelloRetryRequest round-trip.
-	var selectedGroup CurveID
+	var selectedGroup _CurveID
 	var clientKeyShare *keyShare
 GroupSelection:
 	for _, preferredGroup := range c.config.curvePreferences() {
@@ -404,7 +404,7 @@ func (hs *serverHandshakeStateTLS13) sendDummyChangeCipherSpec() error {
 	return err
 }
 
-func (hs *serverHandshakeStateTLS13) doHelloRetryRequest(selectedGroup CurveID) error {
+func (hs *serverHandshakeStateTLS13) doHelloRetryRequest(selectedGroup _CurveID) error {
 	c := hs.c
 
 	// The first ClientHello gets double-hashed into the transcript upon a

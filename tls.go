@@ -165,16 +165,6 @@ func DialWithDialer(dialer *net.Dialer, network, addr string, config *_Config) (
 	return conn, nil
 }
 
-// Dial connects to the given network address using net.Dial
-// and then initiates a TLS handshake, returning the resulting
-// TLS connection.
-// Dial interprets a nil configuration as equivalent to
-// the zero configuration; see the documentation of Config
-// for the defaults.
-func Dial(network, addr string, config *_Config) (*Conn, error) {
-	return DialWithDialer(new(net.Dialer), network, addr, config)
-}
-
 // LoadX509KeyPair reads and parses a public/private key pair from a pair
 // of files. The files must contain PEM encoded data. The certificate file
 // may contain intermediate certificates following the leaf certificate to

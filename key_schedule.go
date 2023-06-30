@@ -103,12 +103,12 @@ func (c *cipherSuiteTLS13) exportKeyingMaterial(masterSecret []byte, transcript 
 // ecdheParameters implements Diffie-Hellman with either NIST curves or X25519,
 // according to RFC 8446, Section 4.2.8.2.
 type ecdheParameters interface {
-	CurveID() CurveID
+	CurveID() _CurveID
 	PublicKey() []byte
 	SharedKey(peerPublicKey []byte) []byte
 }
 
-func generateECDHEParameters(rand io.Reader, curveID CurveID) (ecdheParameters, error) {
+func generateECDHEParameters(rand io.Reader, curveID _CurveID) (ecdheParameters, error) {
 	if curveID == X25519 {
 		p := &x25519Parameters{}
 		if _, err := io.ReadFull(rand, p.privateKey[:]); err != nil {
@@ -132,13 +132,13 @@ func generateECDHEParameters(rand io.Reader, curveID CurveID) (ecdheParameters, 
 	return p, nil
 }
 
-func curveForCurveID(id CurveID) (elliptic.Curve, bool) {
+func curveForCurveID(id _CurveID) (elliptic.Curve, bool) {
 	switch id {
-	case CurveP256:
+	case _CurveP256:
 		return elliptic.P256(), true
-	case CurveP384:
+	case _CurveP384:
 		return elliptic.P384(), true
-	case CurveP521:
+	case _CurveP521:
 		return elliptic.P521(), true
 	default:
 		return nil, false
@@ -148,10 +148,10 @@ func curveForCurveID(id CurveID) (elliptic.Curve, bool) {
 type nistParameters struct {
 	privateKey []byte
 	x, y       *big.Int // public key
-	curveID    CurveID
+	curveID    _CurveID
 }
 
-func (p *nistParameters) CurveID() CurveID {
+func (p *nistParameters) CurveID() _CurveID {
 	return p.curveID
 }
 
@@ -181,7 +181,7 @@ type x25519Parameters struct {
 	publicKey  [32]byte
 }
 
-func (p *x25519Parameters) CurveID() CurveID {
+func (p *x25519Parameters) CurveID() _CurveID {
 	return X25519
 }
 

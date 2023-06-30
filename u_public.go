@@ -251,8 +251,8 @@ type ServerHelloMsg struct {
 	ServerShare             keyShare
 	SelectedIdentityPresent bool
 	SelectedIdentity        uint16
-	Cookie                  []byte  // HelloRetryRequest extension
-	SelectedGroup           CurveID // HelloRetryRequest extension
+	Cookie                  []byte   // HelloRetryRequest extension
+	SelectedGroup           _CurveID // HelloRetryRequest extension
 
 }
 
@@ -328,7 +328,7 @@ type _ClientHelloMsg struct {
 	_OcspStapling                 bool
 	_Scts                         bool
 	_Ems                          bool // [UTLS] actually implemented due to its prevalence
-	_SupportedCurves              []CurveID
+	_SupportedCurves              []_CurveID
 	_SupportedPoints              []uint8
 	_TicketSupported              bool
 	_SessionTicket                []uint8
@@ -534,7 +534,7 @@ func (fh *finishedHash) getPublicObj() FinishedHash {
 
 // TLS 1.3 Key Share. See RFC 8446, Section 4.2.8.
 type KeyShare struct {
-	Group CurveID
+	Group _CurveID
 	Data  []byte
 }
 

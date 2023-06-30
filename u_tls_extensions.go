@@ -102,7 +102,7 @@ func (e *StatusRequestExtension) Read(b []byte) (int, error) {
 }
 
 type SupportedCurvesExtension struct {
-	Curves []CurveID
+	Curves []_CurveID
 }
 
 func (e *SupportedCurvesExtension) writeToUConn(uc *UConn) error {

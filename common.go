@@ -101,23 +101,23 @@ const (
 	scsvRenegotiation uint16 = 0x00ff
 )
 
-// CurveID is the type of a TLS identifier for an elliptic curve. See
+// _CurveID is the type of a TLS identifier for an elliptic curve. See
 // https://www.iana.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-8.
 //
 // In TLS 1.3, this type is called NamedGroup, but at this time this library
 // only supports Elliptic Curve based groups. See RFC 8446, Section 4.2.7.
-type CurveID uint16
+type _CurveID uint16
 
 const (
-	CurveP256 CurveID = 23
-	CurveP384 CurveID = 24
-	CurveP521 CurveID = 25
-	X25519    CurveID = 29
+	_CurveP256 _CurveID = 23
+	_CurveP384 _CurveID = 24
+	_CurveP521 _CurveID = 25
+	X25519     _CurveID = 29
 )
 
 // TLS 1.3 Key Share. See RFC 8446, Section 4.2.8.
 type keyShare struct {
-	group CurveID
+	group _CurveID
 	data  []byte
 }
 
@@ -292,7 +292,7 @@ type _ClientHelloInfo struct {
 	// _SupportedCurves lists the elliptic curves supported by the client.
 	// _SupportedCurves is set only if the Supported Elliptic Curves
 	// Extension is being used (see RFC 4492, Section 5.1.1).
-	_SupportedCurves []CurveID
+	_SupportedCurves []_CurveID
 
 	// _SupportedPoints lists the point formats supported by the client.
 	// _SupportedPoints is set only if the Supported Point Formats Extension
@@ -532,7 +532,7 @@ type _Config struct {
 	// an ECDHE handshake, in preference order. If empty, the default will
 	// be used. The client will use the first preference as the type for
 	// its key share in TLS 1.3. This may change in the future.
-	_CurvePreferences []CurveID
+	_CurvePreferences []_CurveID
 
 	// _DynamicRecordSizingDisabled disables adaptive sizing of TLS records.
 	// When true, the largest possible TLS record size is always used. When
@@ -790,9 +790,9 @@ func supportedVersionsFromMax(maxVersion uint16) []uint16 {
 	return versions
 }
 
-var defaultCurvePreferences = []CurveID{X25519, CurveP256, CurveP384, CurveP521}
+var defaultCurvePreferences = []_CurveID{X25519, _CurveP256, _CurveP384, _CurveP521}
 
-func (c *_Config) curvePreferences() []CurveID {
+func (c *_Config) curvePreferences() []_CurveID {
 	if c == nil || len(c._CurvePreferences) == 0 {
 		return defaultCurvePreferences
 	}
