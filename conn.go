@@ -17,7 +17,6 @@ import (
 	"net"
 	"sync"
 	"sync/atomic"
-	"time"
 )
 
 // A Conn represents a secured connection.
@@ -117,13 +116,6 @@ type Conn struct {
 // _RemoteAddr returns the remote network address.
 func (c *Conn) _RemoteAddr() net.Addr {
 	return c.conn.RemoteAddr()
-}
-
-// _SetDeadline sets the read and write deadlines associated with the connection.
-// A zero value for t means Read and Write will not time out.
-// After a Write has timed out, the TLS state is corrupt and all future writes will return the same error.
-func (c *Conn) _SetDeadline(t time.Time) error {
-	return c.conn.SetDeadline(t)
 }
 
 // A halfConn represents one direction of the record layer

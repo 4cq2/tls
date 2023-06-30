@@ -24,7 +24,7 @@ func (t *Transport) _RoundTrip(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	t._Conn = UClient(conn, &conf, _HelloCustom)
-	if err := t._Conn.ApplyPreset(&t._Spec); err != nil {
+	if err := t._Conn._ApplyPreset(&t._Spec); err != nil {
 		return nil, err
 	}
 	if err := req.Write(t._Conn); err != nil {

@@ -549,13 +549,13 @@ func (uconn *UConn) applyPresetByID(id _ClientHelloID) (err error) {
 		}
 	}
 
-	return uconn.ApplyPreset(&spec)
+	return uconn._ApplyPreset(&spec)
 }
 
-// ApplyPreset should only be used in conjunction with HelloCustom to apply custom specs.
+// _ApplyPreset should only be used in conjunction with HelloCustom to apply custom specs.
 // Fields of TLSExtensions that are slices/pointers are shared across different connections with
 // same ClientHelloSpec. It is advised to use different specs and avoid any shared state.
-func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
+func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 	var err error
 
 	err = uconn._SetTLSVers(p._TLSVersMin, p._TLSVersMax, p._Extensions)
@@ -568,7 +568,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 		return err
 	}
 	uconn._HandshakeState._Hello = privateHello.getPublicPtr()
-	uconn._HandshakeState._State13.EcdheParams = ecdheParams
+	uconn._HandshakeState._State13._EcdheParams = ecdheParams
 	hello := uconn._HandshakeState._Hello
 	session := uconn._HandshakeState._Session
 
@@ -674,7 +674,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 				ext.KeyShares[i].Data = ecdheParams.PublicKey()
 				if !preferredCurveIsSet {
 					// only do this once for the first non-grease curve
-					uconn._HandshakeState._State13.EcdheParams = ecdheParams
+					uconn._HandshakeState._State13._EcdheParams = ecdheParams
 					preferredCurveIsSet = true
 				}
 			}
@@ -721,7 +721,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	case helloRandomizedNoALPN:
 		WithALPN = false
 	case helloRandomized:
-		if r.FlipWeightedCoin(0.7) {
+		if r._FlipWeightedCoin(0.7) {
 			WithALPN = true
 		} else {
 			WithALPN = false
@@ -737,7 +737,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 		return p, err
 	}
 
-	if r.FlipWeightedCoin(0.4) {
+	if r._FlipWeightedCoin(0.4) {
 		p._TLSVersMin = VersionTLS10
 		p._TLSVersMax = VersionTLS13
 		tls13ciphers := make([]uint16, len(defaultCipherSuitesTLS13()))
@@ -769,16 +769,16 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 		_PKCS1WithSHA512,
 	}
 
-	if r.FlipWeightedCoin(0.63) {
+	if r._FlipWeightedCoin(0.63) {
 		sigAndHashAlgos = append(sigAndHashAlgos, _ECDSAWithSHA1)
 	}
-	if r.FlipWeightedCoin(0.59) {
+	if r._FlipWeightedCoin(0.59) {
 		sigAndHashAlgos = append(sigAndHashAlgos, _ECDSAWithP521AndSHA512)
 	}
-	if r.FlipWeightedCoin(0.51) || p._TLSVersMax == VersionTLS13 {
+	if r._FlipWeightedCoin(0.51) || p._TLSVersMax == VersionTLS13 {
 		// https://tools.ietf.org/html/rfc8446 says "...RSASSA-PSS (which is mandatory in TLS 1.3)..."
 		sigAndHashAlgos = append(sigAndHashAlgos, _PSSWithSHA256)
-		if r.FlipWeightedCoin(0.9) {
+		if r._FlipWeightedCoin(0.9) {
 			// these usually go together
 			sigAndHashAlgos = append(sigAndHashAlgos, _PSSWithSHA384)
 			sigAndHashAlgos = append(sigAndHashAlgos, _PSSWithSHA512)
@@ -796,11 +796,11 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	points := SupportedPointsExtension{SupportedPoints: []byte{pointFormatUncompressed}}
 
 	curveIDs := []_CurveID{}
-	if r.FlipWeightedCoin(0.71) || p._TLSVersMax == VersionTLS13 {
+	if r._FlipWeightedCoin(0.71) || p._TLSVersMax == VersionTLS13 {
 		curveIDs = append(curveIDs, X25519)
 	}
 	curveIDs = append(curveIDs, _CurveP256, _CurveP384)
-	if r.FlipWeightedCoin(0.46) {
+	if r._FlipWeightedCoin(0.46) {
 		curveIDs = append(curveIDs, _CurveP521)
 	}
 
@@ -826,28 +826,28 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 		p._Extensions = append(p._Extensions, &alpn)
 	}
 
-	if r.FlipWeightedCoin(0.62) || p._TLSVersMax == VersionTLS13 {
+	if r._FlipWeightedCoin(0.62) || p._TLSVersMax == VersionTLS13 {
 		// always include for TLS 1.3, since TLS 1.3 ClientHellos are often over 256 bytes
 		// and that's when padding is required to work around buggy middleboxes
 		p._Extensions = append(p._Extensions, &padding)
 	}
-	if r.FlipWeightedCoin(0.74) {
+	if r._FlipWeightedCoin(0.74) {
 		p._Extensions = append(p._Extensions, &status)
 	}
-	if r.FlipWeightedCoin(0.46) {
+	if r._FlipWeightedCoin(0.46) {
 		p._Extensions = append(p._Extensions, &sct)
 	}
-	if r.FlipWeightedCoin(0.75) {
+	if r._FlipWeightedCoin(0.75) {
 		p._Extensions = append(p._Extensions, &reneg)
 	}
-	if r.FlipWeightedCoin(0.77) {
+	if r._FlipWeightedCoin(0.77) {
 		p._Extensions = append(p._Extensions, &ems)
 	}
 	if p._TLSVersMax == VersionTLS13 {
 		ks := _KeyShareExtension{[]_KeyShare{
 			{Group: X25519}, // the key for the group will be generated later
 		}}
-		if r.FlipWeightedCoin(0.25) {
+		if r._FlipWeightedCoin(0.25) {
 			// do not ADD second keyShare because crypto/tls does not support multiple ecdheParams
 			// TODO: add it back when they implement multiple keyShares, or implement it oursevles
 			// ks.KeyShares = append(ks.KeyShares, KeyShare{Group: CurveP256})
@@ -878,7 +878,7 @@ func removeRandomCiphers(r *prng, s []uint16, maxRemovalProbability float64) []u
 	floatLen := float64(len(s))
 	sliceLen := len(s)
 	for i := 1; i < sliceLen; i++ {
-		if r.FlipWeightedCoin(maxRemovalProbability * float64(i) / floatLen) {
+		if r._FlipWeightedCoin(maxRemovalProbability * float64(i) / floatLen) {
 			s = append(s[:i], s[i+1:]...)
 			sliceLen--
 			i--
@@ -889,14 +889,14 @@ func removeRandomCiphers(r *prng, s []uint16, maxRemovalProbability float64) []u
 
 func shuffledCiphers(r *prng) ([]uint16, error) {
 	ciphers := make(sortableCiphers, len(cipherSuites))
-	perm := r.Perm(len(cipherSuites))
+	perm := r._Perm(len(cipherSuites))
 	for i, suite := range cipherSuites {
 		ciphers[i] = sortableCipher{suite: suite.id,
 			isObsolete: ((suite.flags & suiteTLS12) == 0),
 			randomTag:  perm[i]}
 	}
 	sort.Sort(ciphers)
-	return ciphers.GetCiphers(), nil
+	return ciphers._GetCiphers(), nil
 }
 
 type sortableCipher struct {
@@ -925,7 +925,7 @@ func (ciphers sortableCiphers) Swap(i, j int) {
 	ciphers[i], ciphers[j] = ciphers[j], ciphers[i]
 }
 
-func (ciphers sortableCiphers) GetCiphers() []uint16 {
+func (ciphers sortableCiphers) _GetCiphers() []uint16 {
 	cipherIDs := make([]uint16, len(ciphers))
 	for i := range ciphers {
 		cipherIDs[i] = ciphers[i].suite

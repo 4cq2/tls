@@ -33,12 +33,12 @@ type _ClientHandshakeState struct {
 
 // TLS 1.3 only
 type TLS13OnlyState struct {
-	Suite         *_CipherSuiteTLS13
-	EcdheParams   _EcdheParameters
-	EarlySecret   []byte
-	BinderKey     []byte
-	CertReq       *_CertificateRequestMsgTLS13
-	UsingPSK      bool
+	_Suite        *_CipherSuiteTLS13
+	_EcdheParams  _EcdheParameters
+	_EarlySecret  []byte
+	_BinderKey    []byte
+	_CertReq      *_CertificateRequestMsgTLS13
+	_UsingPSK     bool
 	SentDummyCCS  bool
 	Transcript    hash.Hash
 	TrafficSecret []byte // client_application_traffic_secret_0
@@ -58,16 +58,16 @@ func (chs *_ClientHandshakeState) toPrivate13() *clientHandshakeStateTLS13 {
 			c:           chs._C,
 			serverHello: chs._ServerHello.getPrivatePtr(),
 			hello:       chs._Hello.getPrivatePtr(),
-			ecdheParams: chs._State13.EcdheParams,
+			ecdheParams: chs._State13._EcdheParams,
 
 			session:     chs._Session,
-			earlySecret: chs._State13.EarlySecret,
-			binderKey:   chs._State13.BinderKey,
+			earlySecret: chs._State13._EarlySecret,
+			binderKey:   chs._State13._BinderKey,
 
-			certReq:       chs._State13.CertReq.toPrivate(),
-			usingPSK:      chs._State13.UsingPSK,
+			certReq:       chs._State13._CertReq.toPrivate(),
+			usingPSK:      chs._State13._UsingPSK,
 			sentDummyCCS:  chs._State13.SentDummyCCS,
-			suite:         chs._State13.Suite.toPrivate(),
+			suite:         chs._State13._Suite.toPrivate(),
 			transcript:    chs._State13.Transcript,
 			masterSecret:  chs._MasterSecret,
 			trafficSecret: chs._State13.TrafficSecret,
@@ -82,13 +82,13 @@ func (chs13 *clientHandshakeStateTLS13) toPublic13() *_ClientHandshakeState {
 		return nil
 	} else {
 		tls13State := TLS13OnlyState{
-			EcdheParams:   chs13.ecdheParams,
-			EarlySecret:   chs13.earlySecret,
-			BinderKey:     chs13.binderKey,
-			CertReq:       chs13.certReq.toPublic(),
-			UsingPSK:      chs13.usingPSK,
+			_EcdheParams:  chs13.ecdheParams,
+			_EarlySecret:  chs13.earlySecret,
+			_BinderKey:    chs13.binderKey,
+			_CertReq:      chs13.certReq.toPublic(),
+			_UsingPSK:     chs13.usingPSK,
 			SentDummyCCS:  chs13.sentDummyCCS,
-			Suite:         chs13.suite.toPublic(),
+			_Suite:        chs13.suite.toPublic(),
 			TrafficSecret: chs13.trafficSecret,
 			Transcript:    chs13.transcript,
 		}

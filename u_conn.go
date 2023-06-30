@@ -75,7 +75,7 @@ func (uconn *UConn) _BuildHandshakeState() error {
 		}
 
 		uconn._HandshakeState._Hello = hello.getPublicPtr()
-		uconn._HandshakeState._State13.EcdheParams = ecdheParams
+		uconn._HandshakeState._State13._EcdheParams = ecdheParams
 		uconn._HandshakeState._C = uconn.Conn
 	} else {
 		if !uconn._ClientHelloBuilt {
@@ -138,17 +138,6 @@ func (uconn *UConn) _SetSessionState(session *_ClientSessionState) error {
 		return nil
 	}
 	return nil
-}
-
-func (uconn *UConn) _SetSNI(sni string) {
-	hname := hostnameInSNI(sni)
-	uconn.Conn.config._ServerName = hname
-	for _, ext := range uconn._Extensions {
-		sniExt, ok := ext.(*SNIExtension)
-		if ok {
-			sniExt.ServerName = hname
-		}
-	}
 }
 
 func (uconn *UConn) removeSNIExtension() {

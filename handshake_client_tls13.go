@@ -296,7 +296,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 					if err != nil {
 						return err
 					}
-					cookieIndex := p.Intn(len(hs.uconn._Extensions) - 2)
+					cookieIndex := p._Intn(len(hs.uconn._Extensions) - 2)
 					if cookieIndex >= len(hs.uconn._Extensions) {
 						// this check is for empty hs.uconn.Extensions
 						return fmt.Errorf("cookieIndex >= len(hs.uconn.Extensions): %v >= %v",
