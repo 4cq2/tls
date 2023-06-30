@@ -12,18 +12,18 @@ import (
 	"net/http"
 )
 
-type Transport struct {
-	_Conn *UConn
+type _Transport struct {
+	_Conn *_UConn
 	_Spec _ClientHelloSpec
 }
 
-func (t *Transport) _RoundTrip(req *http.Request) (*http.Response, error) {
+func (t *_Transport) _RoundTrip(req *http.Request) (*http.Response, error) {
 	conf := _Config{_ServerName: req.URL.Host}
 	conn, err := net.Dial("tcp", req.URL.Host+":443")
 	if err != nil {
 		return nil, err
 	}
-	t._Conn = UClient(conn, &conf, _HelloCustom)
+	t._Conn = _UClient(conn, &conf, _HelloCustom)
 	if err := t._Conn._ApplyPreset(&t._Spec); err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (t *Transport) _RoundTrip(req *http.Request) (*http.Response, error) {
 	return http.ReadResponse(bufio.NewReader(t._Conn.Conn), req)
 }
 
-var Android_API_26 = _ClientHelloSpec{
+var _Android_API_26 = _ClientHelloSpec{
 	_CipherSuites: []uint16{
 		TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 		TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,

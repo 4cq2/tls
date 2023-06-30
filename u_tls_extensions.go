@@ -10,7 +10,7 @@ import (
 )
 
 type TLSExtension interface {
-	writeToUConn(*UConn) error
+	writeToUConn(*_UConn) error
 
 	Len() int // includes header
 
@@ -23,7 +23,7 @@ type _NPNExtension struct {
 	_NextProtos []string
 }
 
-func (e *_NPNExtension) writeToUConn(uc *UConn) error {
+func (e *_NPNExtension) writeToUConn(uc *_UConn) error {
 	uc.Conn.config._NextProtos = e._NextProtos
 	uc._HandshakeState._Hello._NextProtoNeg = true
 	return nil
@@ -47,7 +47,7 @@ type SNIExtension struct {
 	_ServerName string // not an array because go crypto/tls doesn't support multiple SNIs
 }
 
-func (e *SNIExtension) writeToUConn(uc *UConn) error {
+func (e *SNIExtension) writeToUConn(uc *_UConn) error {
 	uc.Conn.config._ServerName = e._ServerName
 	uc._HandshakeState._Hello._ServerName = e._ServerName
 	return nil
@@ -78,7 +78,7 @@ func (e *SNIExtension) Read(b []byte) (int, error) {
 type StatusRequestExtension struct {
 }
 
-func (e *StatusRequestExtension) writeToUConn(uc *UConn) error {
+func (e *StatusRequestExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._OcspStapling = true
 	return nil
 }
@@ -105,7 +105,7 @@ type SupportedCurvesExtension struct {
 	_Curves []_CurveID
 }
 
-func (e *SupportedCurvesExtension) writeToUConn(uc *UConn) error {
+func (e *SupportedCurvesExtension) writeToUConn(uc *_UConn) error {
 	uc.Conn.config._CurvePreferences = e._Curves
 	uc._HandshakeState._Hello._SupportedCurves = e._Curves
 	return nil
@@ -137,7 +137,7 @@ type SupportedPointsExtension struct {
 	_SupportedPoints []uint8
 }
 
-func (e *SupportedPointsExtension) writeToUConn(uc *UConn) error {
+func (e *SupportedPointsExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._SupportedPoints = e._SupportedPoints
 	return nil
 }
@@ -166,7 +166,7 @@ type SignatureAlgorithmsExtension struct {
 	_SupportedSignatureAlgorithms []SignatureScheme
 }
 
-func (e *SignatureAlgorithmsExtension) writeToUConn(uc *UConn) error {
+func (e *SignatureAlgorithmsExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._SupportedSignatureAlgorithms = e._SupportedSignatureAlgorithms
 	return nil
 }
@@ -199,7 +199,7 @@ type RenegotiationInfoExtension struct {
 	_Renegotiation RenegotiationSupport
 }
 
-func (e *RenegotiationInfoExtension) writeToUConn(uc *UConn) error {
+func (e *RenegotiationInfoExtension) writeToUConn(uc *_UConn) error {
 	uc.Conn.config._Renegotiation = e._Renegotiation
 	switch e._Renegotiation {
 	case RenegotiateOnceAsClient:
@@ -239,7 +239,7 @@ type _ALPNExtension struct {
 	_AlpnProtocols []string
 }
 
-func (e *_ALPNExtension) writeToUConn(uc *UConn) error {
+func (e *_ALPNExtension) writeToUConn(uc *_UConn) error {
 	uc.Conn.config._NextProtos = e._AlpnProtocols
 	uc._HandshakeState._Hello._AlpnProtocols = e._AlpnProtocols
 	return nil
@@ -284,7 +284,7 @@ func (e *_ALPNExtension) Read(b []byte) (int, error) {
 type SCTExtension struct {
 }
 
-func (e *SCTExtension) writeToUConn(uc *UConn) error {
+func (e *SCTExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._Scts = true
 	return nil
 }
@@ -308,7 +308,7 @@ type SessionTicketExtension struct {
 	_Session *_ClientSessionState
 }
 
-func (e *SessionTicketExtension) writeToUConn(uc *UConn) error {
+func (e *SessionTicketExtension) writeToUConn(uc *_UConn) error {
 	if e._Session != nil {
 		uc._HandshakeState._Session = e._Session
 		uc._HandshakeState._Hello._SessionTicket = e._Session.sessionTicket
@@ -346,7 +346,7 @@ type _GenericExtension struct {
 	_Data []byte
 }
 
-func (e *_GenericExtension) writeToUConn(uc *UConn) error {
+func (e *_GenericExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
@@ -374,7 +374,7 @@ type UtlsExtendedMasterSecretExtension struct {
 
 // TODO: update when this extension is implemented in crypto/tls
 // but we probably won't have to enable it in Config
-func (e *UtlsExtendedMasterSecretExtension) writeToUConn(uc *UConn) error {
+func (e *UtlsExtendedMasterSecretExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._Ems = true
 	return nil
 }
@@ -420,10 +420,10 @@ const (
 // it is responsibility of user not to generate multiple grease extensions with same value
 type UtlsGREASEExtension struct {
 	_Value uint16
-	Body   []byte // in Chrome first grease has empty body, second grease has a single zero byte
+	_Body  []byte // in Chrome first grease has empty body, second grease has a single zero byte
 }
 
-func (e *UtlsGREASEExtension) writeToUConn(uc *UConn) error {
+func (e *UtlsGREASEExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
@@ -439,7 +439,7 @@ func _GetBoringGREASEValue(greaseSeed [ssl_grease_last_index]uint16, index int) 
 }
 
 func (e *UtlsGREASEExtension) Len() int {
-	return 4 + len(e.Body)
+	return 4 + len(e._Body)
 }
 
 func (e *UtlsGREASEExtension) Read(b []byte) (int, error) {
@@ -449,43 +449,43 @@ func (e *UtlsGREASEExtension) Read(b []byte) (int, error) {
 
 	b[0] = byte(e._Value >> 8)
 	b[1] = byte(e._Value)
-	b[2] = byte(len(e.Body) >> 8)
-	b[3] = byte(len(e.Body))
-	if len(e.Body) > 0 {
-		copy(b[4:], e.Body)
+	b[2] = byte(len(e._Body) >> 8)
+	b[3] = byte(len(e._Body))
+	if len(e._Body) > 0 {
+		copy(b[4:], e._Body)
 	}
 	return e.Len(), io.EOF
 }
 
 type UtlsPaddingExtension struct {
-	PaddingLen int
-	WillPad    bool // set to false to disable extension
+	_PaddingLen int
+	_WillPad    bool // set to false to disable extension
 
 	// Functor for deciding on padding length based on unpadded ClientHello length.
 	// If willPad is false, then this extension should not be included.
-	GetPaddingLen func(clientHelloUnpaddedLen int) (paddingLen int, willPad bool)
+	_GetPaddingLen func(clientHelloUnpaddedLen int) (paddingLen int, willPad bool)
 }
 
-func (e *UtlsPaddingExtension) writeToUConn(uc *UConn) error {
+func (e *UtlsPaddingExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
 func (e *UtlsPaddingExtension) Len() int {
-	if e.WillPad {
-		return 4 + e.PaddingLen
+	if e._WillPad {
+		return 4 + e._PaddingLen
 	} else {
 		return 0
 	}
 }
 
-func (e *UtlsPaddingExtension) Update(clientHelloUnpaddedLen int) {
-	if e.GetPaddingLen != nil {
-		e.PaddingLen, e.WillPad = e.GetPaddingLen(clientHelloUnpaddedLen)
+func (e *UtlsPaddingExtension) _Update(clientHelloUnpaddedLen int) {
+	if e._GetPaddingLen != nil {
+		e._PaddingLen, e._WillPad = e._GetPaddingLen(clientHelloUnpaddedLen)
 	}
 }
 
 func (e *UtlsPaddingExtension) Read(b []byte) (int, error) {
-	if !e.WillPad {
+	if !e._WillPad {
 		return 0, io.EOF
 	}
 	if len(b) < e.Len() {
@@ -494,8 +494,8 @@ func (e *UtlsPaddingExtension) Read(b []byte) (int, error) {
 	// https://tools.ietf.org/html/rfc7627
 	b[0] = byte(utlsExtensionPadding >> 8)
 	b[1] = byte(utlsExtensionPadding)
-	b[2] = byte(e.PaddingLen >> 8)
-	b[3] = byte(e.PaddingLen)
+	b[2] = byte(e._PaddingLen >> 8)
+	b[3] = byte(e._PaddingLen)
 	return e.Len(), io.EOF
 }
 
@@ -515,7 +515,7 @@ func _BoringPaddingStyle(unpaddedLen int) (int, bool) {
 
 /* TLS 1.3 */
 type _KeyShareExtension struct {
-	KeyShares []_KeyShare
+	_KeyShares []_KeyShare
 }
 
 func (e *_KeyShareExtension) Len() int {
@@ -524,7 +524,7 @@ func (e *_KeyShareExtension) Len() int {
 
 func (e *_KeyShareExtension) keySharesLen() int {
 	extLen := 0
-	for _, ks := range e.KeyShares {
+	for _, ks := range e._KeyShares {
 		extLen += 4 + len(ks._Data)
 	}
 	return extLen
@@ -544,7 +544,7 @@ func (e *_KeyShareExtension) Read(b []byte) (int, error) {
 	b[5] = byte((keySharesLen))
 
 	i := 6
-	for _, ks := range e.KeyShares {
+	for _, ks := range e._KeyShares {
 		b[i] = byte(ks._Group >> 8)
 		b[i+1] = byte(ks._Group)
 		b[i+2] = byte(len(ks._Data) >> 8)
@@ -556,17 +556,17 @@ func (e *_KeyShareExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-func (e *_KeyShareExtension) writeToUConn(uc *UConn) error {
-	uc._HandshakeState._Hello._KeyShares = e.KeyShares
+func (e *_KeyShareExtension) writeToUConn(uc *_UConn) error {
+	uc._HandshakeState._Hello._KeyShares = e._KeyShares
 	return nil
 }
 
 type _PSKKeyExchangeModesExtension struct {
-	Modes []uint8
+	_Modes []uint8
 }
 
 func (e *_PSKKeyExchangeModesExtension) Len() int {
-	return 4 + 1 + len(e.Modes)
+	return 4 + 1 + len(e._Modes)
 }
 
 func (e *_PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
@@ -574,48 +574,48 @@ func (e *_PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 
-	if len(e.Modes) > 255 {
+	if len(e._Modes) > 255 {
 		return 0, errors.New("too many PSK Key Exchange modes")
 	}
 
 	b[0] = byte(extensionPSKModes >> 8)
 	b[1] = byte(extensionPSKModes)
 
-	modesLen := len(e.Modes)
+	modesLen := len(e._Modes)
 	b[2] = byte((modesLen + 1) >> 8)
 	b[3] = byte((modesLen + 1))
 	b[4] = byte(modesLen)
 
-	if len(e.Modes) > 0 {
-		copy(b[5:], e.Modes)
+	if len(e._Modes) > 0 {
+		copy(b[5:], e._Modes)
 	}
 
 	return e.Len(), io.EOF
 }
 
-func (e *_PSKKeyExchangeModesExtension) writeToUConn(uc *UConn) error {
-	uc._HandshakeState._Hello._PskModes = e.Modes
+func (e *_PSKKeyExchangeModesExtension) writeToUConn(uc *_UConn) error {
+	uc._HandshakeState._Hello._PskModes = e._Modes
 	return nil
 }
 
 type SupportedVersionsExtension struct {
-	Versions []uint16
+	_Versions []uint16
 }
 
-func (e *SupportedVersionsExtension) writeToUConn(uc *UConn) error {
-	uc._HandshakeState._Hello._SupportedVersions = e.Versions
+func (e *SupportedVersionsExtension) writeToUConn(uc *_UConn) error {
+	uc._HandshakeState._Hello._SupportedVersions = e._Versions
 	return nil
 }
 
 func (e *SupportedVersionsExtension) Len() int {
-	return 4 + 1 + (2 * len(e.Versions))
+	return 4 + 1 + (2 * len(e._Versions))
 }
 
 func (e *SupportedVersionsExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
-	extLen := 2 * len(e.Versions)
+	extLen := 2 * len(e._Versions)
 	if extLen > 255 {
 		return 0, errors.New("too many supported versions")
 	}
@@ -627,7 +627,7 @@ func (e *SupportedVersionsExtension) Read(b []byte) (int, error) {
 	b[4] = byte(extLen)
 
 	i := 5
-	for _, sv := range e.Versions {
+	for _, sv := range e._Versions {
 		b[i] = byte(sv >> 8)
 		b[i+1] = byte(sv)
 		i += 2
@@ -640,7 +640,7 @@ type _CookieExtension struct {
 	_Cookie []byte
 }
 
-func (e *_CookieExtension) writeToUConn(uc *UConn) error {
+func (e *_CookieExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
@@ -670,7 +670,7 @@ FAKE EXTENSIONS
 type _FakeChannelIDExtension struct {
 }
 
-func (e *_FakeChannelIDExtension) writeToUConn(uc *UConn) error {
+func (e *_FakeChannelIDExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
@@ -690,15 +690,15 @@ func (e *_FakeChannelIDExtension) Read(b []byte) (int, error) {
 }
 
 type _FakeCertCompressionAlgsExtension struct {
-	Methods []_CertCompressionAlgo
+	_Methods []_CertCompressionAlgo
 }
 
-func (e *_FakeCertCompressionAlgsExtension) writeToUConn(uc *UConn) error {
+func (e *_FakeCertCompressionAlgsExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
 func (e *_FakeCertCompressionAlgsExtension) Len() int {
-	return 4 + 1 + (2 * len(e.Methods))
+	return 4 + 1 + (2 * len(e._Methods))
 }
 
 func (e *_FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
@@ -709,7 +709,7 @@ func (e *_FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
 	b[0] = byte(fakeCertCompressionAlgs >> 8)
 	b[1] = byte(fakeCertCompressionAlgs & 0xff)
 
-	extLen := 2 * len(e.Methods)
+	extLen := 2 * len(e._Methods)
 	if extLen > 255 {
 		return 0, errors.New("too many certificate compression methods")
 	}
@@ -719,7 +719,7 @@ func (e *_FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
 	b[4] = byte(extLen)
 
 	i := 5
-	for _, compMethod := range e.Methods {
+	for _, compMethod := range e._Methods {
 		b[i] = byte(compMethod >> 8)
 		b[i+1] = byte(compMethod)
 		i += 2
@@ -728,10 +728,10 @@ func (e *_FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
 }
 
 type _FakeRecordSizeLimitExtension struct {
-	Limit uint16
+	_Limit uint16
 }
 
-func (e *_FakeRecordSizeLimitExtension) writeToUConn(uc *UConn) error {
+func (e *_FakeRecordSizeLimitExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
@@ -750,7 +750,7 @@ func (e *_FakeRecordSizeLimitExtension) Read(b []byte) (int, error) {
 	b[2] = byte(0)
 	b[3] = byte(2)
 
-	b[4] = byte(e.Limit >> 8)
-	b[5] = byte(e.Limit & 0xff)
+	b[4] = byte(e._Limit >> 8)
+	b[5] = byte(e._Limit & 0xff)
 	return e.Len(), io.EOF
 }

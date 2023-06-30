@@ -28,7 +28,7 @@ type _ClientHandshakeState struct {
 	_State12 TLS12OnlyState
 	_State13 TLS13OnlyState
 
-	uconn *UConn
+	uconn *_UConn
 }
 
 // TLS 1.3 only

@@ -95,10 +95,10 @@ var cipherSuites = []*cipherSuite{
 	{TLS_RSA_WITH_AES_128_CBC_SHA, 16, 20, 16, rsaKA, 0, cipherAES, macSHA1, nil},
 	{TLS_RSA_WITH_AES_256_CBC_SHA, 32, 20, 16, rsaKA, 0, cipherAES, macSHA1, nil},
 	{TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA, 24, 20, 8, ecdheRSAKA, suiteECDHE, cipher3DES, macSHA1, nil},
-	{TLS_RSA_WITH_3DES_EDE_CBC_SHA, 24, 20, 8, rsaKA, 0, cipher3DES, macSHA1, nil},
+	{_TLS_RSA_WITH_3DES_EDE_CBC_SHA, 24, 20, 8, rsaKA, 0, cipher3DES, macSHA1, nil},
 
 	// RC4-based cipher suites are disabled by default.
-	{TLS_RSA_WITH_RC4_128_SHA, 16, 20, 0, rsaKA, suiteDefaultOff, cipherRC4, macSHA1, nil},
+	{_TLS_RSA_WITH_RC4_128_SHA, 16, 20, 0, rsaKA, suiteDefaultOff, cipherRC4, macSHA1, nil},
 	{TLS_ECDHE_RSA_WITH_RC4_128_SHA, 16, 20, 0, ecdheRSAKA, suiteECDHE | suiteDefaultOff, cipherRC4, macSHA1, nil},
 	{TLS_ECDHE_ECDSA_WITH_RC4_128_SHA, 16, 20, 0, ecdheECDSAKA, suiteECDHE | suiteECDSA | suiteDefaultOff, cipherRC4, macSHA1, nil},
 }
@@ -438,8 +438,8 @@ func cipherSuiteTLS13ByID(id uint16) *cipherSuiteTLS13 {
 // Taken from https://www.iana.org/assignments/tls-parameters/tls-parameters.xml
 const (
 	// TLS 1.0 - 1.2 cipher suites.
-	TLS_RSA_WITH_RC4_128_SHA                uint16 = 0x0005
-	TLS_RSA_WITH_3DES_EDE_CBC_SHA           uint16 = 0x000a
+	_TLS_RSA_WITH_RC4_128_SHA               uint16 = 0x0005
+	_TLS_RSA_WITH_3DES_EDE_CBC_SHA          uint16 = 0x000a
 	TLS_RSA_WITH_AES_128_CBC_SHA            uint16 = 0x002f
 	TLS_RSA_WITH_AES_256_CBC_SHA            uint16 = 0x0035
 	TLS_RSA_WITH_AES_128_CBC_SHA256         uint16 = 0x003c

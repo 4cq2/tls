@@ -301,7 +301,7 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsExtendedMasterSecretExtension{})
 
 		case utlsExtensionPadding:
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle})
 
 		case fakeExtensionChannelID, fakeCertCompressionAlgs, fakeRecordSizeLimit:
 			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_GenericExtension{extension, extData})
@@ -352,7 +352,7 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 			}
 		}
 		if !alreadyHasPadding {
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle})
 		}
 	}
 

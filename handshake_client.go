@@ -30,7 +30,7 @@ type clientHandshakeState struct {
 	masterSecret []byte
 	session      *_ClientSessionState
 
-	uconn *UConn // [UTLS]
+	uconn *_UConn // [UTLS]
 }
 
 func (c *Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {

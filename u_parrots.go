@@ -34,7 +34,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_GCM_SHA384,
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				TLS_RSA_WITH_AES_256_CBC_SHA,
-				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+				_TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
 			_CompressionMethods: []byte{compressionNone},
 			_Extensions: []TLSExtension{
@@ -62,7 +62,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SupportedCurvesExtension{[]_CurveID{_CurveID(_GREASE_PLACEHOLDER),
 					X25519, _CurveP256, _CurveP384}},
 				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
+				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 			_GetSessionID: sha256.Sum256,
 		}, nil
@@ -87,7 +87,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_GCM_SHA384,
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				TLS_RSA_WITH_AES_256_CBC_SHA,
-				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+				_TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
 			_CompressionMethods: []byte{
 				compressionNone,
@@ -135,7 +135,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{_CertCompressionBrotli}},
 				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
+				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case _HelloChrome_72:
@@ -157,7 +157,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_256_GCM_SHA384,
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				TLS_RSA_WITH_AES_256_CBC_SHA,
-				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+				_TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
 			_CompressionMethods: []byte{
 				0x00, // compressionNone
@@ -209,7 +209,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_CertCompressionBrotli,
 				}},
 				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
+				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case _HelloChrome_83:
@@ -281,7 +281,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_CertCompressionBrotli,
 				}},
 				&UtlsGREASEExtension{},
-				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
+				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
 	case _HelloFirefox_55, _HelloFirefox_56:
@@ -303,7 +303,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				_FAKE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				TLS_RSA_WITH_AES_256_CBC_SHA,
-				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+				_TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
 			_CompressionMethods: []byte{compressionNone},
 			_Extensions: []TLSExtension{
@@ -328,7 +328,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_ECDSAWithSHA1,
 					_PKCS1WithSHA1},
 				},
-				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
+				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
 			_GetSessionID: nil,
 		}, nil
@@ -354,7 +354,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				_FAKE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				TLS_RSA_WITH_AES_256_CBC_SHA,
-				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+				_TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
 			_CompressionMethods: []byte{
 				compressionNone,
@@ -401,7 +401,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&_FakeRecordSizeLimitExtension{0x4001},
-				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
+				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			}}, nil
 	case _HelloIOS_11_1:
 		return _ClientHelloSpec{
@@ -487,7 +487,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				0xc008,
 				TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
-				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+				_TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 			},
 			_CompressionMethods: []byte{
 				compressionNone,
@@ -529,7 +529,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 	}
 }
 
-func (uconn *UConn) applyPresetByID(id _ClientHelloID) (err error) {
+func (uconn *_UConn) applyPresetByID(id _ClientHelloID) (err error) {
 	var spec _ClientHelloSpec
 	uconn._ClientHelloID = id
 	// choose/generate the spec
@@ -555,7 +555,7 @@ func (uconn *UConn) applyPresetByID(id _ClientHelloID) (err error) {
 // _ApplyPreset should only be used in conjunction with HelloCustom to apply custom specs.
 // Fields of TLSExtensions that are slices/pointers are shared across different connections with
 // same ClientHelloSpec. It is advised to use different specs and avoid any shared state.
-func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
+func (uconn *_UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 	var err error
 
 	err = uconn._SetTLSVers(p._TLSVersMin, p._TLSVersMax, p._Extensions)
@@ -633,7 +633,7 @@ func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 				ext._Value = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension1)
 			case 1:
 				ext._Value = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension2)
-				ext.Body = []byte{0}
+				ext._Body = []byte{0}
 			default:
 				return errors.New("at most 2 grease extensions are supported")
 			}
@@ -656,13 +656,13 @@ func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 			}
 		case *_KeyShareExtension:
 			preferredCurveIsSet := false
-			for i := range ext.KeyShares {
-				curveID := ext.KeyShares[i]._Group
+			for i := range ext._KeyShares {
+				curveID := ext._KeyShares[i]._Group
 				if curveID == _GREASE_PLACEHOLDER {
-					ext.KeyShares[i]._Group = _CurveID(_GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
+					ext._KeyShares[i]._Group = _CurveID(_GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
 					continue
 				}
-				if len(ext.KeyShares[i]._Data) > 1 {
+				if len(ext._KeyShares[i]._Data) > 1 {
 					continue
 				}
 
@@ -671,7 +671,7 @@ func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 					return fmt.Errorf("unsupported Curve in KeyShareExtension: %v."+
 						"To mimic it, fill the Data(key) field manually.", curveID)
 				}
-				ext.KeyShares[i]._Data = ecdheParams.PublicKey()
+				ext._KeyShares[i]._Data = ecdheParams.PublicKey()
 				if !preferredCurveIsSet {
 					// only do this once for the first non-grease curve
 					uconn._HandshakeState._State13._EcdheParams = ecdheParams
@@ -679,9 +679,9 @@ func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 				}
 			}
 		case *SupportedVersionsExtension:
-			for i := range ext.Versions {
-				if ext.Versions[i] == _GREASE_PLACEHOLDER {
-					ext.Versions[i] = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_version)
+			for i := range ext._Versions {
+				if ext._Versions[i] == _GREASE_PLACEHOLDER {
+					ext._Versions[i] = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_version)
 				}
 			}
 		case *_NPNExtension:
@@ -696,7 +696,7 @@ func (uconn *UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 	return nil
 }
 
-func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
+func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	p := _ClientHelloSpec{}
 
 	if uconn._ClientHelloID._Seed == nil {
@@ -806,7 +806,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 
 	curves := SupportedCurvesExtension{curveIDs}
 
-	padding := UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle}
+	padding := UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle}
 	reneg := RenegotiationInfoExtension{_Renegotiation: RenegotiateOnceAsClient}
 
 	p._Extensions = []TLSExtension{
@@ -851,11 +851,11 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 			// do not ADD second keyShare because crypto/tls does not support multiple ecdheParams
 			// TODO: add it back when they implement multiple keyShares, or implement it oursevles
 			// ks.KeyShares = append(ks.KeyShares, KeyShare{Group: CurveP256})
-			ks.KeyShares[0]._Group = _CurveP256
+			ks._KeyShares[0]._Group = _CurveP256
 		}
 		pskExchangeModes := _PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}}
 		supportedVersionsExt := SupportedVersionsExtension{
-			Versions: makeSupportedVersions(p._TLSVersMin, p._TLSVersMax),
+			_Versions: makeSupportedVersions(p._TLSVersMin, p._TLSVersMax),
 		}
 		p._Extensions = append(p._Extensions, &ks, &pskExchangeModes, &supportedVersionsExt)
 	}
@@ -940,7 +940,7 @@ func removeRC4Ciphers(s []uint16) []uint16 {
 		cipher := s[i]
 		if cipher == TLS_ECDHE_ECDSA_WITH_RC4_128_SHA ||
 			cipher == TLS_ECDHE_RSA_WITH_RC4_128_SHA ||
-			cipher == TLS_RSA_WITH_RC4_128_SHA {
+			cipher == _TLS_RSA_WITH_RC4_128_SHA {
 			s = append(s[:i], s[i+1:]...)
 			sliceLen--
 			i--

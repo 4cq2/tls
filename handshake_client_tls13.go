@@ -34,7 +34,7 @@ type clientHandshakeStateTLS13 struct {
 	masterSecret  []byte
 	trafficSecret []byte // client_application_traffic_secret_0
 
-	uconn *UConn // [UTLS]
+	uconn *_UConn // [UTLS]
 }
 
 // handshake requires hs.c, hs.hello, hs.serverHello, hs.ecdheParams, and,
@@ -270,7 +270,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 			for _, ext := range hs.uconn._Extensions {
 				// new ks seems to be generated either way
 				if ks, ok := ext.(*_KeyShareExtension); ok {
-					ks.KeyShares = keyShares(hs.hello.keyShares)._ToPublic()
+					ks._KeyShares = keyShares(hs.hello.keyShares)._ToPublic()
 					keyShareExtFound = true
 				}
 			}

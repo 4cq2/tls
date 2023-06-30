@@ -17,7 +17,7 @@ import (
 	"sync/atomic"
 )
 
-type UConn struct {
+type _UConn struct {
 	Conn *Conn
 
 	_Extensions    []TLSExtension
@@ -34,15 +34,15 @@ type UConn struct {
 	omitSNIExtension bool
 }
 
-// UClient returns a new uTLS client, with behavior depending on clientHelloID.
+// _UClient returns a new uTLS client, with behavior depending on clientHelloID.
 // Config CAN be nil, but make sure to eventually specify ServerName.
-func UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *UConn {
+func _UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *_UConn {
 	if config == nil {
 		config = &_Config{}
 	}
 	tlsConn := Conn{conn: conn, config: config, isClient: true}
 	handshakeState := _ClientHandshakeState{_C: &tlsConn, _Hello: &_ClientHelloMsg{}}
-	uconn := UConn{Conn: &tlsConn, _ClientHelloID: clientHelloID, _HandshakeState: handshakeState}
+	uconn := _UConn{Conn: &tlsConn, _ClientHelloID: clientHelloID, _HandshakeState: handshakeState}
 	uconn._HandshakeState.uconn = &uconn
 	return &uconn
 }
@@ -62,7 +62,7 @@ func UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *UCon
 // _BuildHandshakeState is automatically called before uTLS performs handshake,
 // amd should only be called explicitly to inspect/change fields of
 // default/mimicked ClientHello.
-func (uconn *UConn) _BuildHandshakeState() error {
+func (uconn *_UConn) _BuildHandshakeState() error {
 	if uconn._ClientHelloID == _HelloGolang {
 		if uconn._ClientHelloBuilt {
 			return nil
@@ -105,7 +105,7 @@ func (uconn *UConn) _BuildHandshakeState() error {
 // If session is nil, the body of session ticket extension will be unset,
 // but the extension itself still MAY be present for mimicking purposes.
 // Session tickets to be reused - use same cache on following connections.
-func (uconn *UConn) _SetSessionState(session *_ClientSessionState) error {
+func (uconn *_UConn) _SetSessionState(session *_ClientSessionState) error {
 	uconn._HandshakeState._Session = session
 	var sessionTicket []uint8
 	if session != nil {
@@ -140,7 +140,7 @@ func (uconn *UConn) _SetSessionState(session *_ClientSessionState) error {
 	return nil
 }
 
-func (uconn *UConn) removeSNIExtension() {
+func (uconn *_UConn) removeSNIExtension() {
 	filteredExts := make([]TLSExtension, 0, len(uconn._Extensions))
 	for _, e := range uconn._Extensions {
 		if _, ok := e.(*SNIExtension); !ok {
@@ -152,7 +152,7 @@ func (uconn *UConn) removeSNIExtension() {
 
 // _Handshake runs the client handshake using given clientHandshakeState
 // Requires hs.hello, and, optionally, hs.session to be set.
-func (c *UConn) _Handshake() error {
+func (c *_UConn) _Handshake() error {
 	c.Conn.handshakeMutex.Lock()
 	defer c.Conn.handshakeMutex.Unlock()
 
@@ -195,7 +195,7 @@ func (c *UConn) _Handshake() error {
 
 // Copy-pasted from tls.Conn in its entirety. But c.Handshake() is now utls' one, not tls.
 // Write writes data to the connection.
-func (c *UConn) Write(b []byte) (int, error) {
+func (c *_UConn) Write(b []byte) (int, error) {
 	// interlock with Close below
 	for {
 		x := atomic.LoadInt32(&c.Conn.activeCall)
@@ -253,7 +253,7 @@ func (c *UConn) Write(b []byte) (int, error) {
 
 // clientHandshakeWithOneState checks that exactly one expected state is set (1.2 or 1.3)
 // and performs client TLS handshake with that state
-func (c *UConn) clientHandshake() (err error) {
+func (c *_UConn) clientHandshake() (err error) {
 	// [uTLS section begins]
 	hello := c._HandshakeState._Hello.getPrivatePtr()
 	defer func() { c._HandshakeState._Hello = hello.getPublicPtr() }()
@@ -374,7 +374,7 @@ func (c *UConn) clientHandshake() (err error) {
 	return nil
 }
 
-func (uconn *UConn) _ApplyConfig() error {
+func (uconn *_UConn) _ApplyConfig() error {
 	for _, ext := range uconn._Extensions {
 		err := ext.writeToUConn(uconn)
 		if err != nil {
@@ -384,7 +384,7 @@ func (uconn *UConn) _ApplyConfig() error {
 	return nil
 }
 
-func (uconn *UConn) _MarshalClientHello() error {
+func (uconn *_UConn) _MarshalClientHello() error {
 	hello := uconn._HandshakeState._Hello
 	headerLength := 2 + 32 + 1 + len(hello._SessionId) +
 		2 + len(hello._CipherSuites)*2 +
@@ -408,7 +408,7 @@ func (uconn *UConn) _MarshalClientHello() error {
 
 	if paddingExt != nil {
 		// determine padding extension presence and length
-		paddingExt.Update(headerLength + 4 + extensionsLen + 2)
+		paddingExt._Update(headerLength + 4 + extensionsLen + 2)
 		extensionsLen += paddingExt.Len()
 	}
 
@@ -469,7 +469,7 @@ func (uconn *UConn) _MarshalClientHello() error {
 //
 // Error is only returned if things are in clearly undesirable state
 // to help user fix them.
-func (uconn *UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []TLSExtension) error {
+func (uconn *_UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []TLSExtension) error {
 	if minTLSVers == 0 && maxTLSVers == 0 {
 		// if version is not set explicitly in the ClientHelloSpec, check the SupportedVersions extension
 		supportedVersionsExtensionsPresent := 0
@@ -495,7 +495,7 @@ func (uconn *UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []
 				}
 
 				supportedVersionsExtensionsPresent += 1
-				minTLSVers, maxTLSVers = findVersionsInSupportedVersionsExtensions(ext.Versions)
+				minTLSVers, maxTLSVers = findVersionsInSupportedVersionsExtensions(ext._Versions)
 				if minTLSVers == 0 && maxTLSVers == 0 {
 					return fmt.Errorf("SupportedVersions extension has invalid Versions field")
 				} // else: proceed
