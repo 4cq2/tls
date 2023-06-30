@@ -536,22 +536,22 @@ func (hc *halfConn) encrypt(record, payload []byte, rand io.Reader) ([]byte, err
 type _RecordHeaderError struct {
 	// _Msg contains a human readable string that describes the error.
 	_Msg string
-	// RecordHeader contains the five bytes of TLS record header that
+	// _RecordHeader contains the five bytes of TLS record header that
 	// triggered the error.
-	RecordHeader [5]byte
-	// Conn provides the underlying net.Conn in the case that a client
+	_RecordHeader [5]byte
+	// _Conn provides the underlying net._Conn in the case that a client
 	// sent an initial handshake that didn't look like TLS.
 	// It is nil if there's already been a handshake or a TLS alert has
 	// been written to the connection.
-	Conn net.Conn
+	_Conn net.Conn
 }
 
 func (e _RecordHeaderError) Error() string { return "tls: " + e._Msg }
 
 func (c *Conn) newRecordHeaderError(conn net.Conn, msg string) (err _RecordHeaderError) {
 	err._Msg = msg
-	err.Conn = conn
-	copy(err.RecordHeader[:], c.rawInput.Bytes())
+	err._Conn = conn
+	copy(err._RecordHeader[:], c.rawInput.Bytes())
 	return err
 }
 
@@ -753,20 +753,20 @@ func (c *Conn) retryReadRecord(expectChangeCipherSpec bool) error {
 // read. It is different from an io.LimitedReader in that it doesn't cut short
 // the last Read call, and in that it considers an early EOF an error.
 type atLeastReader struct {
-	R io.Reader
-	N int64
+	_R io.Reader
+	_N int64
 }
 
 func (r *atLeastReader) Read(p []byte) (int, error) {
-	if r.N <= 0 {
+	if r._N <= 0 {
 		return 0, io.EOF
 	}
-	n, err := r.R.Read(p)
-	r.N -= int64(n) // won't underflow unless len(p) >= n > 9223372036854775809
-	if r.N > 0 && err == io.EOF {
+	n, err := r._R.Read(p)
+	r._N -= int64(n) // won't underflow unless len(p) >= n > 9223372036854775809
+	if r._N > 0 && err == io.EOF {
 		return n, io.ErrUnexpectedEOF
 	}
-	if r.N <= 0 && err == nil {
+	if r._N <= 0 && err == nil {
 		return n, io.EOF
 	}
 	return n, err
@@ -1061,63 +1061,6 @@ var (
 	errShutdown = errors.New("tls: protocol is shutdown")
 )
 
-// Write writes data to the connection.
-func (c *Conn) Write(b []byte) (int, error) {
-	// interlock with Close below
-	for {
-		x := atomic.LoadInt32(&c.activeCall)
-		if x&1 != 0 {
-			return 0, errClosed
-		}
-		if atomic.CompareAndSwapInt32(&c.activeCall, x, x+2) {
-			defer atomic.AddInt32(&c.activeCall, -2)
-			break
-		}
-	}
-
-	if err := c._Handshake(); err != nil {
-		return 0, err
-	}
-
-	c.out.Lock()
-	defer c.out.Unlock()
-
-	if err := c.out.err; err != nil {
-		return 0, err
-	}
-
-	if !c.handshakeComplete() {
-		return 0, alertInternalError
-	}
-
-	if c.closeNotifySent {
-		return 0, errShutdown
-	}
-
-	// SSL 3.0 and TLS 1.0 are susceptible to a chosen-plaintext
-	// attack when using block mode ciphers due to predictable IVs.
-	// This can be prevented by splitting each Application Data
-	// record into two records, effectively randomizing the IV.
-	//
-	// https://www.openssl.org/~bodo/tls-cbc.txt
-	// https://bugzilla.mozilla.org/show_bug.cgi?id=665814
-	// https://www.imperialviolet.org/2012/01/15/beastfollowup.html
-
-	var m int
-	if len(b) > 1 && c.vers <= VersionTLS10 {
-		if _, ok := c.out.cipher.(cipher.BlockMode); ok {
-			n, err := c.writeRecordLocked(recordTypeApplicationData, b[:1])
-			if err != nil {
-				return n, c.out.setErrorLocked(err)
-			}
-			m, b = 1, b[1:]
-		}
-	}
-
-	n, err := c.writeRecordLocked(recordTypeApplicationData, b)
-	return n + m, c.out.setErrorLocked(err)
-}
-
 // handleRenegotiation processes a HelloRequest handshake message.
 func (c *Conn) handleRenegotiation() error {
 	if c.vers == VersionTLS13 {
@@ -1265,8 +1208,8 @@ func (c *Conn) Read(b []byte) (int, error) {
 	return n, nil
 }
 
-// Close closes the connection.
-func (c *Conn) Close() error {
+// _Close closes the connection.
+func (c *Conn) _Close() error {
 	// Interlock with Conn.Write above.
 	var x int32
 	for {

@@ -44,7 +44,7 @@ func Test_Android(t *testing.T) {
 	if err := res.Body.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if err := tr._Conn.Conn.Close(); err != nil {
+	if err := tr._Conn.Conn._Close(); err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(res.Status)
