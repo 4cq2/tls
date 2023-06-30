@@ -251,16 +251,16 @@ var (
 	_HelloCustom = _ClientHelloID{helloCustom, helloAutoVers, nil}
 
 	// The rest will will parrot given browser.
-	_HelloFirefox_55   = _ClientHelloID{helloFirefox, "55", nil}
-	_HelloFirefox_56   = _ClientHelloID{helloFirefox, "56", nil}
-	_HelloFirefox_63   = _ClientHelloID{helloFirefox, "63", nil}
-	_HelloFirefox_65   = _ClientHelloID{helloFirefox, "65", nil}
+	_HelloFirefox_55 = _ClientHelloID{helloFirefox, "55", nil}
+	_HelloFirefox_56 = _ClientHelloID{helloFirefox, "56", nil}
+	_HelloFirefox_63 = _ClientHelloID{helloFirefox, "63", nil}
+	_HelloFirefox_65 = _ClientHelloID{helloFirefox, "65", nil}
 
-	_HelloChrome_58   = _ClientHelloID{helloChrome, "58", nil}
-	_HelloChrome_62   = _ClientHelloID{helloChrome, "62", nil}
-	_HelloChrome_70   = _ClientHelloID{helloChrome, "70", nil}
-	_HelloChrome_72   = _ClientHelloID{helloChrome, "72", nil}
-	_HelloChrome_83   = _ClientHelloID{helloChrome, "83", nil}
+	_HelloChrome_58 = _ClientHelloID{helloChrome, "58", nil}
+	_HelloChrome_62 = _ClientHelloID{helloChrome, "62", nil}
+	_HelloChrome_70 = _ClientHelloID{helloChrome, "70", nil}
+	_HelloChrome_72 = _ClientHelloID{helloChrome, "72", nil}
+	_HelloChrome_83 = _ClientHelloID{helloChrome, "83", nil}
 
 	_HelloIOS_11_1 = _ClientHelloID{helloIOS, "111", nil} // legacy "111" means 11.1
 	_HelloIOS_12_1 = _ClientHelloID{helloIOS, "12.1", nil}
