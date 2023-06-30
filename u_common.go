@@ -6,8 +6,6 @@ package tls
 
 import (
 	"bufio"
-	"crypto/hmac"
-	"crypto/sha512"
 	"encoding/binary"
 	"fmt"
 	"net"
@@ -59,7 +57,7 @@ var Android_API_26 = _ClientHelloSpec{
 		&SessionTicketExtension{},
 		&SignatureAlgorithmsExtension{
 			SupportedSignatureAlgorithms: []SignatureScheme{
-				ECDSAWithP256AndSHA256,
+				_ECDSAWithP256AndSHA256,
 			},
 		},
 		&StatusRequestExtension{},
@@ -168,29 +166,17 @@ const (
 	_DISABLED_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384   = uint16(0xc028)
 	_DISABLED_TLS_RSA_WITH_AES_256_CBC_SHA256         = uint16(0x003d)
 
-	FAKE_OLD_TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256 = uint16(0xcc15) // we can try to craft these ciphersuites
-	FAKE_TLS_DHE_RSA_WITH_AES_128_GCM_SHA256           = uint16(0x009e) // from existing pieces, if needed
-
-	FAKE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA    = uint16(0x0033)
-	FAKE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA    = uint16(0x0039)
-	FAKE_TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 = uint16(0x009f)
-	FAKE_TLS_RSA_WITH_RC4_128_MD5            = uint16(0x0004)
-	FAKE_TLS_EMPTY_RENEGOTIATION_INFO_SCSV   = uint16(0x00ff)
-)
-
-// newest signatures
-var (
-	FakePKCS1WithSHA224 SignatureScheme = 0x0301
-	FakeECDSAWithSHA224 SignatureScheme = 0x0303
-
-	// fakeEd25519 = SignatureAndHash{0x08, 0x07}
-	// fakeEd448 = SignatureAndHash{0x08, 0x08}
+	_FAKE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA    = uint16(0x0033)
+	_FAKE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA    = uint16(0x0039)
+	_FAKE_TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 = uint16(0x009f)
+	_FAKE_TLS_RSA_WITH_RC4_128_MD5            = uint16(0x0004)
+	_FAKE_TLS_EMPTY_RENEGOTIATION_INFO_SCSV   = uint16(0x00ff)
 )
 
 // fake curves(groups)
 var (
-	FakeFFDHE2048 = uint16(0x0100)
-	FakeFFDHE3072 = uint16(0x0101)
+	_FakeFFDHE2048 = uint16(0x0100)
+	_FakeFFDHE3072 = uint16(0x0101)
 )
 
 // https://tools.ietf.org/html/draft-ietf-tls-certificate-compression-04
@@ -306,12 +292,6 @@ func unGREASEUint16(v uint16) uint16 {
 	}
 }
 
-// utlsMacSHA384 returns a SHA-384 based MAC. These are only supported in TLS 1.2
-// so the given version is ignored.
-func utlsMacSHA384(version uint16, key []byte) macFunction {
-	return tls10MAC{h: hmac.New(sha512.New384, key)}
-}
-
 var utlsSupportedCipherSuites []*cipherSuite
 
 func init() {
@@ -320,22 +300,5 @@ func init() {
 			suiteECDHE | suiteTLS12 | suiteDefaultOff, nil, nil, aeadChaCha20Poly1305},
 		{OLD_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256, 32, 0, 12, ecdheECDSAKA,
 			suiteECDHE | suiteECDSA | suiteTLS12 | suiteDefaultOff, nil, nil, aeadChaCha20Poly1305},
-	}...)
-}
-
-// EnableWeakCiphers allows utls connections to continue in some cases, when weak cipher was chosen.
-// This provides better compatibility with servers on the web, but weakens security. Feel free
-// to use this option if you establish additional secure connection inside of utls connection.
-// This option does not change the shape of parrots (i.e. same ciphers will be offered either way).
-// Must be called before establishing any connections.
-func EnableWeakCiphers() {
-	utlsSupportedCipherSuites = append(cipherSuites, []*cipherSuite{
-		{_DISABLED_TLS_RSA_WITH_AES_256_CBC_SHA256, 32, 32, 16, rsaKA,
-			suiteTLS12 | suiteDefaultOff, cipherAES, macSHA256, nil},
-
-		{_DISABLED_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384, 32, 48, 16, ecdheECDSAKA,
-			suiteECDHE | suiteECDSA | suiteTLS12 | suiteDefaultOff | suiteSHA384, cipherAES, utlsMacSHA384, nil},
-		{_DISABLED_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, 32, 48, 16, ecdheRSAKA,
-			suiteECDHE | suiteTLS12 | suiteDefaultOff | suiteSHA384, cipherAES, utlsMacSHA384, nil},
 	}...)
 }

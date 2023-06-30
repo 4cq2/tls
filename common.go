@@ -168,13 +168,13 @@ var supportedSignatureAlgorithms = []SignatureScheme{
 	PSSWithSHA384,
 	PSSWithSHA512,
 	PKCS1WithSHA256,
-	ECDSAWithP256AndSHA256,
+	_ECDSAWithP256AndSHA256,
 	PKCS1WithSHA384,
-	ECDSAWithP384AndSHA384,
+	_ECDSAWithP384AndSHA384,
 	PKCS1WithSHA512,
-	ECDSAWithP521AndSHA512,
+	_ECDSAWithP521AndSHA512,
 	PKCS1WithSHA1,
-	ECDSAWithSHA1,
+	_ECDSAWithSHA1,
 }
 
 // helloRetryRequestRandom is set as the Random value of a ServerHello
@@ -268,13 +268,13 @@ const (
 	PSSWithSHA512 SignatureScheme = 0x0806
 
 	// ECDSA algorithms. Only constrained to a specific curve in TLS 1.3.
-	ECDSAWithP256AndSHA256 SignatureScheme = 0x0403
-	ECDSAWithP384AndSHA384 SignatureScheme = 0x0503
-	ECDSAWithP521AndSHA512 SignatureScheme = 0x0603
+	_ECDSAWithP256AndSHA256 SignatureScheme = 0x0403
+	_ECDSAWithP384AndSHA384 SignatureScheme = 0x0503
+	_ECDSAWithP521AndSHA512 SignatureScheme = 0x0603
 
 	// Legacy signature and hash algorithms for TLS 1.2.
-	PKCS1WithSHA1 SignatureScheme = 0x0201
-	ECDSAWithSHA1 SignatureScheme = 0x0203
+	PKCS1WithSHA1  SignatureScheme = 0x0201
+	_ECDSAWithSHA1 SignatureScheme = 0x0203
 )
 
 // _ClientHelloInfo contains information from a ClientHello message in order to
@@ -590,48 +590,6 @@ func ticketKeyFromBytes(b [32]byte) (key ticketKey) {
 // maxSessionTicketLifetime is the maximum allowed lifetime of a TLS 1.3 session
 // ticket, and the lifetime we set for tickets we send.
 const maxSessionTicketLifetime = 7 * 24 * time.Hour
-
-// _Clone returns a shallow clone of c. It is safe to clone a Config that is
-// being used concurrently by a TLS client or server.
-func (c *_Config) _Clone() *_Config {
-	// Running serverInit ensures that it's safe to read
-	// SessionTicketsDisabled.
-	c.serverInitOnce.Do(func() { c.serverInit(nil) })
-
-	var sessionTicketKeys []ticketKey
-	c.mutex.RLock()
-	sessionTicketKeys = c.sessionTicketKeys
-	c.mutex.RUnlock()
-
-	return &_Config{
-		_Rand:                        c._Rand,
-		_Time:                        c._Time,
-		_Certificates:                c._Certificates,
-		_NameToCertificate:           c._NameToCertificate,
-		_GetCertificate:              c._GetCertificate,
-		_GetClientCertificate:        c._GetClientCertificate,
-		_GetConfigForClient:          c._GetConfigForClient,
-		_VerifyPeerCertificate:       c._VerifyPeerCertificate,
-		_RootCAs:                     c._RootCAs,
-		_NextProtos:                  c._NextProtos,
-		_ServerName:                  c._ServerName,
-		_ClientAuth:                  c._ClientAuth,
-		_ClientCAs:                   c._ClientCAs,
-		_InsecureSkipVerify:          c._InsecureSkipVerify,
-		_CipherSuites:                c._CipherSuites,
-		_PreferServerCipherSuites:    c._PreferServerCipherSuites,
-		_SessionTicketsDisabled:      c._SessionTicketsDisabled,
-		_SessionTicketKey:            c._SessionTicketKey,
-		_ClientSessionCache:          c._ClientSessionCache,
-		_MinVersion:                  c._MinVersion,
-		_MaxVersion:                  c._MaxVersion,
-		_CurvePreferences:            c._CurvePreferences,
-		_DynamicRecordSizingDisabled: c._DynamicRecordSizingDisabled,
-		_Renegotiation:               c._Renegotiation,
-		_KeyLogWriter:                c._KeyLogWriter,
-		sessionTicketKeys:            sessionTicketKeys,
-	}
-}
 
 // serverInit is run under c.serverInitOnce to do initialization of c. If c was
 // returned by a GetConfigForClient callback then the argument should be the
@@ -1070,7 +1028,7 @@ func signatureFromSignatureScheme(signatureAlgorithm SignatureScheme) uint8 {
 		return signaturePKCS1v15
 	case PSSWithSHA256, PSSWithSHA384, PSSWithSHA512:
 		return signatureRSAPSS
-	case ECDSAWithSHA1, ECDSAWithP256AndSHA256, ECDSAWithP384AndSHA384, ECDSAWithP521AndSHA512:
+	case _ECDSAWithSHA1, _ECDSAWithP256AndSHA256, _ECDSAWithP384AndSHA384, _ECDSAWithP521AndSHA512:
 		return signatureECDSA
 	default:
 		return 0

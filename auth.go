@@ -37,7 +37,7 @@ func pickSignatureAlgorithm(pubkey crypto.PublicKey, peerSigAlgs, ourSigAlgs []S
 				return PKCS1WithSHA1, signaturePKCS1v15, crypto.SHA1, nil
 			}
 		case *ecdsa.PublicKey:
-			return ECDSAWithSHA1, signatureECDSA, crypto.SHA1, nil
+			return _ECDSAWithSHA1, signatureECDSA, crypto.SHA1, nil
 		default:
 			return 0, 0, 0, fmt.Errorf("tls: unsupported public key: %T", pubkey)
 		}
@@ -149,19 +149,19 @@ func signatureSchemesForCertificate(version uint16, cert *_Certificate) []Signat
 			// In TLS 1.2 and earlier, ECDSA algorithms are not
 			// constrained to a single curve.
 			return []SignatureScheme{
-				ECDSAWithP256AndSHA256,
-				ECDSAWithP384AndSHA384,
-				ECDSAWithP521AndSHA512,
-				ECDSAWithSHA1,
+				_ECDSAWithP256AndSHA256,
+				_ECDSAWithP384AndSHA384,
+				_ECDSAWithP521AndSHA512,
+				_ECDSAWithSHA1,
 			}
 		}
 		switch pub.Curve {
 		case elliptic.P256():
-			return []SignatureScheme{ECDSAWithP256AndSHA256}
+			return []SignatureScheme{_ECDSAWithP256AndSHA256}
 		case elliptic.P384():
-			return []SignatureScheme{ECDSAWithP384AndSHA384}
+			return []SignatureScheme{_ECDSAWithP384AndSHA384}
 		case elliptic.P521():
-			return []SignatureScheme{ECDSAWithP521AndSHA512}
+			return []SignatureScheme{_ECDSAWithP521AndSHA512}
 		default:
 			return nil
 		}

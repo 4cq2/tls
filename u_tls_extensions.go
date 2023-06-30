@@ -667,18 +667,18 @@ func (e *_CookieExtension) Read(b []byte) (int, error) {
 FAKE EXTENSIONS
 */
 
-type FakeChannelIDExtension struct {
+type _FakeChannelIDExtension struct {
 }
 
-func (e *FakeChannelIDExtension) writeToUConn(uc *UConn) error {
+func (e *_FakeChannelIDExtension) writeToUConn(uc *UConn) error {
 	return nil
 }
 
-func (e *FakeChannelIDExtension) Len() int {
+func (e *_FakeChannelIDExtension) Len() int {
 	return 4
 }
 
-func (e *FakeChannelIDExtension) Read(b []byte) (int, error) {
+func (e *_FakeChannelIDExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -689,19 +689,19 @@ func (e *FakeChannelIDExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type FakeCertCompressionAlgsExtension struct {
+type _FakeCertCompressionAlgsExtension struct {
 	Methods []_CertCompressionAlgo
 }
 
-func (e *FakeCertCompressionAlgsExtension) writeToUConn(uc *UConn) error {
+func (e *_FakeCertCompressionAlgsExtension) writeToUConn(uc *UConn) error {
 	return nil
 }
 
-func (e *FakeCertCompressionAlgsExtension) Len() int {
+func (e *_FakeCertCompressionAlgsExtension) Len() int {
 	return 4 + 1 + (2 * len(e.Methods))
 }
 
-func (e *FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
+func (e *_FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -727,19 +727,19 @@ func (e *FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type FakeRecordSizeLimitExtension struct {
+type _FakeRecordSizeLimitExtension struct {
 	Limit uint16
 }
 
-func (e *FakeRecordSizeLimitExtension) writeToUConn(uc *UConn) error {
+func (e *_FakeRecordSizeLimitExtension) writeToUConn(uc *UConn) error {
 	return nil
 }
 
-func (e *FakeRecordSizeLimitExtension) Len() int {
+func (e *_FakeRecordSizeLimitExtension) Len() int {
 	return 6
 }
 
-func (e *FakeRecordSizeLimitExtension) Read(b []byte) (int, error) {
+func (e *_FakeRecordSizeLimitExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}

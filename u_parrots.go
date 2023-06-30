@@ -44,10 +44,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsExtendedMasterSecretExtension{},
 				&SessionTicketExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
-					ECDSAWithP256AndSHA256,
+					_ECDSAWithP256AndSHA256,
 					PSSWithSHA256,
 					PKCS1WithSHA256,
-					ECDSAWithP384AndSHA384,
+					_ECDSAWithP384AndSHA384,
 					PSSWithSHA384,
 					PKCS1WithSHA384,
 					PSSWithSHA512,
@@ -57,7 +57,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&StatusRequestExtension{},
 				&SCTExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
-				&FakeChannelIDExtension{},
+				&_FakeChannelIDExtension{},
 				&SupportedPointsExtension{SupportedPoints: []byte{pointFormatUncompressed}},
 				&SupportedCurvesExtension{[]_CurveID{_CurveID(GREASE_PLACEHOLDER),
 					X25519, _CurveP256, _CurveP384}},
@@ -99,10 +99,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsExtendedMasterSecretExtension{},
 				&SessionTicketExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
-					ECDSAWithP256AndSHA256,
+					_ECDSAWithP256AndSHA256,
 					PSSWithSHA256,
 					PKCS1WithSHA256,
-					ECDSAWithP384AndSHA384,
+					_ECDSAWithP384AndSHA384,
 					PSSWithSHA384,
 					PKCS1WithSHA384,
 					PSSWithSHA512,
@@ -112,7 +112,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&StatusRequestExtension{},
 				&SCTExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
-				&FakeChannelIDExtension{},
+				&_FakeChannelIDExtension{},
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
 				}},
@@ -133,7 +133,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_CurveP256,
 					_CurveP384,
 				}},
-				&FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{_CertCompressionBrotli}},
+				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{_CertCompressionBrotli}},
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
@@ -180,10 +180,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
-					ECDSAWithP256AndSHA256,
+					_ECDSAWithP256AndSHA256,
 					PSSWithSHA256,
 					PKCS1WithSHA256,
-					ECDSAWithP384AndSHA384,
+					_ECDSAWithP384AndSHA384,
 					PSSWithSHA384,
 					PKCS1WithSHA384,
 					PSSWithSHA512,
@@ -205,7 +205,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					VersionTLS11,
 					VersionTLS10,
 				}},
-				&FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
+				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
 					_CertCompressionBrotli,
 				}},
 				&UtlsGREASEExtension{},
@@ -253,10 +253,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
-					ECDSAWithP256AndSHA256,
+					_ECDSAWithP256AndSHA256,
 					PSSWithSHA256,
 					PKCS1WithSHA256,
-					ECDSAWithP384AndSHA384,
+					_ECDSAWithP384AndSHA384,
 					PSSWithSHA384,
 					PKCS1WithSHA384,
 					PSSWithSHA512,
@@ -277,7 +277,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					VersionTLS11,
 					VersionTLS10,
 				}},
-				&FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
+				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
 					_CertCompressionBrotli,
 				}},
 				&UtlsGREASEExtension{},
@@ -299,8 +299,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
 				TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
 				TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-				FAKE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
-				FAKE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA,
+				_FAKE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
+				_FAKE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
@@ -316,16 +316,16 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
-					ECDSAWithP256AndSHA256,
-					ECDSAWithP384AndSHA384,
-					ECDSAWithP521AndSHA512,
+					_ECDSAWithP256AndSHA256,
+					_ECDSAWithP384AndSHA384,
+					_ECDSAWithP521AndSHA512,
 					PSSWithSHA256,
 					PSSWithSHA384,
 					PSSWithSHA512,
 					PKCS1WithSHA256,
 					PKCS1WithSHA384,
 					PKCS1WithSHA512,
-					ECDSAWithSHA1,
+					_ECDSAWithSHA1,
 					PKCS1WithSHA1},
 				},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
@@ -350,8 +350,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
 				TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
 				TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-				FAKE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
-				FAKE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA,
+				_FAKE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
+				_FAKE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_AES_128_CBC_SHA,
 				TLS_RSA_WITH_AES_256_CBC_SHA,
 				TLS_RSA_WITH_3DES_EDE_CBC_SHA,
@@ -368,8 +368,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_CurveP256,
 					_CurveP384,
 					_CurveP521,
-					_CurveID(FakeFFDHE2048),
-					_CurveID(FakeFFDHE3072),
+					_CurveID(_FakeFFDHE2048),
+					_CurveID(_FakeFFDHE3072),
 				}},
 				&SupportedPointsExtension{SupportedPoints: []byte{
 					pointFormatUncompressed,
@@ -387,20 +387,20 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					VersionTLS11,
 					VersionTLS10}},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
-					ECDSAWithP256AndSHA256,
-					ECDSAWithP384AndSHA384,
-					ECDSAWithP521AndSHA512,
+					_ECDSAWithP256AndSHA256,
+					_ECDSAWithP384AndSHA384,
+					_ECDSAWithP521AndSHA512,
 					PSSWithSHA256,
 					PSSWithSHA384,
 					PSSWithSHA512,
 					PKCS1WithSHA256,
 					PKCS1WithSHA384,
 					PKCS1WithSHA512,
-					ECDSAWithSHA1,
+					_ECDSAWithSHA1,
 					PKCS1WithSHA1,
 				}},
 				&PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
-				&FakeRecordSizeLimitExtension{0x4001},
+				&_FakeRecordSizeLimitExtension{0x4001},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			}}, nil
 	case HelloIOS_11_1:
@@ -437,10 +437,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
-					ECDSAWithP256AndSHA256,
+					_ECDSAWithP256AndSHA256,
 					PSSWithSHA256,
 					PKCS1WithSHA256,
-					ECDSAWithP384AndSHA384,
+					_ECDSAWithP384AndSHA384,
 					PSSWithSHA384,
 					PKCS1WithSHA384,
 					PSSWithSHA512,
@@ -497,11 +497,11 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
-					ECDSAWithP256AndSHA256,
+					_ECDSAWithP256AndSHA256,
 					PSSWithSHA256,
 					PKCS1WithSHA256,
-					ECDSAWithP384AndSHA384,
-					ECDSAWithSHA1,
+					_ECDSAWithP384AndSHA384,
+					_ECDSAWithSHA1,
 					PSSWithSHA384,
 					PSSWithSHA384,
 					PKCS1WithSHA384,
@@ -761,19 +761,19 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	sessionTicket := SessionTicketExtension{Session: uconn.HandshakeState._Session}
 
 	sigAndHashAlgos := []SignatureScheme{
-		ECDSAWithP256AndSHA256,
+		_ECDSAWithP256AndSHA256,
 		PKCS1WithSHA256,
-		ECDSAWithP384AndSHA384,
+		_ECDSAWithP384AndSHA384,
 		PKCS1WithSHA384,
 		PKCS1WithSHA1,
 		PKCS1WithSHA512,
 	}
 
 	if r.FlipWeightedCoin(0.63) {
-		sigAndHashAlgos = append(sigAndHashAlgos, ECDSAWithSHA1)
+		sigAndHashAlgos = append(sigAndHashAlgos, _ECDSAWithSHA1)
 	}
 	if r.FlipWeightedCoin(0.59) {
-		sigAndHashAlgos = append(sigAndHashAlgos, ECDSAWithP521AndSHA512)
+		sigAndHashAlgos = append(sigAndHashAlgos, _ECDSAWithP521AndSHA512)
 	}
 	if r.FlipWeightedCoin(0.51) || p._TLSVersMax == VersionTLS13 {
 		// https://tools.ietf.org/html/rfc8446 says "...RSASSA-PSS (which is mandatory in TLS 1.3)..."

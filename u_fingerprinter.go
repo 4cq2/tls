@@ -12,8 +12,8 @@ import (
 	"golang.org/x/crypto/cryptobyte"
 )
 
-// Fingerprinter is a struct largely for holding options for the FingerprintClientHello func
-type Fingerprinter struct {
+// _Fingerprinter is a struct largely for holding options for the FingerprintClientHello func
+type _Fingerprinter struct {
 	// KeepPSK will ensure that the PreSharedKey extension is passed along into the resulting ClientHelloSpec as-is
 	KeepPSK bool
 	// AllowBluntMimicry will ensure that unknown extensions are
@@ -40,7 +40,7 @@ type Fingerprinter struct {
 // as well as the handshake type/length/version header
 // https://tools.ietf.org/html/rfc5246#section-6.2
 // https://tools.ietf.org/html/rfc5246#section-7.4
-func (f *Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec, error) {
+func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec, error) {
 	clientHelloSpec := &_ClientHelloSpec{}
 	s := cryptobyte.String(data)
 

@@ -35,7 +35,7 @@ type _ClientHandshakeState struct {
 // TLS 1.3 only
 type TLS13OnlyState struct {
 	Suite         *_CipherSuiteTLS13
-	EcdheParams   EcdheParameters
+	EcdheParams   _EcdheParameters
 	EarlySecret   []byte
 	BinderKey     []byte
 	CertReq       *_CertificateRequestMsgTLS13
@@ -153,7 +153,7 @@ func (chs12 *clientHandshakeState) toPublic12() *_ClientHandshakeState {
 	}
 }
 
-type EcdheParameters interface {
+type _EcdheParameters interface {
 	ecdheParameters
 }
 

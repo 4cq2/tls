@@ -179,13 +179,13 @@ func keysFromMasterSecret(version uint16, suite *cipherSuite, masterSecret, clie
 // hash from a TLS SignatureScheme.
 func hashFromSignatureScheme(signatureAlgorithm SignatureScheme) (crypto.Hash, error) {
 	switch signatureAlgorithm {
-	case PKCS1WithSHA1, ECDSAWithSHA1:
+	case PKCS1WithSHA1, _ECDSAWithSHA1:
 		return crypto.SHA1, nil
-	case PKCS1WithSHA256, PSSWithSHA256, ECDSAWithP256AndSHA256:
+	case PKCS1WithSHA256, PSSWithSHA256, _ECDSAWithP256AndSHA256:
 		return crypto.SHA256, nil
-	case PKCS1WithSHA384, PSSWithSHA384, ECDSAWithP384AndSHA384:
+	case PKCS1WithSHA384, PSSWithSHA384, _ECDSAWithP384AndSHA384:
 		return crypto.SHA384, nil
-	case PKCS1WithSHA512, PSSWithSHA512, ECDSAWithP521AndSHA512:
+	case PKCS1WithSHA512, PSSWithSHA512, _ECDSAWithP521AndSHA512:
 		return crypto.SHA512, nil
 	default:
 		return 0, fmt.Errorf("tls: unsupported signature algorithm: %#04x", signatureAlgorithm)
