@@ -50,24 +50,24 @@ var _Android_API_26 = _ClientHelloSpec{
 		_TLS_RSA_WITH_AES_128_CBC_SHA,
 		_TLS_RSA_WITH_AES_256_CBC_SHA,
 	},
-	_Extensions: []TLSExtension{
-		&RenegotiationInfoExtension{},
-		&SNIExtension{},
+	_Extensions: []_TLSExtension{
+		&_RenegotiationInfoExtension{},
+		&_SNIExtension{},
 		&UtlsExtendedMasterSecretExtension{},
 		&SessionTicketExtension{},
-		&SignatureAlgorithmsExtension{
+		&_SignatureAlgorithmsExtension{
 			_SupportedSignatureAlgorithms: []_SignatureScheme{
 				_ECDSAWithP256AndSHA256,
 			},
 		},
-		&StatusRequestExtension{},
+		&_StatusRequestExtension{},
 		&_ALPNExtension{
 			_AlpnProtocols: []string{"http/1.1"},
 		},
-		&SupportedPointsExtension{
+		&_SupportedPointsExtension{
 			_SupportedPoints: []uint8{pointFormatUncompressed},
 		},
-		&SupportedCurvesExtension{
+		&_SupportedCurvesExtension{
 			_Curves: []_CurveID{
 				_X25519,
 				_CurveP256,
@@ -225,9 +225,9 @@ const (
 )
 
 type _ClientHelloSpec struct {
-	_CipherSuites       []uint16       // nil => default
-	_CompressionMethods []uint8        // nil => no compression
-	_Extensions         []TLSExtension // nil => no extensions
+	_CipherSuites       []uint16        // nil => default
+	_CompressionMethods []uint8         // nil => no compression
+	_Extensions         []_TLSExtension // nil => no extensions
 
 	_TLSVersMin uint16 // [1.0-1.3] default: parse from .Extensions, if SupportedVersions ext is not present => 1.0
 	_TLSVersMax uint16 // [1.2-1.3] default: parse from .Extensions, if SupportedVersions ext is not present => 1.2

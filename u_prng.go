@@ -21,9 +21,6 @@ import (
 	"sync"
 )
 
-type Roller struct {
-}
-
 const _PRNGSeedLength = 32
 
 // _PRNGSeed is a PRNG seed.

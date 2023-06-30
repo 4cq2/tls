@@ -19,9 +19,9 @@ import (
 	"sync/atomic"
 )
 
-// A Conn represents a secured connection.
-// It implements the net.Conn interface.
-type Conn struct {
+// A _Conn represents a secured connection.
+// It implements the net._Conn interface.
+type _Conn struct {
 	// constant
 	conn     net.Conn
 	isClient bool
@@ -114,7 +114,7 @@ type Conn struct {
 // export the struct field too.
 
 // _RemoteAddr returns the remote network address.
-func (c *Conn) _RemoteAddr() net.Addr {
+func (c *_Conn) _RemoteAddr() net.Addr {
 	return c.conn.RemoteAddr()
 }
 
@@ -540,18 +540,18 @@ type _RecordHeaderError struct {
 
 func (e _RecordHeaderError) Error() string { return "tls: " + e._Msg }
 
-func (c *Conn) newRecordHeaderError(conn net.Conn, msg string) (err _RecordHeaderError) {
+func (c *_Conn) newRecordHeaderError(conn net.Conn, msg string) (err _RecordHeaderError) {
 	err._Msg = msg
 	err._Conn = conn
 	copy(err._RecordHeader[:], c.rawInput.Bytes())
 	return err
 }
 
-func (c *Conn) readRecord() error {
+func (c *_Conn) readRecord() error {
 	return c.readRecordOrCCS(false)
 }
 
-func (c *Conn) readChangeCipherSpec() error {
+func (c *_Conn) readChangeCipherSpec() error {
 	return c.readRecordOrCCS(true)
 }
 
@@ -569,7 +569,7 @@ func (c *Conn) readChangeCipherSpec() error {
 //   - c.hand grows
 //   - c.input is set
 //   - an error is returned
-func (c *Conn) readRecordOrCCS(expectChangeCipherSpec bool) error {
+func (c *_Conn) readRecordOrCCS(expectChangeCipherSpec bool) error {
 	if c.in.err != nil {
 		return c.in.err
 	}
@@ -732,7 +732,7 @@ func (c *Conn) readRecordOrCCS(expectChangeCipherSpec bool) error {
 
 // retryReadRecord recurses into readRecordOrCCS to drop a non-advancing record, like
 // a warning alert, empty application_data, or a change_cipher_spec in TLS 1.3.
-func (c *Conn) retryReadRecord(expectChangeCipherSpec bool) error {
+func (c *_Conn) retryReadRecord(expectChangeCipherSpec bool) error {
 	c.retryCount++
 	if c.retryCount > maxUselessRecords {
 		c.sendAlert(alertUnexpectedMessage)
@@ -766,7 +766,7 @@ func (r *atLeastReader) Read(p []byte) (int, error) {
 
 // readFromUntil reads from r into c.rawInput until c.rawInput contains
 // at least n bytes or else returns an error.
-func (c *Conn) readFromUntil(r io.Reader, n int) error {
+func (c *_Conn) readFromUntil(r io.Reader, n int) error {
 	if c.rawInput.Len() >= n {
 		return nil
 	}
@@ -780,7 +780,7 @@ func (c *Conn) readFromUntil(r io.Reader, n int) error {
 }
 
 // sendAlert sends a TLS alert message.
-func (c *Conn) sendAlertLocked(err alert) error {
+func (c *_Conn) sendAlertLocked(err alert) error {
 	switch err {
 	case alertNoRenegotiation, alertCloseNotify:
 		c.tmp[0] = alertLevelWarning
@@ -799,7 +799,7 @@ func (c *Conn) sendAlertLocked(err alert) error {
 }
 
 // sendAlert sends a TLS alert message.
-func (c *Conn) sendAlert(err alert) error {
+func (c *_Conn) sendAlert(err alert) error {
 	c.out.Lock()
 	defer c.out.Unlock()
 	return c.sendAlertLocked(err)
@@ -835,7 +835,7 @@ const (
 //
 // In the interests of simplicity and determinism, this code does not attempt
 // to reset the record size once the connection is idle, however.
-func (c *Conn) maxPayloadSizeForWrite(typ recordType) int {
+func (c *_Conn) maxPayloadSizeForWrite(typ recordType) int {
 	if c.config._DynamicRecordSizingDisabled || typ != recordTypeApplicationData {
 		return maxPlaintext
 	}
@@ -882,7 +882,7 @@ func (c *Conn) maxPayloadSizeForWrite(typ recordType) int {
 	return n
 }
 
-func (c *Conn) write(data []byte) (int, error) {
+func (c *_Conn) write(data []byte) (int, error) {
 	if c.buffering {
 		c.sendBuf = append(c.sendBuf, data...)
 		return len(data), nil
@@ -893,7 +893,7 @@ func (c *Conn) write(data []byte) (int, error) {
 	return n, err
 }
 
-func (c *Conn) flush() (int, error) {
+func (c *_Conn) flush() (int, error) {
 	if len(c.sendBuf) == 0 {
 		return 0, nil
 	}
@@ -907,7 +907,7 @@ func (c *Conn) flush() (int, error) {
 
 // writeRecordLocked writes a TLS record with the given type and payload to the
 // connection and updates the record layer state.
-func (c *Conn) writeRecordLocked(typ recordType, data []byte) (int, error) {
+func (c *_Conn) writeRecordLocked(typ recordType, data []byte) (int, error) {
 	var n int
 	for len(data) > 0 {
 		m := len(data)
@@ -955,7 +955,7 @@ func (c *Conn) writeRecordLocked(typ recordType, data []byte) (int, error) {
 
 // writeRecord writes a TLS record with the given type and payload to the
 // connection and updates the record layer state.
-func (c *Conn) writeRecord(typ recordType, data []byte) (int, error) {
+func (c *_Conn) writeRecord(typ recordType, data []byte) (int, error) {
 	c.out.Lock()
 	defer c.out.Unlock()
 
@@ -964,7 +964,7 @@ func (c *Conn) writeRecord(typ recordType, data []byte) (int, error) {
 
 // readHandshake reads the next handshake message from
 // the record layer.
-func (c *Conn) readHandshake() (interface{}, error) {
+func (c *_Conn) readHandshake() (interface{}, error) {
 	for c.hand.Len() < 4 {
 		if err := c.readRecord(); err != nil {
 			return nil, err
@@ -1054,7 +1054,7 @@ var (
 )
 
 // handleRenegotiation processes a HelloRequest handshake message.
-func (c *Conn) handleRenegotiation() error {
+func (c *_Conn) handleRenegotiation() error {
 	if c.vers == _VersionTLS13 {
 		return errors.New("tls: internal error: unexpected renegotiation")
 	}
@@ -1075,9 +1075,9 @@ func (c *Conn) handleRenegotiation() error {
 	}
 
 	switch c.config._Renegotiation {
-	case RenegotiateNever:
+	case _RenegotiateNever:
 		return c.sendAlert(alertNoRenegotiation)
-	case RenegotiateOnceAsClient:
+	case _RenegotiateOnceAsClient:
 		if c.handshakes > 1 {
 			return c.sendAlert(alertNoRenegotiation)
 		}
@@ -1100,7 +1100,7 @@ func (c *Conn) handleRenegotiation() error {
 
 // handlePostHandshakeMessage processes a handshake message arrived after the
 // handshake is complete. Up to TLS 1.2, it indicates the start of a renegotiation.
-func (c *Conn) handlePostHandshakeMessage() error {
+func (c *_Conn) handlePostHandshakeMessage() error {
 	if c.vers != _VersionTLS13 {
 		return c.handleRenegotiation()
 	}
@@ -1127,7 +1127,7 @@ func (c *Conn) handlePostHandshakeMessage() error {
 	}
 }
 
-func (c *Conn) handleKeyUpdate(keyUpdate *keyUpdateMsg) error {
+func (c *_Conn) handleKeyUpdate(keyUpdate *keyUpdateMsg) error {
 	cipherSuite := cipherSuiteTLS13ByID(c.cipherSuite)
 	if cipherSuite == nil {
 		return c.in.setErrorLocked(c.sendAlert(alertInternalError))
@@ -1157,7 +1157,7 @@ func (c *Conn) handleKeyUpdate(keyUpdate *keyUpdateMsg) error {
 
 // Read can be made to time out and return a net.Error with Timeout() == true
 // after a fixed time limit; see SetDeadline and SetReadDeadline.
-func (c *Conn) Read(b []byte) (int, error) {
+func (c *_Conn) Read(b []byte) (int, error) {
 	if err := c._Handshake(); err != nil {
 		return 0, err
 	}
@@ -1201,7 +1201,7 @@ func (c *Conn) Read(b []byte) (int, error) {
 }
 
 // _Close closes the connection.
-func (c *Conn) _Close() error {
+func (c *_Conn) _Close() error {
 	// Interlock with Conn.Write above.
 	var x int32
 	for {
@@ -1235,7 +1235,7 @@ func (c *Conn) _Close() error {
 	return alertErr
 }
 
-func (c *Conn) closeNotify() error {
+func (c *_Conn) closeNotify() error {
 	c.out.Lock()
 	defer c.out.Unlock()
 
@@ -1250,7 +1250,7 @@ func (c *Conn) closeNotify() error {
 // protocol if it has not yet been run.
 // Most uses of this package need not call _Handshake
 // explicitly: the first Read or Write will call it automatically.
-func (c *Conn) _Handshake() error {
+func (c *_Conn) _Handshake() error {
 	c.handshakeMutex.Lock()
 	defer c.handshakeMutex.Unlock()
 
@@ -1284,6 +1284,6 @@ func (c *Conn) _Handshake() error {
 	return c.handshakeErr
 }
 
-func (c *Conn) handshakeComplete() bool {
+func (c *_Conn) handshakeComplete() bool {
 	return atomic.LoadUint32(&c.handshakeStatus) == 1
 }

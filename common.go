@@ -355,12 +355,12 @@ type _CertificateRequestInfo struct {
 type _RenegotiationSupport int
 
 const (
-	// RenegotiateNever disables renegotiation.
-	RenegotiateNever _RenegotiationSupport = iota
+	// _RenegotiateNever disables renegotiation.
+	_RenegotiateNever _RenegotiationSupport = iota
 
-	// RenegotiateOnceAsClient allows a remote server to request
+	// _RenegotiateOnceAsClient allows a remote server to request
 	// renegotiation once per connection.
-	RenegotiateOnceAsClient
+	_RenegotiateOnceAsClient
 
 	// _RenegotiateFreelyAsClient allows a remote server to repeatedly
 	// request renegotiation.

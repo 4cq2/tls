@@ -19,20 +19,20 @@ import (
 // uTLS will call .handshake() on one of these private internal states,
 // to perform TLS handshake using standard crypto/tls implementation.
 type _ClientHandshakeState struct {
-	_C            *Conn
-	_ServerHello  *ServerHelloMsg
+	_C            *_Conn
+	_ServerHello  *_ServerHelloMsg
 	_Hello        *_ClientHelloMsg
 	_MasterSecret []byte
 	_Session      *_ClientSessionState
 
-	_State12 TLS12OnlyState
-	_State13 TLS13OnlyState
+	_State12 _TLS12OnlyState
+	_State13 _TLS13OnlyState
 
 	uconn *_UConn
 }
 
 // TLS 1.3 only
-type TLS13OnlyState struct {
+type _TLS13OnlyState struct {
 	_Suite         *_CipherSuiteTLS13
 	_EcdheParams   _EcdheParameters
 	_EarlySecret   []byte
@@ -45,7 +45,7 @@ type TLS13OnlyState struct {
 }
 
 // TLS 1.2 and before only
-type TLS12OnlyState struct {
+type _TLS12OnlyState struct {
 	_FinishedHash _FinishedHash
 	_Suite        _CipherSuite
 }
@@ -81,7 +81,7 @@ func (chs13 *clientHandshakeStateTLS13) toPublic13() *_ClientHandshakeState {
 	if chs13 == nil {
 		return nil
 	} else {
-		tls13State := TLS13OnlyState{
+		tls13State := _TLS13OnlyState{
 			_EcdheParams:   chs13.ecdheParams,
 			_EarlySecret:   chs13.earlySecret,
 			_BinderKey:     chs13.binderKey,
@@ -132,7 +132,7 @@ func (chs12 *clientHandshakeState) toPublic12() *_ClientHandshakeState {
 	if chs12 == nil {
 		return nil
 	} else {
-		tls12State := TLS12OnlyState{
+		tls12State := _TLS12OnlyState{
 			_Suite:        chs12.suite.getPublicObj(),
 			_FinishedHash: chs12.finishedHash.getPublicObj(),
 		}
@@ -228,7 +228,7 @@ func (c *_CipherSuiteTLS13) toPrivate() *cipherSuiteTLS13 {
 	}
 }
 
-type ServerHelloMsg struct {
+type _ServerHelloMsg struct {
 	_Raw                          []byte
 	_Vers                         uint16
 	_Random                       []byte
@@ -255,7 +255,7 @@ type ServerHelloMsg struct {
 
 }
 
-func (shm *ServerHelloMsg) getPrivatePtr() *serverHelloMsg {
+func (shm *_ServerHelloMsg) getPrivatePtr() *serverHelloMsg {
 	if shm == nil {
 		return nil
 	} else {
@@ -285,11 +285,11 @@ func (shm *ServerHelloMsg) getPrivatePtr() *serverHelloMsg {
 	}
 }
 
-func (shm *serverHelloMsg) getPublicPtr() *ServerHelloMsg {
+func (shm *serverHelloMsg) getPublicPtr() *_ServerHelloMsg {
 	if shm == nil {
 		return nil
 	} else {
-		return &ServerHelloMsg{
+		return &_ServerHelloMsg{
 			_Raw:                          shm.raw,
 			_Vers:                         shm.vers,
 			_Random:                       shm.random,
@@ -419,16 +419,6 @@ func (chm *clientHelloMsg) getPublicPtr() *_ClientHelloMsg {
 			_PskBinders:                       chm.pskBinders,
 		}
 	}
-}
-
-// UnmarshalClientHello allows external code to parse raw client hellos.
-// It returns nil on failure.
-func UnmarshalClientHello(data []byte) *_ClientHelloMsg {
-	m := &clientHelloMsg{}
-	if m.unmarshal(data) {
-		return m.getPublicPtr()
-	}
-	return nil
 }
 
 // A _CipherSuite is a specific combination of key agreement, cipher and MAC
@@ -562,8 +552,8 @@ func (css *_ClientSessionState) _SessionTicket() []uint8 {
 	return css.sessionTicket
 }
 
-// TicketKey is the internal representation of a session ticket key.
-type TicketKey struct {
+// _TicketKey is the internal representation of a session ticket key.
+type _TicketKey struct {
 	// _KeyName is an opaque byte string that serves to identify the session
 	// ticket key. It's exposed as plaintext in every session ticket.
 	_KeyName [ticketKeyNameLen]byte
@@ -571,23 +561,18 @@ type TicketKey struct {
 	_HmacKey [16]byte
 }
 
-type TicketKeys []TicketKey
+type _TicketKeys []_TicketKey
 type ticketKeys []ticketKey
 
-func TicketKeyFromBytes(b [32]byte) TicketKey {
-	tk := ticketKeyFromBytes(b)
-	return tk._ToPublic()
-}
-
-func (tk ticketKey) _ToPublic() TicketKey {
-	return TicketKey{
+func (tk ticketKey) _ToPublic() _TicketKey {
+	return _TicketKey{
 		_KeyName: tk.keyName,
 		_AesKey:  tk.aesKey,
 		_HmacKey: tk.hmacKey,
 	}
 }
 
-func (TK TicketKey) _ToPrivate() ticketKey {
+func (TK _TicketKey) _ToPrivate() ticketKey {
 	return ticketKey{
 		keyName: TK._KeyName,
 		aesKey:  TK._AesKey,
@@ -595,15 +580,15 @@ func (TK TicketKey) _ToPrivate() ticketKey {
 	}
 }
 
-func (tks ticketKeys) _ToPublic() []TicketKey {
-	var TKS []TicketKey
+func (tks ticketKeys) _ToPublic() []_TicketKey {
+	var TKS []_TicketKey
 	for _, ks := range tks {
 		TKS = append(TKS, ks._ToPublic())
 	}
 	return TKS
 }
 
-func (TKS TicketKeys) _ToPrivate() []ticketKey {
+func (TKS _TicketKeys) _ToPrivate() []ticketKey {
 	var tks []ticketKey
 	for _, TK := range TKS {
 		tks = append(tks, TK._ToPrivate())

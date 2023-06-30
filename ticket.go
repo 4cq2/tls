@@ -147,7 +147,7 @@ func (m *sessionStateTLS13) unmarshal(data []byte) bool {
 		s.Empty()
 }
 
-func (c *Conn) encryptTicket(state []byte) ([]byte, error) {
+func (c *_Conn) encryptTicket(state []byte) ([]byte, error) {
 	encrypted := make([]byte, ticketKeyNameLen+aes.BlockSize+len(state)+sha256.Size)
 	keyName := encrypted[:ticketKeyNameLen]
 	iv := encrypted[ticketKeyNameLen : ticketKeyNameLen+aes.BlockSize]
@@ -172,7 +172,7 @@ func (c *Conn) encryptTicket(state []byte) ([]byte, error) {
 }
 
 // [uTLS] changed to use exported DecryptTicketWith func below
-func (c *Conn) decryptTicket(encrypted []byte) (plaintext []byte, usedOldKey bool) {
+func (c *_Conn) decryptTicket(encrypted []byte) (plaintext []byte, usedOldKey bool) {
 	tks := ticketKeys(c.config.ticketKeys())._ToPublic()
 	return _DecryptTicketWith(encrypted, tks)
 }
@@ -184,7 +184,7 @@ func (c *Conn) decryptTicket(encrypted []byte) (plaintext []byte, usedOldKey boo
 // not the first in the []TicketKey slice
 //
 // [uTLS] changed to be made public and take a TicketKeys instead of use a Conn receiver
-func _DecryptTicketWith(encrypted []byte, tks TicketKeys) (plaintext []byte, usedOldKey bool) {
+func _DecryptTicketWith(encrypted []byte, tks _TicketKeys) (plaintext []byte, usedOldKey bool) {
 	if len(encrypted) < ticketKeyNameLen+aes.BlockSize+sha256.Size {
 		return nil, false
 	}

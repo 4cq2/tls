@@ -138,7 +138,7 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 					return nil, errors.New("SNI value may not include a trailing dot")
 				}
 
-				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SNIExtension{})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_SNIExtension{})
 
 			}
 		case extensionNextProtoNeg:
@@ -156,7 +156,7 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 			}
 
 			if statusType == statusTypeOCSP {
-				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &StatusRequestExtension{})
+				clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_StatusRequestExtension{})
 			} else {
 				return nil, errors.New("status request extension statusType is not statusTypeOCSP")
 			}
@@ -175,7 +175,7 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 				}
 				curves = append(curves, _CurveID(unGREASEUint16(curve)))
 			}
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SupportedCurvesExtension{curves})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_SupportedCurvesExtension{curves})
 
 		case extensionSupportedPoints:
 			// RFC 4492, Section 5.1.2
@@ -184,7 +184,7 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 				len(supportedPoints) == 0 {
 				return nil, errors.New("unable to read supported points extension data")
 			}
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SupportedPointsExtension{supportedPoints})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_SupportedPointsExtension{supportedPoints})
 
 		case extensionSessionTicket:
 			// RFC 5077, Section 3.2
@@ -205,7 +205,7 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 				supportedSignatureAlgorithms = append(
 					supportedSignatureAlgorithms, _SignatureScheme(sigAndAlg))
 			}
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SignatureAlgorithmsExtension{supportedSignatureAlgorithms})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_SignatureAlgorithmsExtension{supportedSignatureAlgorithms})
 
 		case extensionSignatureAlgorithmsCert:
 			// RFC 8446, Section 4.2.3
@@ -217,7 +217,7 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 
 		case extensionRenegotiationInfo:
 			// RFC 5746, Section 3.2
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &RenegotiationInfoExtension{RenegotiateOnceAsClient})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_RenegotiationInfoExtension{_RenegotiateOnceAsClient})
 
 		case extensionALPN:
 			// RFC 7301, Section 3.1

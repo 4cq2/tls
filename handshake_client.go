@@ -22,7 +22,7 @@ import (
 )
 
 type clientHandshakeState struct {
-	c            *Conn
+	c            *_Conn
 	serverHello  *serverHelloMsg
 	hello        *clientHelloMsg
 	suite        *cipherSuite
@@ -33,7 +33,7 @@ type clientHandshakeState struct {
 	uconn *_UConn // [UTLS]
 }
 
-func (c *Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
+func (c *_Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
 	config := c.config
 	if len(config._ServerName) == 0 && !config._InsecureSkipVerify {
 		return nil, nil, errors.New("tls: either ServerName or InsecureSkipVerify must be specified in the tls.Config")
@@ -136,7 +136,7 @@ func (c *Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
 	return hello, params, nil
 }
 
-func (c *Conn) clientHandshake() (err error) {
+func (c *_Conn) clientHandshake() (err error) {
 	if c.config == nil {
 		c.config = defaultConfig()
 	}
@@ -219,7 +219,7 @@ func (c *Conn) clientHandshake() (err error) {
 	return nil
 }
 
-func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
+func (c *_Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 	session *_ClientSessionState, earlySecret, binderKey []byte) {
 	if c.config._SessionTicketsDisabled || c.config._ClientSessionCache == nil {
 		return "", nil, nil, nil
@@ -335,7 +335,7 @@ func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 	return
 }
 
-func (c *Conn) pickTLSVersion(serverHello *serverHelloMsg) error {
+func (c *_Conn) pickTLSVersion(serverHello *serverHelloMsg) error {
 	peerVersion := serverHello.vers
 	if serverHello.supportedVersion != 0 {
 		peerVersion = serverHello.supportedVersion
@@ -814,7 +814,7 @@ func (hs *clientHandshakeState) sendFinished(out []byte) error {
 
 // verifyServerCertificate parses and verifies the provided chain, setting
 // c.verifiedChains and c.peerCertificates or sending the appropriate alert.
-func (c *Conn) verifyServerCertificate(certificates [][]byte) error {
+func (c *_Conn) verifyServerCertificate(certificates [][]byte) error {
 	certs := make([]*x509.Certificate, len(certificates))
 	for i, asn1Data := range certificates {
 		cert, err := x509.ParseCertificate(asn1Data)
@@ -925,7 +925,7 @@ func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *_Certificate
 	return cri
 }
 
-func (c *Conn) getClientCertificate(cri *_CertificateRequestInfo) (*_Certificate, error) {
+func (c *_Conn) getClientCertificate(cri *_CertificateRequestInfo) (*_Certificate, error) {
 	if c.config._GetClientCertificate != nil {
 		return c.config._GetClientCertificate(cri)
 	}

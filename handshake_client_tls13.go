@@ -17,7 +17,7 @@ import (
 )
 
 type clientHandshakeStateTLS13 struct {
-	c           *Conn
+	c           *_Conn
 	serverHello *serverHelloMsg
 	hello       *clientHelloMsg
 	ecdheParams ecdheParameters
@@ -303,7 +303,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 							cookieIndex, len(hs.uconn._Extensions))
 					}
 					hs.uconn._Extensions = append(hs.uconn._Extensions[:cookieIndex],
-						append([]TLSExtension{&_CookieExtension{_Cookie: hs.serverHello.cookie}},
+						append([]_TLSExtension{&_CookieExtension{_Cookie: hs.serverHello.cookie}},
 							hs.uconn._Extensions[cookieIndex:]...)...)
 				}
 			}
@@ -690,7 +690,7 @@ func (hs *clientHandshakeStateTLS13) sendClientFinished() error {
 	return nil
 }
 
-func (c *Conn) handleNewSessionTicket(msg *newSessionTicketMsgTLS13) error {
+func (c *_Conn) handleNewSessionTicket(msg *newSessionTicketMsgTLS13) error {
 	if !c.isClient {
 		c.sendAlert(alertUnexpectedMessage)
 		return errors.New("tls: received new session ticket from a client")

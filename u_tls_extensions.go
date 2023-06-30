@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-type TLSExtension interface {
+type _TLSExtension interface {
 	writeToUConn(*_UConn) error
 
 	Len() int // includes header
@@ -43,21 +43,21 @@ func (e *_NPNExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type SNIExtension struct {
+type _SNIExtension struct {
 	_ServerName string // not an array because go crypto/tls doesn't support multiple SNIs
 }
 
-func (e *SNIExtension) writeToUConn(uc *_UConn) error {
+func (e *_SNIExtension) writeToUConn(uc *_UConn) error {
 	uc.Conn.config._ServerName = e._ServerName
 	uc._HandshakeState._Hello._ServerName = e._ServerName
 	return nil
 }
 
-func (e *SNIExtension) Len() int {
+func (e *_SNIExtension) Len() int {
 	return 4 + 2 + 1 + 2 + len(e._ServerName)
 }
 
-func (e *SNIExtension) Read(b []byte) (int, error) {
+func (e *_SNIExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -75,19 +75,19 @@ func (e *SNIExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type StatusRequestExtension struct {
+type _StatusRequestExtension struct {
 }
 
-func (e *StatusRequestExtension) writeToUConn(uc *_UConn) error {
+func (e *_StatusRequestExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._OcspStapling = true
 	return nil
 }
 
-func (e *StatusRequestExtension) Len() int {
+func (e *_StatusRequestExtension) Len() int {
 	return 9
 }
 
-func (e *StatusRequestExtension) Read(b []byte) (int, error) {
+func (e *_StatusRequestExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -101,21 +101,21 @@ func (e *StatusRequestExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type SupportedCurvesExtension struct {
+type _SupportedCurvesExtension struct {
 	_Curves []_CurveID
 }
 
-func (e *SupportedCurvesExtension) writeToUConn(uc *_UConn) error {
+func (e *_SupportedCurvesExtension) writeToUConn(uc *_UConn) error {
 	uc.Conn.config._CurvePreferences = e._Curves
 	uc._HandshakeState._Hello._SupportedCurves = e._Curves
 	return nil
 }
 
-func (e *SupportedCurvesExtension) Len() int {
+func (e *_SupportedCurvesExtension) Len() int {
 	return 6 + 2*len(e._Curves)
 }
 
-func (e *SupportedCurvesExtension) Read(b []byte) (int, error) {
+func (e *_SupportedCurvesExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -133,20 +133,20 @@ func (e *SupportedCurvesExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type SupportedPointsExtension struct {
+type _SupportedPointsExtension struct {
 	_SupportedPoints []uint8
 }
 
-func (e *SupportedPointsExtension) writeToUConn(uc *_UConn) error {
+func (e *_SupportedPointsExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._SupportedPoints = e._SupportedPoints
 	return nil
 }
 
-func (e *SupportedPointsExtension) Len() int {
+func (e *_SupportedPointsExtension) Len() int {
 	return 5 + len(e._SupportedPoints)
 }
 
-func (e *SupportedPointsExtension) Read(b []byte) (int, error) {
+func (e *_SupportedPointsExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -162,20 +162,20 @@ func (e *SupportedPointsExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type SignatureAlgorithmsExtension struct {
+type _SignatureAlgorithmsExtension struct {
 	_SupportedSignatureAlgorithms []_SignatureScheme
 }
 
-func (e *SignatureAlgorithmsExtension) writeToUConn(uc *_UConn) error {
+func (e *_SignatureAlgorithmsExtension) writeToUConn(uc *_UConn) error {
 	uc._HandshakeState._Hello._SupportedSignatureAlgorithms = e._SupportedSignatureAlgorithms
 	return nil
 }
 
-func (e *SignatureAlgorithmsExtension) Len() int {
+func (e *_SignatureAlgorithmsExtension) Len() int {
 	return 6 + 2*len(e._SupportedSignatureAlgorithms)
 }
 
-func (e *SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
+func (e *_SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -193,30 +193,30 @@ func (e *SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type RenegotiationInfoExtension struct {
+type _RenegotiationInfoExtension struct {
 	// _Renegotiation field limits how many times client will perform renegotiation: no limit, once, or never.
 	// The extension still will be sent, even if _Renegotiation is set to RenegotiateNever.
 	_Renegotiation _RenegotiationSupport
 }
 
-func (e *RenegotiationInfoExtension) writeToUConn(uc *_UConn) error {
+func (e *_RenegotiationInfoExtension) writeToUConn(uc *_UConn) error {
 	uc.Conn.config._Renegotiation = e._Renegotiation
 	switch e._Renegotiation {
-	case RenegotiateOnceAsClient:
+	case _RenegotiateOnceAsClient:
 		fallthrough
 	case _RenegotiateFreelyAsClient:
 		uc._HandshakeState._Hello._SecureRenegotiationSupported = true
-	case RenegotiateNever:
+	case _RenegotiateNever:
 	default:
 	}
 	return nil
 }
 
-func (e *RenegotiationInfoExtension) Len() int {
+func (e *_RenegotiationInfoExtension) Len() int {
 	return 5
 }
 
-func (e *RenegotiationInfoExtension) Read(b []byte) (int, error) {
+func (e *_RenegotiationInfoExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}

@@ -18,9 +18,9 @@ import (
 )
 
 type _UConn struct {
-	Conn *Conn
+	Conn *_Conn
 
-	_Extensions    []TLSExtension
+	_Extensions    []_TLSExtension
 	_ClientHelloID _ClientHelloID
 
 	_ClientHelloBuilt bool
@@ -40,7 +40,7 @@ func _UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *_UC
 	if config == nil {
 		config = &_Config{}
 	}
-	tlsConn := Conn{conn: conn, config: config, isClient: true}
+	tlsConn := _Conn{conn: conn, config: config, isClient: true}
 	handshakeState := _ClientHandshakeState{_C: &tlsConn, _Hello: &_ClientHelloMsg{}}
 	uconn := _UConn{Conn: &tlsConn, _ClientHelloID: clientHelloID, _HandshakeState: handshakeState}
 	uconn._HandshakeState.uconn = &uconn
@@ -141,9 +141,9 @@ func (uconn *_UConn) _SetSessionState(session *_ClientSessionState) error {
 }
 
 func (uconn *_UConn) removeSNIExtension() {
-	filteredExts := make([]TLSExtension, 0, len(uconn._Extensions))
+	filteredExts := make([]_TLSExtension, 0, len(uconn._Extensions))
 	for _, e := range uconn._Extensions {
-		if _, ok := e.(*SNIExtension); !ok {
+		if _, ok := e.(*_SNIExtension); !ok {
 			filteredExts = append(filteredExts, e)
 		}
 	}
@@ -469,7 +469,7 @@ func (uconn *_UConn) _MarshalClientHello() error {
 //
 // Error is only returned if things are in clearly undesirable state
 // to help user fix them.
-func (uconn *_UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []TLSExtension) error {
+func (uconn *_UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []_TLSExtension) error {
 	if minTLSVers == 0 && maxTLSVers == 0 {
 		// if version is not set explicitly in the ClientHelloSpec, check the SupportedVersions extension
 		supportedVersionsExtensionsPresent := 0
