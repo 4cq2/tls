@@ -395,7 +395,7 @@ func (uconn *_UConn) _MarshalClientHello() error {
 	for _, ext := range uconn._Extensions {
 		if pe, ok := ext.(*_UtlsPaddingExtension); !ok {
 			// If not padding - just add length of extension to total length
-			extensionsLen += ext.Len()
+			extensionsLen += ext._Len()
 		} else {
 			// If padding - process it later
 			if paddingExt == nil {
@@ -409,7 +409,7 @@ func (uconn *_UConn) _MarshalClientHello() error {
 	if paddingExt != nil {
 		// determine padding extension presence and length
 		paddingExt._Update(headerLength + 4 + extensionsLen + 2)
-		extensionsLen += paddingExt.Len()
+		extensionsLen += paddingExt._Len()
 	}
 
 	helloLen := headerLength

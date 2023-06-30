@@ -12,7 +12,7 @@ import (
 type _TLSExtension interface {
 	writeToUConn(*_UConn) error
 
-	Len() int // includes header
+	_Len() int // includes header
 
 	// Read reads up to len(p) bytes into p.
 	// It returns the number of bytes read (0 <= n <= len(p)) and any error encountered.
@@ -29,18 +29,18 @@ func (e *_NPNExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_NPNExtension) Len() int {
+func (e *_NPNExtension) _Len() int {
 	return 4
 }
 
 func (e *_NPNExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	b[0] = byte(extensionNextProtoNeg >> 8)
 	b[1] = byte(extensionNextProtoNeg & 0xff)
 	// The length is always 0
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _SNIExtension struct {
@@ -53,12 +53,12 @@ func (e *_SNIExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_SNIExtension) Len() int {
+func (e *_SNIExtension) _Len() int {
 	return 4 + 2 + 1 + 2 + len(e._ServerName)
 }
 
 func (e *_SNIExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// RFC 3546, section 3.1
@@ -72,7 +72,7 @@ func (e *_SNIExtension) Read(b []byte) (int, error) {
 	b[7] = byte(len(e._ServerName) >> 8)
 	b[8] = byte(len(e._ServerName))
 	copy(b[9:], []byte(e._ServerName))
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _StatusRequestExtension struct {
@@ -83,12 +83,12 @@ func (e *_StatusRequestExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_StatusRequestExtension) Len() int {
+func (e *_StatusRequestExtension) _Len() int {
 	return 9
 }
 
 func (e *_StatusRequestExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// RFC 4366, section 3.6
@@ -98,7 +98,7 @@ func (e *_StatusRequestExtension) Read(b []byte) (int, error) {
 	b[3] = 5
 	b[4] = 1 // OCSP type
 	// Two zero valued uint16s for the two lengths.
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _SupportedCurvesExtension struct {
@@ -111,12 +111,12 @@ func (e *_SupportedCurvesExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_SupportedCurvesExtension) Len() int {
+func (e *_SupportedCurvesExtension) _Len() int {
 	return 6 + 2*len(e._Curves)
 }
 
 func (e *_SupportedCurvesExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// http://tools.ietf.org/html/rfc4492#section-5.5.1
@@ -130,7 +130,7 @@ func (e *_SupportedCurvesExtension) Read(b []byte) (int, error) {
 		b[6+2*i] = byte(curve >> 8)
 		b[7+2*i] = byte(curve)
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _SupportedPointsExtension struct {
@@ -142,12 +142,12 @@ func (e *_SupportedPointsExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_SupportedPointsExtension) Len() int {
+func (e *_SupportedPointsExtension) _Len() int {
 	return 5 + len(e._SupportedPoints)
 }
 
 func (e *_SupportedPointsExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// http://tools.ietf.org/html/rfc4492#section-5.5.2
@@ -159,7 +159,7 @@ func (e *_SupportedPointsExtension) Read(b []byte) (int, error) {
 	for i, pointFormat := range e._SupportedPoints {
 		b[5+i] = pointFormat
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _SignatureAlgorithmsExtension struct {
@@ -171,12 +171,12 @@ func (e *_SignatureAlgorithmsExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_SignatureAlgorithmsExtension) Len() int {
+func (e *_SignatureAlgorithmsExtension) _Len() int {
 	return 6 + 2*len(e._SupportedSignatureAlgorithms)
 }
 
 func (e *_SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/rfc5246#section-7.4.1.4.1
@@ -190,7 +190,7 @@ func (e *_SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
 		b[6+2*i] = byte(sigAndHash >> 8)
 		b[7+2*i] = byte(sigAndHash)
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _RenegotiationInfoExtension struct {
@@ -212,12 +212,12 @@ func (e *_RenegotiationInfoExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_RenegotiationInfoExtension) Len() int {
+func (e *_RenegotiationInfoExtension) _Len() int {
 	return 5
 }
 
 func (e *_RenegotiationInfoExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 
@@ -232,7 +232,7 @@ func (e *_RenegotiationInfoExtension) Read(b []byte) (int, error) {
 	b[4] = byte(innerBodyLen)
 	copy(b[5:], extInnerBody)
 
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _ALPNExtension struct {
@@ -245,7 +245,7 @@ func (e *_ALPNExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_ALPNExtension) Len() int {
+func (e *_ALPNExtension) _Len() int {
 	bLen := 2 + 2 + 2
 	for _, s := range e._AlpnProtocols {
 		bLen += 1 + len(s)
@@ -254,7 +254,7 @@ func (e *_ALPNExtension) Len() int {
 }
 
 func (e *_ALPNExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 
@@ -278,7 +278,7 @@ func (e *_ALPNExtension) Read(b []byte) (int, error) {
 	lengths[0] = byte(stringsLength >> 8)
 	lengths[1] = byte(stringsLength)
 
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _SCTExtension struct {
@@ -289,19 +289,19 @@ func (e *_SCTExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_SCTExtension) Len() int {
+func (e *_SCTExtension) _Len() int {
 	return 4
 }
 
 func (e *_SCTExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/rfc6962#section-3.3.1
 	b[0] = byte(extensionSCT >> 8)
 	b[1] = byte(extensionSCT)
 	// zero uint16 for the zero-length extension_data
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _SessionTicketExtension struct {
@@ -316,7 +316,7 @@ func (e *_SessionTicketExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_SessionTicketExtension) Len() int {
+func (e *_SessionTicketExtension) _Len() int {
 	if e._Session != nil {
 		return 4 + len(e._Session.sessionTicket)
 	}
@@ -324,11 +324,11 @@ func (e *_SessionTicketExtension) Len() int {
 }
 
 func (e *_SessionTicketExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 
-	extBodyLen := e.Len() - 4
+	extBodyLen := e._Len() - 4
 
 	b[0] = byte(extensionSessionTicket >> 8)
 	b[1] = byte(extensionSessionTicket)
@@ -337,7 +337,7 @@ func (e *_SessionTicketExtension) Read(b []byte) (int, error) {
 	if extBodyLen > 0 {
 		copy(b[4:], e._Session.sessionTicket)
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 // _GenericExtension allows to include in ClientHello arbitrary unsupported extensions.
@@ -350,12 +350,12 @@ func (e *_GenericExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_GenericExtension) Len() int {
+func (e *_GenericExtension) _Len() int {
 	return 4 + len(e._Data)
 }
 
 func (e *_GenericExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 
@@ -366,7 +366,7 @@ func (e *_GenericExtension) Read(b []byte) (int, error) {
 	if len(e._Data) > 0 {
 		copy(b[4:], e._Data)
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _UtlsExtendedMasterSecretExtension struct {
@@ -379,19 +379,19 @@ func (e *_UtlsExtendedMasterSecretExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_UtlsExtendedMasterSecretExtension) Len() int {
+func (e *_UtlsExtendedMasterSecretExtension) _Len() int {
 	return 4
 }
 
 func (e *_UtlsExtendedMasterSecretExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/rfc7627
 	b[0] = byte(utlsExtensionExtendedMasterSecret >> 8)
 	b[1] = byte(utlsExtensionExtendedMasterSecret)
 	// The length is 0
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 var extendedMasterSecretLabel = []byte("extended master secret")
@@ -438,12 +438,12 @@ func _GetBoringGREASEValue(greaseSeed [ssl_grease_last_index]uint16, index int) 
 	return ret
 }
 
-func (e *_UtlsGREASEExtension) Len() int {
+func (e *_UtlsGREASEExtension) _Len() int {
 	return 4 + len(e._Body)
 }
 
 func (e *_UtlsGREASEExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 
@@ -454,7 +454,7 @@ func (e *_UtlsGREASEExtension) Read(b []byte) (int, error) {
 	if len(e._Body) > 0 {
 		copy(b[4:], e._Body)
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _UtlsPaddingExtension struct {
@@ -470,7 +470,7 @@ func (e *_UtlsPaddingExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_UtlsPaddingExtension) Len() int {
+func (e *_UtlsPaddingExtension) _Len() int {
 	if e._WillPad {
 		return 4 + e._PaddingLen
 	} else {
@@ -488,7 +488,7 @@ func (e *_UtlsPaddingExtension) Read(b []byte) (int, error) {
 	if !e._WillPad {
 		return 0, io.EOF
 	}
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/rfc7627
@@ -496,7 +496,7 @@ func (e *_UtlsPaddingExtension) Read(b []byte) (int, error) {
 	b[1] = byte(utlsExtensionPadding)
 	b[2] = byte(e._PaddingLen >> 8)
 	b[3] = byte(e._PaddingLen)
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 // https://github.com/google/boringssl/blob/7d7554b6b3c79e707e25521e61e066ce2b996e4c/ssl/t1_lib.c#L2803
@@ -518,7 +518,7 @@ type _KeyShareExtension struct {
 	_KeyShares []_KeyShare
 }
 
-func (e *_KeyShareExtension) Len() int {
+func (e *_KeyShareExtension) _Len() int {
 	return 4 + 2 + e.keySharesLen()
 }
 
@@ -531,7 +531,7 @@ func (e *_KeyShareExtension) keySharesLen() int {
 }
 
 func (e *_KeyShareExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 
@@ -553,7 +553,7 @@ func (e *_KeyShareExtension) Read(b []byte) (int, error) {
 		i += 4 + len(ks._Data)
 	}
 
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 func (e *_KeyShareExtension) writeToUConn(uc *_UConn) error {
@@ -565,12 +565,12 @@ type _PSKKeyExchangeModesExtension struct {
 	_Modes []uint8
 }
 
-func (e *_PSKKeyExchangeModesExtension) Len() int {
+func (e *_PSKKeyExchangeModesExtension) _Len() int {
 	return 4 + 1 + len(e._Modes)
 }
 
 func (e *_PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 
@@ -590,7 +590,7 @@ func (e *_PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
 		copy(b[5:], e._Modes)
 	}
 
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 func (e *_PSKKeyExchangeModesExtension) writeToUConn(uc *_UConn) error {
@@ -607,12 +607,12 @@ func (e *_SupportedVersionsExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_SupportedVersionsExtension) Len() int {
+func (e *_SupportedVersionsExtension) _Len() int {
 	return 4 + 1 + (2 * len(e._Versions))
 }
 
 func (e *_SupportedVersionsExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	extLen := 2 * len(e._Versions)
@@ -632,7 +632,7 @@ func (e *_SupportedVersionsExtension) Read(b []byte) (int, error) {
 		b[i+1] = byte(sv)
 		i += 2
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 // MUST NOT be part of initial ClientHello
@@ -644,12 +644,12 @@ func (e *_CookieExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_CookieExtension) Len() int {
+func (e *_CookieExtension) _Len() int {
 	return 4 + len(e._Cookie)
 }
 
 func (e *_CookieExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 
@@ -660,7 +660,7 @@ func (e *_CookieExtension) Read(b []byte) (int, error) {
 	if len(e._Cookie) > 0 {
 		copy(b[4:], e._Cookie)
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 /*
@@ -674,19 +674,19 @@ func (e *_FakeChannelIDExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_FakeChannelIDExtension) Len() int {
+func (e *_FakeChannelIDExtension) _Len() int {
 	return 4
 }
 
 func (e *_FakeChannelIDExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/draft-balfanz-tls-channelid-00
 	b[0] = byte(fakeExtensionChannelID >> 8)
 	b[1] = byte(fakeExtensionChannelID & 0xff)
 	// The length is 0
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _FakeCertCompressionAlgsExtension struct {
@@ -697,12 +697,12 @@ func (e *_FakeCertCompressionAlgsExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_FakeCertCompressionAlgsExtension) Len() int {
+func (e *_FakeCertCompressionAlgsExtension) _Len() int {
 	return 4 + 1 + (2 * len(e._Methods))
 }
 
 func (e *_FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/draft-balfanz-tls-channelid-00
@@ -724,7 +724,7 @@ func (e *_FakeCertCompressionAlgsExtension) Read(b []byte) (int, error) {
 		b[i+1] = byte(compMethod)
 		i += 2
 	}
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
 
 type _FakeRecordSizeLimitExtension struct {
@@ -735,12 +735,12 @@ func (e *_FakeRecordSizeLimitExtension) writeToUConn(uc *_UConn) error {
 	return nil
 }
 
-func (e *_FakeRecordSizeLimitExtension) Len() int {
+func (e *_FakeRecordSizeLimitExtension) _Len() int {
 	return 6
 }
 
 func (e *_FakeRecordSizeLimitExtension) Read(b []byte) (int, error) {
-	if len(b) < e.Len() {
+	if len(b) < e._Len() {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/draft-balfanz-tls-channelid-00
@@ -752,5 +752,5 @@ func (e *_FakeRecordSizeLimitExtension) Read(b []byte) (int, error) {
 
 	b[4] = byte(e._Limit >> 8)
 	b[5] = byte(e._Limit & 0xff)
-	return e.Len(), io.EOF
+	return e._Len(), io.EOF
 }
