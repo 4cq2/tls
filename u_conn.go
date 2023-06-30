@@ -63,7 +63,7 @@ func UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *UCon
 // amd should only be called explicitly to inspect/change fields of
 // default/mimicked ClientHello.
 func (uconn *UConn) BuildHandshakeState() error {
-	if uconn.ClientHelloID == HelloGolang {
+	if uconn.ClientHelloID == _HelloGolang {
 		if uconn.ClientHelloBuilt {
 			return nil
 		}
@@ -173,7 +173,7 @@ func (uconn *UConn) SetSNI(sni string) {
 // RemoveSNIExtension removes SNI from the list of extensions sent in ClientHello
 // It returns an error when used with HelloGolang ClientHelloID
 func (uconn *UConn) RemoveSNIExtension() error {
-	if uconn.ClientHelloID == HelloGolang {
+	if uconn.ClientHelloID == _HelloGolang {
 		return fmt.Errorf("Cannot call RemoveSNIExtension on a UConn with a HelloGolang ClientHelloID")
 	}
 	uconn.omitSNIExtension = true
@@ -532,7 +532,7 @@ func (uconn *UConn) SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []T
 					minVers := uint16(0)
 					maxVers := uint16(0)
 					for _, vers := range versions {
-						if vers == GREASE_PLACEHOLDER {
+						if vers == _GREASE_PLACEHOLDER {
 							continue
 						}
 						if maxVers < vers || maxVers == 0 {

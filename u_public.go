@@ -47,7 +47,7 @@ type TLS13OnlyState struct {
 
 // TLS 1.2 and before only
 type TLS12OnlyState struct {
-	FinishedHash FinishedHash
+	FinishedHash _FinishedHash
 	Suite        _CipherSuite
 }
 
@@ -484,9 +484,9 @@ func (cs *cipherSuite) getPublicObj() _CipherSuite {
 	}
 }
 
-// A FinishedHash calculates the hash of a set of handshake messages suitable
+// A _FinishedHash calculates the hash of a set of handshake messages suitable
 // for including in a Finished message.
-type FinishedHash struct {
+type _FinishedHash struct {
 	Client hash.Hash
 	Server hash.Hash
 
@@ -501,7 +501,7 @@ type FinishedHash struct {
 	Prf     func(result, secret, label, seed []byte)
 }
 
-func (fh *FinishedHash) getPrivateObj() finishedHash {
+func (fh *_FinishedHash) getPrivateObj() finishedHash {
 	if fh == nil {
 		return finishedHash{}
 	} else {
@@ -517,11 +517,11 @@ func (fh *FinishedHash) getPrivateObj() finishedHash {
 	}
 }
 
-func (fh *finishedHash) getPublicObj() FinishedHash {
+func (fh *finishedHash) getPublicObj() _FinishedHash {
 	if fh == nil {
-		return FinishedHash{}
+		return _FinishedHash{}
 	} else {
-		return FinishedHash{
+		return _FinishedHash{
 			Client:    fh.client,
 			Server:    fh.server,
 			ClientMD5: fh.clientMD5,

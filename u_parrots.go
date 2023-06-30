@@ -16,12 +16,12 @@ import (
 
 func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 	switch id {
-	case HelloChrome_58, HelloChrome_62:
+	case _HelloChrome_58, _HelloChrome_62:
 		return _ClientHelloSpec{
 			_TLSVersMax: VersionTLS12,
 			_TLSVersMin: VersionTLS10,
 			_CipherSuites: []uint16{
-				GREASE_PLACEHOLDER,
+				_GREASE_PLACEHOLDER,
 				TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
@@ -59,19 +59,19 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&_FakeChannelIDExtension{},
 				&SupportedPointsExtension{SupportedPoints: []byte{pointFormatUncompressed}},
-				&SupportedCurvesExtension{[]_CurveID{_CurveID(GREASE_PLACEHOLDER),
+				&SupportedCurvesExtension{[]_CurveID{_CurveID(_GREASE_PLACEHOLDER),
 					X25519, _CurveP256, _CurveP384}},
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 			_GetSessionID: sha256.Sum256,
 		}, nil
-	case HelloChrome_70:
+	case _HelloChrome_70:
 		return _ClientHelloSpec{
 			_TLSVersMin: VersionTLS10,
 			_TLSVersMax: VersionTLS13,
 			_CipherSuites: []uint16{
-				GREASE_PLACEHOLDER,
+				_GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
 				TLS_AES_256_GCM_SHA384,
 				TLS_CHACHA20_POLY1305_SHA256,
@@ -117,18 +117,18 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					pointFormatUncompressed,
 				}},
 				&KeyShareExtension{[]KeyShare{
-					{Group: _CurveID(GREASE_PLACEHOLDER), Data: []byte{0}},
+					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
 				&PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&SupportedVersionsExtension{[]uint16{
-					GREASE_PLACEHOLDER,
+					_GREASE_PLACEHOLDER,
 					VersionTLS13,
 					VersionTLS12,
 					VersionTLS11,
 					VersionTLS10}},
 				&SupportedCurvesExtension{[]_CurveID{
-					_CurveID(GREASE_PLACEHOLDER),
+					_CurveID(_GREASE_PLACEHOLDER),
 					X25519,
 					_CurveP256,
 					_CurveP384,
@@ -138,10 +138,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
-	case HelloChrome_72:
+	case _HelloChrome_72:
 		return _ClientHelloSpec{
 			_CipherSuites: []uint16{
-				GREASE_PLACEHOLDER,
+				_GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
 				TLS_AES_256_GCM_SHA384,
 				TLS_CHACHA20_POLY1305_SHA256,
@@ -168,7 +168,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsExtendedMasterSecretExtension{},
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
 				&SupportedCurvesExtension{[]_CurveID{
-					_CurveID(GREASE_PLACEHOLDER),
+					_CurveID(_GREASE_PLACEHOLDER),
 					X25519,
 					_CurveP256,
 					_CurveP384,
@@ -192,14 +192,14 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&SCTExtension{},
 				&KeyShareExtension{[]KeyShare{
-					{Group: _CurveID(GREASE_PLACEHOLDER), Data: []byte{0}},
+					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
 				&PSKKeyExchangeModesExtension{[]uint8{
 					PskModeDHE,
 				}},
 				&SupportedVersionsExtension{[]uint16{
-					GREASE_PLACEHOLDER,
+					_GREASE_PLACEHOLDER,
 					VersionTLS13,
 					VersionTLS12,
 					VersionTLS11,
@@ -212,10 +212,10 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
-	case HelloChrome_83:
+	case _HelloChrome_83:
 		return _ClientHelloSpec{
 			_CipherSuites: []uint16{
-				GREASE_PLACEHOLDER,
+				_GREASE_PLACEHOLDER,
 				TLS_AES_128_GCM_SHA256,
 				TLS_AES_256_GCM_SHA384,
 				TLS_CHACHA20_POLY1305_SHA256,
@@ -241,7 +241,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsExtendedMasterSecretExtension{},
 				&RenegotiationInfoExtension{Renegotiation: RenegotiateOnceAsClient},
 				&SupportedCurvesExtension{[]_CurveID{
-					_CurveID(GREASE_PLACEHOLDER),
+					_CurveID(_GREASE_PLACEHOLDER),
 					X25519,
 					_CurveP256,
 					_CurveP384,
@@ -264,14 +264,14 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&SCTExtension{},
 				&KeyShareExtension{[]KeyShare{
-					{Group: _CurveID(GREASE_PLACEHOLDER), Data: []byte{0}},
+					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
 				&PSKKeyExchangeModesExtension{[]uint8{
 					PskModeDHE,
 				}},
 				&SupportedVersionsExtension{[]uint16{
-					GREASE_PLACEHOLDER,
+					_GREASE_PLACEHOLDER,
 					VersionTLS13,
 					VersionTLS12,
 					VersionTLS11,
@@ -284,7 +284,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			},
 		}, nil
-	case HelloFirefox_55, HelloFirefox_56:
+	case _HelloFirefox_55, _HelloFirefox_56:
 		return _ClientHelloSpec{
 			_TLSVersMax: VersionTLS12,
 			_TLSVersMin: VersionTLS10,
@@ -332,7 +332,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 			},
 			_GetSessionID: nil,
 		}, nil
-	case HelloFirefox_63, HelloFirefox_65:
+	case _HelloFirefox_63, _HelloFirefox_65:
 		return _ClientHelloSpec{
 			_TLSVersMin: VersionTLS10,
 			_TLSVersMax: VersionTLS13,
@@ -602,15 +602,15 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 	for i := range uconn.greaseSeed {
 		uconn.greaseSeed[i] = binary.LittleEndian.Uint16(grease_bytes[2*i : 2*i+2])
 	}
-	if GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension1) == GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension2) {
+	if _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension1) == _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension2) {
 		uconn.greaseSeed[ssl_grease_extension2] ^= 0x1010
 	}
 
 	hello._CipherSuites = make([]uint16, len(p._CipherSuites))
 	copy(hello._CipherSuites, p._CipherSuites)
 	for i := range hello._CipherSuites {
-		if hello._CipherSuites[i] == GREASE_PLACEHOLDER {
-			hello._CipherSuites[i] = GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_cipher)
+		if hello._CipherSuites[i] == _GREASE_PLACEHOLDER {
+			hello._CipherSuites[i] = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_cipher)
 		}
 	}
 	uconn.GetSessionID = p._GetSessionID
@@ -630,9 +630,9 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 		case *UtlsGREASEExtension:
 			switch grease_extensions_seen {
 			case 0:
-				ext.Value = GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension1)
+				ext.Value = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension1)
 			case 1:
-				ext.Value = GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension2)
+				ext.Value = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_extension2)
 				ext.Body = []byte{0}
 			default:
 				return errors.New("at most 2 grease extensions are supported")
@@ -650,16 +650,16 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 			}
 		case *SupportedCurvesExtension:
 			for i := range ext.Curves {
-				if ext.Curves[i] == GREASE_PLACEHOLDER {
-					ext.Curves[i] = _CurveID(GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
+				if ext.Curves[i] == _GREASE_PLACEHOLDER {
+					ext.Curves[i] = _CurveID(_GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
 				}
 			}
 		case *KeyShareExtension:
 			preferredCurveIsSet := false
 			for i := range ext.KeyShares {
 				curveID := ext.KeyShares[i].Group
-				if curveID == GREASE_PLACEHOLDER {
-					ext.KeyShares[i].Group = _CurveID(GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
+				if curveID == _GREASE_PLACEHOLDER {
+					ext.KeyShares[i].Group = _CurveID(_GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
 					continue
 				}
 				if len(ext.KeyShares[i].Data) > 1 {
@@ -680,8 +680,8 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 			}
 		case *SupportedVersionsExtension:
 			for i := range ext.Versions {
-				if ext.Versions[i] == GREASE_PLACEHOLDER {
-					ext.Versions[i] = GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_version)
+				if ext.Versions[i] == _GREASE_PLACEHOLDER {
+					ext.Versions[i] = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_version)
 				}
 			}
 		case *NPNExtension:

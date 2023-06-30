@@ -260,7 +260,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 	// Only extensionCookie, extensionPreSharedKey, extensionKeyShare, extensionEarlyData, extensionSupportedVersions,
 	// and utlsExtensionPadding are supposed to change
 	if hs.uconn != nil {
-		if hs.uconn.ClientHelloID != HelloGolang {
+		if hs.uconn.ClientHelloID != _HelloGolang {
 			if len(hs.hello.pskIdentities) > 0 {
 				// TODO: wait for someone who cares about PSK to implement
 				return errors.New("uTLS does not support reprocessing of PSK key triggered by HelloRetryRequest")

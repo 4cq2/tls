@@ -23,7 +23,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	t.Conn = UClient(conn, &conf, HelloCustom)
+	t.Conn = UClient(conn, &conf, _HelloCustom)
 	if err := t.Conn.ApplyPreset(&t.Spec); err != nil {
 		return nil, err
 	}
@@ -240,15 +240,15 @@ type _ClientHelloSpec struct {
 }
 
 var (
-	// HelloGolang will use default "crypto/tls" handshake marshaling codepath, which WILL
+	// _HelloGolang will use default "crypto/tls" handshake marshaling codepath, which WILL
 	// overwrite your changes to Hello(Config, Session are fine).
 	// You might want to call BuildHandshakeState() before applying any changes.
 	// UConn.Extensions will be completely ignored.
-	HelloGolang = _ClientHelloID{helloGolang, helloAutoVers, nil}
+	_HelloGolang = _ClientHelloID{helloGolang, helloAutoVers, nil}
 
-	// HelloCustom will prepare ClientHello with empty uconn.Extensions so you can fill it with
+	// _HelloCustom will prepare ClientHello with empty uconn.Extensions so you can fill it with
 	// TLSExtensions manually or use ApplyPreset function
-	HelloCustom = _ClientHelloID{helloCustom, helloAutoVers, nil}
+	_HelloCustom = _ClientHelloID{helloCustom, helloAutoVers, nil}
 
 	// HelloRandomized* randomly adds/reorders extensions, ciphersuites, etc.
 	HelloRandomized       = _ClientHelloID{helloRandomized, helloAutoVers, nil}
@@ -256,27 +256,27 @@ var (
 	HelloRandomizedNoALPN = _ClientHelloID{helloRandomizedNoALPN, helloAutoVers, nil}
 
 	// The rest will will parrot given browser.
-	HelloFirefox_Auto = HelloFirefox_65
-	HelloFirefox_55   = _ClientHelloID{helloFirefox, "55", nil}
-	HelloFirefox_56   = _ClientHelloID{helloFirefox, "56", nil}
-	HelloFirefox_63   = _ClientHelloID{helloFirefox, "63", nil}
-	HelloFirefox_65   = _ClientHelloID{helloFirefox, "65", nil}
+	_HelloFirefox_Auto = _HelloFirefox_65
+	_HelloFirefox_55   = _ClientHelloID{helloFirefox, "55", nil}
+	_HelloFirefox_56   = _ClientHelloID{helloFirefox, "56", nil}
+	_HelloFirefox_63   = _ClientHelloID{helloFirefox, "63", nil}
+	_HelloFirefox_65   = _ClientHelloID{helloFirefox, "65", nil}
 
-	HelloChrome_Auto = HelloChrome_83
-	HelloChrome_58   = _ClientHelloID{helloChrome, "58", nil}
-	HelloChrome_62   = _ClientHelloID{helloChrome, "62", nil}
-	HelloChrome_70   = _ClientHelloID{helloChrome, "70", nil}
-	HelloChrome_72   = _ClientHelloID{helloChrome, "72", nil}
-	HelloChrome_83   = _ClientHelloID{helloChrome, "83", nil}
+	_HelloChrome_Auto = _HelloChrome_83
+	_HelloChrome_58   = _ClientHelloID{helloChrome, "58", nil}
+	_HelloChrome_62   = _ClientHelloID{helloChrome, "62", nil}
+	_HelloChrome_70   = _ClientHelloID{helloChrome, "70", nil}
+	_HelloChrome_72   = _ClientHelloID{helloChrome, "72", nil}
+	_HelloChrome_83   = _ClientHelloID{helloChrome, "83", nil}
 
 	HelloIOS_Auto = HelloIOS_12_1
 	HelloIOS_11_1 = _ClientHelloID{helloIOS, "111", nil} // legacy "111" means 11.1
 	HelloIOS_12_1 = _ClientHelloID{helloIOS, "12.1", nil}
 )
 
-// based on spec's GreaseStyle, GREASE_PLACEHOLDER may be replaced by another GREASE value
+// based on spec's GreaseStyle, _GREASE_PLACEHOLDER may be replaced by another GREASE value
 // https://tools.ietf.org/html/draft-ietf-tls-grease-01
-const GREASE_PLACEHOLDER = 0x0a0a
+const _GREASE_PLACEHOLDER = 0x0a0a
 
 func isGREASEUint16(v uint16) bool {
 	// First byte is same as second byte
@@ -286,7 +286,7 @@ func isGREASEUint16(v uint16) bool {
 
 func unGREASEUint16(v uint16) uint16 {
 	if isGREASEUint16(v) {
-		return GREASE_PLACEHOLDER
+		return _GREASE_PLACEHOLDER
 	} else {
 		return v
 	}

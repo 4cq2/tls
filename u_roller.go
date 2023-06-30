@@ -31,8 +31,8 @@ func NewRoller() (*Roller, error) {
 
 	return &Roller{
 		HelloIDs: []_ClientHelloID{
-			HelloChrome_Auto,
-			HelloFirefox_Auto,
+			_HelloChrome_Auto,
+			_HelloFirefox_Auto,
 			HelloIOS_Auto,
 			HelloRandomized,
 		},

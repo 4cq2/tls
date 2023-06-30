@@ -340,21 +340,21 @@ func (e *SessionTicketExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-// GenericExtension allows to include in ClientHello arbitrary unsupported extensions.
-type GenericExtension struct {
+// _GenericExtension allows to include in ClientHello arbitrary unsupported extensions.
+type _GenericExtension struct {
 	Id   uint16
 	Data []byte
 }
 
-func (e *GenericExtension) writeToUConn(uc *UConn) error {
+func (e *_GenericExtension) writeToUConn(uc *UConn) error {
 	return nil
 }
 
-func (e *GenericExtension) Len() int {
+func (e *_GenericExtension) Len() int {
 	return 4 + len(e.Data)
 }
 
-func (e *GenericExtension) Read(b []byte) (int, error) {
+func (e *_GenericExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -428,7 +428,7 @@ func (e *UtlsGREASEExtension) writeToUConn(uc *UConn) error {
 }
 
 // will panic if ssl_grease_last_index[index] is out of bounds.
-func GetBoringGREASEValue(greaseSeed [ssl_grease_last_index]uint16, index int) uint16 {
+func _GetBoringGREASEValue(greaseSeed [ssl_grease_last_index]uint16, index int) uint16 {
 	// GREASE value is back from deterministic to random.
 	// https://github.com/google/boringssl/blob/a365138ac60f38b64bfc608b493e0f879845cb88/ssl/handshake_client.c#L530
 	ret := uint16(greaseSeed[index])
