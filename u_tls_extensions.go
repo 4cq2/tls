@@ -25,7 +25,7 @@ type _NPNExtension struct {
 
 func (e *_NPNExtension) writeToUConn(uc *UConn) error {
 	uc.config._NextProtos = e.NextProtos
-	uc.HandshakeState._Hello._NextProtoNeg = true
+	uc._HandshakeState._Hello._NextProtoNeg = true
 	return nil
 }
 
@@ -49,7 +49,7 @@ type SNIExtension struct {
 
 func (e *SNIExtension) writeToUConn(uc *UConn) error {
 	uc.config._ServerName = e.ServerName
-	uc.HandshakeState._Hello._ServerName = e.ServerName
+	uc._HandshakeState._Hello._ServerName = e.ServerName
 	return nil
 }
 
@@ -79,7 +79,7 @@ type StatusRequestExtension struct {
 }
 
 func (e *StatusRequestExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello._OcspStapling = true
+	uc._HandshakeState._Hello._OcspStapling = true
 	return nil
 }
 
@@ -107,7 +107,7 @@ type SupportedCurvesExtension struct {
 
 func (e *SupportedCurvesExtension) writeToUConn(uc *UConn) error {
 	uc.config._CurvePreferences = e.Curves
-	uc.HandshakeState._Hello._SupportedCurves = e.Curves
+	uc._HandshakeState._Hello._SupportedCurves = e.Curves
 	return nil
 }
 
@@ -138,7 +138,7 @@ type SupportedPointsExtension struct {
 }
 
 func (e *SupportedPointsExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello._SupportedPoints = e.SupportedPoints
+	uc._HandshakeState._Hello._SupportedPoints = e.SupportedPoints
 	return nil
 }
 
@@ -167,7 +167,7 @@ type SignatureAlgorithmsExtension struct {
 }
 
 func (e *SignatureAlgorithmsExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello._SupportedSignatureAlgorithms = e.SupportedSignatureAlgorithms
+	uc._HandshakeState._Hello._SupportedSignatureAlgorithms = e.SupportedSignatureAlgorithms
 	return nil
 }
 
@@ -205,7 +205,7 @@ func (e *RenegotiationInfoExtension) writeToUConn(uc *UConn) error {
 	case RenegotiateOnceAsClient:
 		fallthrough
 	case _RenegotiateFreelyAsClient:
-		uc.HandshakeState._Hello._SecureRenegotiationSupported = true
+		uc._HandshakeState._Hello._SecureRenegotiationSupported = true
 	case RenegotiateNever:
 	default:
 	}
@@ -241,7 +241,7 @@ type _ALPNExtension struct {
 
 func (e *_ALPNExtension) writeToUConn(uc *UConn) error {
 	uc.config._NextProtos = e._AlpnProtocols
-	uc.HandshakeState._Hello._AlpnProtocols = e._AlpnProtocols
+	uc._HandshakeState._Hello._AlpnProtocols = e._AlpnProtocols
 	return nil
 }
 
@@ -285,7 +285,7 @@ type SCTExtension struct {
 }
 
 func (e *SCTExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello._Scts = true
+	uc._HandshakeState._Hello._Scts = true
 	return nil
 }
 
@@ -310,8 +310,8 @@ type SessionTicketExtension struct {
 
 func (e *SessionTicketExtension) writeToUConn(uc *UConn) error {
 	if e.Session != nil {
-		uc.HandshakeState._Session = e.Session
-		uc.HandshakeState._Hello._SessionTicket = e.Session.sessionTicket
+		uc._HandshakeState._Session = e.Session
+		uc._HandshakeState._Hello._SessionTicket = e.Session.sessionTicket
 	}
 	return nil
 }
@@ -375,7 +375,7 @@ type UtlsExtendedMasterSecretExtension struct {
 // TODO: update when this extension is implemented in crypto/tls
 // but we probably won't have to enable it in Config
 func (e *UtlsExtendedMasterSecretExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello._Ems = true
+	uc._HandshakeState._Hello._Ems = true
 	return nil
 }
 
@@ -399,7 +399,7 @@ var extendedMasterSecretLabel = []byte("extended master secret")
 // extendedMasterFromPreMasterSecret generates the master secret from the pre-master
 // secret and session hash. See https://tools.ietf.org/html/rfc7627#section-4
 func extendedMasterFromPreMasterSecret(version uint16, suite *cipherSuite, preMasterSecret []byte, fh finishedHash) []byte {
-	sessionHash := fh.Sum()
+	sessionHash := fh._Sum()
 	masterSecret := make([]byte, masterSecretLength)
 	prfForVersion(version, suite)(masterSecret, preMasterSecret, extendedMasterSecretLabel, sessionHash)
 	return masterSecret
@@ -557,7 +557,7 @@ func (e *_KeyShareExtension) Read(b []byte) (int, error) {
 }
 
 func (e *_KeyShareExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello._KeyShares = e.KeyShares
+	uc._HandshakeState._Hello._KeyShares = e.KeyShares
 	return nil
 }
 
@@ -594,7 +594,7 @@ func (e *_PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
 }
 
 func (e *_PSKKeyExchangeModesExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello._PskModes = e.Modes
+	uc._HandshakeState._Hello._PskModes = e.Modes
 	return nil
 }
 
@@ -603,7 +603,7 @@ type SupportedVersionsExtension struct {
 }
 
 func (e *SupportedVersionsExtension) writeToUConn(uc *UConn) error {
-	uc.HandshakeState._Hello._SupportedVersions = e.Versions
+	uc._HandshakeState._Hello._SupportedVersions = e.Versions
 	return nil
 }
 

@@ -260,14 +260,14 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 	// Only extensionCookie, extensionPreSharedKey, extensionKeyShare, extensionEarlyData, extensionSupportedVersions,
 	// and utlsExtensionPadding are supposed to change
 	if hs.uconn != nil {
-		if hs.uconn.ClientHelloID != _HelloGolang {
+		if hs.uconn._ClientHelloID != _HelloGolang {
 			if len(hs.hello.pskIdentities) > 0 {
 				// TODO: wait for someone who cares about PSK to implement
 				return errors.New("uTLS does not support reprocessing of PSK key triggered by HelloRetryRequest")
 			}
 
 			keyShareExtFound := false
-			for _, ext := range hs.uconn.Extensions {
+			for _, ext := range hs.uconn._Extensions {
 				// new ks seems to be generated either way
 				if ks, ok := ext.(*_KeyShareExtension); ok {
 					ks.KeyShares = keyShares(hs.hello.keyShares).ToPublic()
@@ -282,7 +282,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 			if len(hs.serverHello.cookie) > 0 {
 				// serverHello specified a cookie, let's echo it
 				cookieFound := false
-				for _, ext := range hs.uconn.Extensions {
+				for _, ext := range hs.uconn._Extensions {
 					if ks, ok := ext.(*_CookieExtension); ok {
 						ks._Cookie = hs.serverHello.cookie
 						cookieFound = true
@@ -296,21 +296,21 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 					if err != nil {
 						return err
 					}
-					cookieIndex := p.Intn(len(hs.uconn.Extensions) - 2)
-					if cookieIndex >= len(hs.uconn.Extensions) {
+					cookieIndex := p.Intn(len(hs.uconn._Extensions) - 2)
+					if cookieIndex >= len(hs.uconn._Extensions) {
 						// this check is for empty hs.uconn.Extensions
 						return fmt.Errorf("cookieIndex >= len(hs.uconn.Extensions): %v >= %v",
-							cookieIndex, len(hs.uconn.Extensions))
+							cookieIndex, len(hs.uconn._Extensions))
 					}
-					hs.uconn.Extensions = append(hs.uconn.Extensions[:cookieIndex],
+					hs.uconn._Extensions = append(hs.uconn._Extensions[:cookieIndex],
 						append([]TLSExtension{&_CookieExtension{_Cookie: hs.serverHello.cookie}},
-							hs.uconn.Extensions[cookieIndex:]...)...)
+							hs.uconn._Extensions[cookieIndex:]...)...)
 				}
 			}
 			if err = hs.uconn.MarshalClientHello(); err != nil {
 				return err
 			}
-			hs.hello.raw = hs.uconn.HandshakeState._Hello._Raw
+			hs.hello.raw = hs.uconn._HandshakeState._Hello._Raw
 		}
 	}
 	// [UTLS SECTION ENDS]

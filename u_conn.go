@@ -20,14 +20,14 @@ import (
 type UConn struct {
 	*Conn
 
-	Extensions    []TLSExtension
-	ClientHelloID _ClientHelloID
+	_Extensions    []TLSExtension
+	_ClientHelloID _ClientHelloID
 
-	ClientHelloBuilt bool
-	HandshakeState   _ClientHandshakeState
+	_ClientHelloBuilt bool
+	_HandshakeState   _ClientHandshakeState
 
 	// sessionID may or may not depend on ticket; nil => random
-	GetSessionID func(ticket []byte) [32]byte
+	_GetSessionID func(ticket []byte) [32]byte
 
 	greaseSeed [ssl_grease_last_index]uint16
 
@@ -42,12 +42,12 @@ func UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *UCon
 	}
 	tlsConn := Conn{conn: conn, config: config, isClient: true}
 	handshakeState := _ClientHandshakeState{_C: &tlsConn, _Hello: &_ClientHelloMsg{}}
-	uconn := UConn{Conn: &tlsConn, ClientHelloID: clientHelloID, HandshakeState: handshakeState}
-	uconn.HandshakeState.uconn = &uconn
+	uconn := UConn{Conn: &tlsConn, _ClientHelloID: clientHelloID, _HandshakeState: handshakeState}
+	uconn._HandshakeState.uconn = &uconn
 	return &uconn
 }
 
-// BuildHandshakeState behavior varies based on ClientHelloID and
+// _BuildHandshakeState behavior varies based on ClientHelloID and
 // whether it was already called before.
 // If HelloGolang:
 //
@@ -59,12 +59,12 @@ func UClient(conn net.Conn, config *_Config, clientHelloID _ClientHelloID) *UCon
 //	[each call] apply uconn.Extensions config to internal crypto/tls structures
 //	[each call] marshal ClientHello.
 //
-// BuildHandshakeState is automatically called before uTLS performs handshake,
+// _BuildHandshakeState is automatically called before uTLS performs handshake,
 // amd should only be called explicitly to inspect/change fields of
 // default/mimicked ClientHello.
-func (uconn *UConn) BuildHandshakeState() error {
-	if uconn.ClientHelloID == _HelloGolang {
-		if uconn.ClientHelloBuilt {
+func (uconn *UConn) _BuildHandshakeState() error {
+	if uconn._ClientHelloID == _HelloGolang {
+		if uconn._ClientHelloBuilt {
 			return nil
 		}
 
@@ -74,12 +74,12 @@ func (uconn *UConn) BuildHandshakeState() error {
 			return err
 		}
 
-		uconn.HandshakeState._Hello = hello.getPublicPtr()
-		uconn.HandshakeState._State13.EcdheParams = ecdheParams
-		uconn.HandshakeState._C = uconn.Conn
+		uconn._HandshakeState._Hello = hello.getPublicPtr()
+		uconn._HandshakeState._State13.EcdheParams = ecdheParams
+		uconn._HandshakeState._C = uconn.Conn
 	} else {
-		if !uconn.ClientHelloBuilt {
-			err := uconn.applyPresetByID(uconn.ClientHelloID)
+		if !uconn._ClientHelloBuilt {
+			err := uconn.applyPresetByID(uconn._ClientHelloID)
 			if err != nil {
 				return err
 			}
@@ -97,24 +97,24 @@ func (uconn *UConn) BuildHandshakeState() error {
 			return err
 		}
 	}
-	uconn.ClientHelloBuilt = true
+	uconn._ClientHelloBuilt = true
 	return nil
 }
 
-// SetSessionState sets the session ticket, which may be preshared or fake.
+// _SetSessionState sets the session ticket, which may be preshared or fake.
 // If session is nil, the body of session ticket extension will be unset,
 // but the extension itself still MAY be present for mimicking purposes.
 // Session tickets to be reused - use same cache on following connections.
-func (uconn *UConn) SetSessionState(session *_ClientSessionState) error {
-	uconn.HandshakeState._Session = session
+func (uconn *UConn) _SetSessionState(session *_ClientSessionState) error {
+	uconn._HandshakeState._Session = session
 	var sessionTicket []uint8
 	if session != nil {
 		sessionTicket = session.sessionTicket
 	}
-	uconn.HandshakeState._Hello._TicketSupported = true
-	uconn.HandshakeState._Hello._SessionTicket = sessionTicket
+	uconn._HandshakeState._Hello._TicketSupported = true
+	uconn._HandshakeState._Hello._SessionTicket = sessionTicket
 
-	for _, ext := range uconn.Extensions {
+	for _, ext := range uconn._Extensions {
 		st, ok := ext.(*SessionTicketExtension)
 		if !ok {
 			continue
@@ -122,9 +122,9 @@ func (uconn *UConn) SetSessionState(session *_ClientSessionState) error {
 		st.Session = session
 		if session != nil {
 			if len(session._SessionTicket()) > 0 {
-				if uconn.GetSessionID != nil {
-					sid := uconn.GetSessionID(session._SessionTicket())
-					uconn.HandshakeState._Hello._SessionId = sid[:]
+				if uconn._GetSessionID != nil {
+					sid := uconn._GetSessionID(session._SessionTicket())
+					uconn._HandshakeState._Hello._SessionId = sid[:]
 					return nil
 				}
 			}
@@ -133,7 +133,7 @@ func (uconn *UConn) SetSessionState(session *_ClientSessionState) error {
 			if err != nil {
 				return err
 			}
-			uconn.HandshakeState._Hello._SessionId = sessionID[:]
+			uconn._HandshakeState._Hello._SessionId = sessionID[:]
 		}
 		return nil
 	}
@@ -143,7 +143,7 @@ func (uconn *UConn) SetSessionState(session *_ClientSessionState) error {
 // If you want session tickets to be reused - use same cache on following connections
 func (uconn *UConn) SetSessionCache(cache _ClientSessionCache) {
 	uconn.config._ClientSessionCache = cache
-	uconn.HandshakeState._Hello._TicketSupported = true
+	uconn._HandshakeState._Hello._TicketSupported = true
 }
 
 // SetClientRandom sets client random explicitly.
@@ -153,8 +153,8 @@ func (uconn *UConn) SetClientRandom(r []byte) error {
 	if len(r) != 32 {
 		return errors.New("Incorrect client random length! Expected: 32, got: " + strconv.Itoa(len(r)))
 	} else {
-		uconn.HandshakeState._Hello._Random = make([]byte, 32)
-		copy(uconn.HandshakeState._Hello._Random, r)
+		uconn._HandshakeState._Hello._Random = make([]byte, 32)
+		copy(uconn._HandshakeState._Hello._Random, r)
 		return nil
 	}
 }
@@ -162,7 +162,7 @@ func (uconn *UConn) SetClientRandom(r []byte) error {
 func (uconn *UConn) SetSNI(sni string) {
 	hname := hostnameInSNI(sni)
 	uconn.config._ServerName = hname
-	for _, ext := range uconn.Extensions {
+	for _, ext := range uconn._Extensions {
 		sniExt, ok := ext.(*SNIExtension)
 		if ok {
 			sniExt.ServerName = hname
@@ -173,7 +173,7 @@ func (uconn *UConn) SetSNI(sni string) {
 // RemoveSNIExtension removes SNI from the list of extensions sent in ClientHello
 // It returns an error when used with HelloGolang ClientHelloID
 func (uconn *UConn) RemoveSNIExtension() error {
-	if uconn.ClientHelloID == _HelloGolang {
+	if uconn._ClientHelloID == _HelloGolang {
 		return fmt.Errorf("Cannot call RemoveSNIExtension on a UConn with a HelloGolang ClientHelloID")
 	}
 	uconn.omitSNIExtension = true
@@ -181,13 +181,13 @@ func (uconn *UConn) RemoveSNIExtension() error {
 }
 
 func (uconn *UConn) removeSNIExtension() {
-	filteredExts := make([]TLSExtension, 0, len(uconn.Extensions))
-	for _, e := range uconn.Extensions {
+	filteredExts := make([]TLSExtension, 0, len(uconn._Extensions))
+	for _, e := range uconn._Extensions {
 		if _, ok := e.(*SNIExtension); !ok {
 			filteredExts = append(filteredExts, e)
 		}
 	}
-	uconn.Extensions = filteredExts
+	uconn._Extensions = filteredExts
 }
 
 // Handshake runs the client handshake using given clientHandshakeState
@@ -208,7 +208,7 @@ func (c *UConn) Handshake() error {
 
 	if c.isClient {
 		// [uTLS section begins]
-		err := c.BuildHandshakeState()
+		err := c._BuildHandshakeState()
 		if err != nil {
 			return err
 		}
@@ -295,10 +295,10 @@ func (c *UConn) Write(b []byte) (int, error) {
 // and performs client TLS handshake with that state
 func (c *UConn) clientHandshake() (err error) {
 	// [uTLS section begins]
-	hello := c.HandshakeState._Hello.getPrivatePtr()
-	defer func() { c.HandshakeState._Hello = hello.getPublicPtr() }()
+	hello := c._HandshakeState._Hello.getPrivatePtr()
+	defer func() { c._HandshakeState._Hello = hello.getPublicPtr() }()
 
-	sessionIsAlreadySet := c.HandshakeState._Session != nil
+	sessionIsAlreadySet := c._HandshakeState._Session != nil
 
 	// after this point exactly 1 out of 2 HandshakeState pointers is non-nil,
 	// useTLS13 variable tells which pointer
@@ -353,7 +353,7 @@ func (c *UConn) clientHandshake() (err error) {
 	}
 
 	if !sessionIsAlreadySet { // uTLS: do not overwrite already set session
-		err = c.SetSessionState(session)
+		err = c._SetSessionState(session)
 		if err != nil {
 			return
 		}
@@ -380,7 +380,7 @@ func (c *UConn) clientHandshake() (err error) {
 
 	// uTLS: do not create new handshakeState, use existing one
 	if c.vers == VersionTLS13 {
-		hs13 := c.HandshakeState.toPrivate13()
+		hs13 := c._HandshakeState.toPrivate13()
 		hs13.serverHello = serverHello
 		hs13.hello = hello
 		if !sessionIsAlreadySet {
@@ -390,17 +390,17 @@ func (c *UConn) clientHandshake() (err error) {
 		// In TLS 1.3, session tickets are delivered after the handshake.
 		err = hs13.handshake()
 		if handshakeState := hs13.toPublic13(); handshakeState != nil {
-			c.HandshakeState = *handshakeState
+			c._HandshakeState = *handshakeState
 		}
 		return err
 	}
 
-	hs12 := c.HandshakeState.toPrivate12()
+	hs12 := c._HandshakeState.toPrivate12()
 	hs12.serverHello = serverHello
 	hs12.hello = hello
 	err = hs12.handshake()
 	if handshakeState := hs12.toPublic12(); handshakeState != nil {
-		c.HandshakeState = *handshakeState
+		c._HandshakeState = *handshakeState
 	}
 	if err != nil {
 		return err
@@ -415,7 +415,7 @@ func (c *UConn) clientHandshake() (err error) {
 }
 
 func (uconn *UConn) ApplyConfig() error {
-	for _, ext := range uconn.Extensions {
+	for _, ext := range uconn._Extensions {
 		err := ext.writeToUConn(uconn)
 		if err != nil {
 			return err
@@ -425,14 +425,14 @@ func (uconn *UConn) ApplyConfig() error {
 }
 
 func (uconn *UConn) MarshalClientHello() error {
-	hello := uconn.HandshakeState._Hello
+	hello := uconn._HandshakeState._Hello
 	headerLength := 2 + 32 + 1 + len(hello._SessionId) +
 		2 + len(hello._CipherSuites)*2 +
 		1 + len(hello._CompressionMethods)
 
 	extensionsLen := 0
 	var paddingExt *UtlsPaddingExtension
-	for _, ext := range uconn.Extensions {
+	for _, ext := range uconn._Extensions {
 		if pe, ok := ext.(*UtlsPaddingExtension); !ok {
 			// If not padding - just add length of extension to total length
 			extensionsLen += ext.Len()
@@ -453,7 +453,7 @@ func (uconn *UConn) MarshalClientHello() error {
 	}
 
 	helloLen := headerLength
-	if len(uconn.Extensions) > 0 {
+	if len(uconn._Extensions) > 0 {
 		helloLen += 2 + extensionsLen // 2 bytes for extensions' length
 	}
 
@@ -480,9 +480,9 @@ func (uconn *UConn) MarshalClientHello() error {
 	binary.Write(bufferedWriter, binary.BigEndian, uint8(len(hello._CompressionMethods)))
 	binary.Write(bufferedWriter, binary.BigEndian, hello._CompressionMethods)
 
-	if len(uconn.Extensions) > 0 {
+	if len(uconn._Extensions) > 0 {
 		binary.Write(bufferedWriter, binary.BigEndian, uint16(extensionsLen))
-		for _, ext := range uconn.Extensions {
+		for _, ext := range uconn._Extensions {
 			bufferedWriter.ReadFrom(ext)
 		}
 	}
@@ -572,7 +572,7 @@ func (uconn *UConn) SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions []T
 		return fmt.Errorf("uTLS does not support 0x%X as max version", maxTLSVers)
 	}
 
-	uconn.HandshakeState._Hello._SupportedVersions = makeSupportedVersions(minTLSVers, maxTLSVers)
+	uconn._HandshakeState._Hello._SupportedVersions = makeSupportedVersions(minTLSVers, maxTLSVers)
 	uconn.config._MinVersion = minTLSVers
 	uconn.config._MaxVersion = maxTLSVers
 

@@ -375,8 +375,8 @@ func (hs *clientHandshakeState) handshake() error {
 		hs.finishedHash.discardHandshakeBuffer()
 	}
 
-	hs.finishedHash.Write(hs.hello.marshal())
-	hs.finishedHash.Write(hs.serverHello.marshal())
+	hs.finishedHash._Write(hs.hello.marshal())
+	hs.finishedHash._Write(hs.serverHello.marshal())
 
 	c.buffering = true
 	if isResume {
@@ -447,7 +447,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		c.sendAlert(alertUnexpectedMessage)
 		return unexpectedMessageError(certMsg, msg)
 	}
-	hs.finishedHash.Write(certMsg.marshal())
+	hs.finishedHash._Write(certMsg.marshal())
 
 	if c.handshakes == 0 {
 		// If this is the first handshake on a connection, process and
@@ -486,7 +486,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 			c.sendAlert(alertUnexpectedMessage)
 			return errors.New("tls: received unexpected CertificateStatus message")
 		}
-		hs.finishedHash.Write(cs.marshal())
+		hs.finishedHash._Write(cs.marshal())
 
 		c.ocspResponse = cs.response
 
@@ -500,7 +500,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 
 	skx, ok := msg.(*serverKeyExchangeMsg)
 	if ok {
-		hs.finishedHash.Write(skx.marshal())
+		hs.finishedHash._Write(skx.marshal())
 		err = keyAgreement.processServerKeyExchange(c.config, hs.hello, hs.serverHello, c.peerCertificates[0], skx)
 		if err != nil {
 			c.sendAlert(alertUnexpectedMessage)
@@ -518,7 +518,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 	certReq, ok := msg.(*certificateRequestMsg)
 	if ok {
 		certRequested = true
-		hs.finishedHash.Write(certReq.marshal())
+		hs.finishedHash._Write(certReq.marshal())
 
 		cri := certificateRequestInfoFromMsg(certReq)
 		if chainToSend, err = c.getClientCertificate(cri); err != nil {
@@ -537,7 +537,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		c.sendAlert(alertUnexpectedMessage)
 		return unexpectedMessageError(shd, msg)
 	}
-	hs.finishedHash.Write(shd.marshal())
+	hs.finishedHash._Write(shd.marshal())
 
 	// If the server requested a certificate then we have to send a
 	// Certificate message, even if it's empty because we don't have a
@@ -545,7 +545,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 	if certRequested {
 		certMsg = new(certificateMsg)
 		certMsg.certificates = chainToSend._Certificate
-		hs.finishedHash.Write(certMsg.marshal())
+		hs.finishedHash._Write(certMsg.marshal())
 		if _, err := c.writeRecord(recordTypeHandshake, certMsg.marshal()); err != nil {
 			return err
 		}
@@ -557,7 +557,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		return err
 	}
 	if ckx != nil {
-		hs.finishedHash.Write(ckx.marshal())
+		hs.finishedHash._Write(ckx.marshal())
 		if _, err := c.writeRecord(recordTypeHandshake, ckx.marshal()); err != nil {
 			return err
 		}
@@ -598,7 +598,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 			return err
 		}
 
-		hs.finishedHash.Write(certVerify.marshal())
+		hs.finishedHash._Write(certVerify.marshal())
 		if _, err := c.writeRecord(recordTypeHandshake, certVerify.marshal()); err != nil {
 			return err
 		}
@@ -748,7 +748,7 @@ func (hs *clientHandshakeState) readFinished(out []byte) error {
 		c.sendAlert(alertHandshakeFailure)
 		return errors.New("tls: server's Finished message was incorrect")
 	}
-	hs.finishedHash.Write(serverFinished.marshal())
+	hs.finishedHash._Write(serverFinished.marshal())
 	copy(out, verify)
 	return nil
 }
@@ -768,7 +768,7 @@ func (hs *clientHandshakeState) readSessionTicket() error {
 		c.sendAlert(alertUnexpectedMessage)
 		return unexpectedMessageError(sessionTicketMsg, msg)
 	}
-	hs.finishedHash.Write(sessionTicketMsg.marshal())
+	hs.finishedHash._Write(sessionTicketMsg.marshal())
 
 	hs.session = &_ClientSessionState{
 		sessionTicket:      sessionTicketMsg.ticket,
@@ -796,7 +796,7 @@ func (hs *clientHandshakeState) sendFinished(out []byte) error {
 		c.clientProtocol = proto
 		c.clientProtocolFallback = fallback
 
-		hs.finishedHash.Write(nextProto.marshal())
+		hs.finishedHash._Write(nextProto.marshal())
 		if _, err := c.writeRecord(recordTypeHandshake, nextProto.marshal()); err != nil {
 			return err
 		}
@@ -804,7 +804,7 @@ func (hs *clientHandshakeState) sendFinished(out []byte) error {
 
 	finished := new(finishedMsg)
 	finished.verifyData = hs.finishedHash.clientSum(hs.masterSecret)
-	hs.finishedHash.Write(finished.marshal())
+	hs.finishedHash._Write(finished.marshal())
 	if _, err := c.writeRecord(recordTypeHandshake, finished.marshal()); err != nil {
 		return err
 	}

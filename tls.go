@@ -94,7 +94,7 @@ var alertText = map[alert]string{
 	alertNoApplicationProtocol:  "no application protocol",
 }
 
-func (e alert) String() string {
+func (e alert) _String() string {
 	s, ok := alertText[e]
 	if ok {
 		return "tls: " + s
@@ -103,7 +103,7 @@ func (e alert) String() string {
 }
 
 func (e alert) Error() string {
-	return e.String()
+	return e._String()
 }
 
 // Server returns a new TLS server side connection

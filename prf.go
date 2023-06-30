@@ -223,7 +223,7 @@ type finishedHash struct {
 	prf     func(result, secret, label, seed []byte)
 }
 
-func (h *finishedHash) Write(msg []byte) (n int, err error) {
+func (h *finishedHash) _Write(msg []byte) (n int, err error) {
 	h.client.Write(msg)
 	h.server.Write(msg)
 
@@ -239,7 +239,7 @@ func (h *finishedHash) Write(msg []byte) (n int, err error) {
 	return len(msg), nil
 }
 
-func (h finishedHash) Sum() []byte {
+func (h finishedHash) _Sum() []byte {
 	if h.version >= VersionTLS12 {
 		return h.client.Sum(nil)
 	}
@@ -292,7 +292,7 @@ func (h finishedHash) clientSum(masterSecret []byte) []byte {
 	}
 
 	out := make([]byte, finishedVerifyLength)
-	h.prf(out, masterSecret, clientFinishedLabel, h.Sum())
+	h.prf(out, masterSecret, clientFinishedLabel, h._Sum())
 	return out
 }
 
@@ -304,7 +304,7 @@ func (h finishedHash) serverSum(masterSecret []byte) []byte {
 	}
 
 	out := make([]byte, finishedVerifyLength)
-	h.prf(out, masterSecret, serverFinishedLabel, h.Sum())
+	h.prf(out, masterSecret, serverFinishedLabel, h._Sum())
 	return out
 }
 
@@ -336,7 +336,7 @@ func (h finishedHash) hashForClientCertificate(sigType uint8, hashAlg crypto.Has
 		return h.server.Sum(nil), nil
 	}
 
-	return h.Sum(), nil
+	return h._Sum(), nil
 }
 
 // discardHandshakeBuffer is called when there is no more need to

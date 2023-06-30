@@ -13,24 +13,24 @@ import (
 )
 
 type Transport struct {
-	Conn *UConn
-	Spec _ClientHelloSpec
+	_Conn *UConn
+	_Spec _ClientHelloSpec
 }
 
-func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t *Transport) _RoundTrip(req *http.Request) (*http.Response, error) {
 	conf := _Config{_ServerName: req.URL.Host}
 	conn, err := net.Dial("tcp", req.URL.Host+":443")
 	if err != nil {
 		return nil, err
 	}
-	t.Conn = UClient(conn, &conf, _HelloCustom)
-	if err := t.Conn.ApplyPreset(&t.Spec); err != nil {
+	t._Conn = UClient(conn, &conf, _HelloCustom)
+	if err := t._Conn.ApplyPreset(&t._Spec); err != nil {
 		return nil, err
 	}
-	if err := req.Write(t.Conn); err != nil {
+	if err := req.Write(t._Conn); err != nil {
 		return nil, err
 	}
-	return http.ReadResponse(bufio.NewReader(t.Conn), req)
+	return http.ReadResponse(bufio.NewReader(t._Conn), req)
 }
 
 var Android_API_26 = _ClientHelloSpec{
@@ -79,11 +79,11 @@ var Android_API_26 = _ClientHelloSpec{
 
 type builder []byte
 
-func (b *builder) Add_Bytes(v []byte) {
+func (b *builder) _Add_Bytes(v []byte) {
 	*b = append(*b, v...)
 }
 
-func (b *builder) Add_String(v string) {
+func (b *builder) _Add_String(v string) {
 	*b = append(*b, v...)
 }
 
@@ -116,7 +116,7 @@ func (b *builder) add_uint32(v uint32) {
 	*b = binary.BigEndian.AppendUint32(*b, v)
 }
 
-func (b *builder) Add_Uint64(v uint64) {
+func (b *builder) _Add_Uint64(v uint64) {
 	*b = binary.BigEndian.AppendUint64(*b, v)
 }
 

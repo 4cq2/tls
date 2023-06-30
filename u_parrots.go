@@ -531,7 +531,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 
 func (uconn *UConn) applyPresetByID(id _ClientHelloID) (err error) {
 	var spec _ClientHelloSpec
-	uconn.ClientHelloID = id
+	uconn._ClientHelloID = id
 	// choose/generate the spec
 	switch id._Client {
 	case helloRandomized, helloRandomizedNoALPN, helloRandomizedALPN:
@@ -567,10 +567,10 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 	if err != nil {
 		return err
 	}
-	uconn.HandshakeState._Hello = privateHello.getPublicPtr()
-	uconn.HandshakeState._State13.EcdheParams = ecdheParams
-	hello := uconn.HandshakeState._Hello
-	session := uconn.HandshakeState._Session
+	uconn._HandshakeState._Hello = privateHello.getPublicPtr()
+	uconn._HandshakeState._State13.EcdheParams = ecdheParams
+	hello := uconn._HandshakeState._Hello
+	session := uconn._HandshakeState._Session
 
 	switch len(hello._Random) {
 	case 0:
@@ -613,15 +613,15 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 			hello._CipherSuites[i] = _GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_cipher)
 		}
 	}
-	uconn.GetSessionID = p._GetSessionID
-	uconn.Extensions = make([]TLSExtension, len(p._Extensions))
-	copy(uconn.Extensions, p._Extensions)
+	uconn._GetSessionID = p._GetSessionID
+	uconn._Extensions = make([]TLSExtension, len(p._Extensions))
+	copy(uconn._Extensions, p._Extensions)
 
 	// Check whether NPN extension actually exists
 	var haveNPN bool
 
 	// reGrease, and point things to each other
-	for _, e := range uconn.Extensions {
+	for _, e := range uconn._Extensions {
 		switch ext := e.(type) {
 		case *SNIExtension:
 			if ext.ServerName == "" {
@@ -644,7 +644,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 				session, _ = uconn.config._ClientSessionCache.Get(cacheKey)
 				// TODO: use uconn.loadSession(hello.getPrivateObj()) to support TLS 1.3 PSK-style resumption
 			}
-			err := uconn.SetSessionState(session)
+			err := uconn._SetSessionState(session)
 			if err != nil {
 				return err
 			}
@@ -674,7 +674,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 				ext.KeyShares[i].Data = ecdheParams.PublicKey()
 				if !preferredCurveIsSet {
 					// only do this once for the first non-grease curve
-					uconn.HandshakeState._State13.EcdheParams = ecdheParams
+					uconn._HandshakeState._State13.EcdheParams = ecdheParams
 					preferredCurveIsSet = true
 				}
 			}
@@ -699,20 +699,20 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	p := _ClientHelloSpec{}
 
-	if uconn.ClientHelloID._Seed == nil {
+	if uconn._ClientHelloID._Seed == nil {
 		seed, err := _NewPRNGSeed()
 		if err != nil {
 			return p, err
 		}
-		uconn.ClientHelloID._Seed = seed
+		uconn._ClientHelloID._Seed = seed
 	}
 
-	r, err := newPRNGWithSeed(uconn.ClientHelloID._Seed)
+	r, err := newPRNGWithSeed(uconn._ClientHelloID._Seed)
 	if err != nil {
 		return p, err
 	}
 
-	id := uconn.ClientHelloID
+	id := uconn._ClientHelloID
 
 	var WithALPN bool
 	switch id._Client {
@@ -758,7 +758,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	p._CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
 
 	sni := SNIExtension{uconn.config._ServerName}
-	sessionTicket := SessionTicketExtension{Session: uconn.HandshakeState._Session}
+	sessionTicket := SessionTicketExtension{Session: uconn._HandshakeState._Session}
 
 	sigAndHashAlgos := []SignatureScheme{
 		_ECDSAWithP256AndSHA256,

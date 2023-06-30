@@ -10,6 +10,48 @@ import (
 	"testing"
 )
 
+func Test_Builder(t *testing.T) {
+	{
+		b := builder("hello")
+		b._Add_String("world")
+		b._Add_Bytes([]byte("hello"))
+		fmt.Printf("%q\n", b)
+	}
+	{
+		b := builder("hello")
+		b.add_uint8_prefixed(func(b *builder) {
+			b.add_uint8(0x0a)
+		})
+		fmt.Printf("%q\n", b)
+	}
+	{
+		b := builder("hello")
+		b.add_uint16_prefixed(func(b *builder) {
+			b.add_uint16(0x0a0b)
+		})
+		fmt.Printf("%q\n", b)
+	}
+	{
+		b := builder("hello")
+		b.add_uint24_prefixed(func(b *builder) {
+			b.add_uint24(0x0a0b0c0d)
+		})
+		fmt.Printf("%q\n", b)
+	}
+	{
+		b := builder("hello")
+		b.add_uint32_prefixed(func(b *builder) {
+			b.add_uint32(0x0a0b0c0d)
+		})
+		fmt.Printf("%q\n", b)
+	}
+	{
+		b := builder("hello")
+		b._Add_Uint64(0x0a0b0c0d)
+		fmt.Printf("%q\n", b)
+	}
+}
+
 func Test_Fingerprint(t *testing.T) {
 	hello := []byte(Android_Hellos[0])
 	spec, err := new(_Fingerprinter).FingerprintClientHello(hello)
@@ -107,8 +149,8 @@ func Test_Android(t *testing.T) {
 		t.Fatal(err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	tr := Transport{Spec: Android_API_26}
-	res, err := tr.RoundTrip(req)
+	tr := Transport{_Spec: Android_API_26}
+	res, err := tr._RoundTrip(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,41 +160,10 @@ func Test_Android(t *testing.T) {
 	if err := res.Body.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if err := tr.Conn.Close(); err != nil {
+	if err := tr._Conn.Close(); err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(res.Status)
-}
-
-func Test_Builder(t *testing.T) {
-	{
-		b := builder("hello")
-		b.add_uint8_prefixed(func(b *builder) {
-			b.add_uint8(0x0a)
-		})
-		fmt.Printf("%q\n", b)
-	}
-	{
-		b := builder("hello")
-		b.add_uint16_prefixed(func(b *builder) {
-			b.add_uint16(0x0a0b)
-		})
-		fmt.Printf("%q\n", b)
-	}
-	{
-		b := builder("hello")
-		b.add_uint24_prefixed(func(b *builder) {
-			b.add_uint24(0x0a0b0c0d)
-		})
-		fmt.Printf("%q\n", b)
-	}
-	{
-		b := builder("hello")
-		b.add_uint32_prefixed(func(b *builder) {
-			b.add_uint32(0x0a0b0c0d)
-		})
-		fmt.Printf("%q\n", b)
-	}
 }
 
 func Test_String(t *testing.T) {

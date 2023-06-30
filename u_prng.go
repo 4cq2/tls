@@ -83,7 +83,7 @@ func (c *Roller) Dial(network, addr, serverName string) (*UConn, error) {
 		}
 
 		c.HelloIDMu.Lock()
-		c.WorkingHelloID = &client.ClientHelloID
+		c.WorkingHelloID = &client._ClientHelloID
 		c.HelloIDMu.Unlock()
 		return client, err
 	}
