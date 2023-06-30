@@ -44,17 +44,17 @@ func (e *_NPNExtension) Read(b []byte) (int, error) {
 }
 
 type SNIExtension struct {
-	ServerName string // not an array because go crypto/tls doesn't support multiple SNIs
+	_ServerName string // not an array because go crypto/tls doesn't support multiple SNIs
 }
 
 func (e *SNIExtension) writeToUConn(uc *UConn) error {
-	uc.Conn.config._ServerName = e.ServerName
-	uc._HandshakeState._Hello._ServerName = e.ServerName
+	uc.Conn.config._ServerName = e._ServerName
+	uc._HandshakeState._Hello._ServerName = e._ServerName
 	return nil
 }
 
 func (e *SNIExtension) Len() int {
-	return 4 + 2 + 1 + 2 + len(e.ServerName)
+	return 4 + 2 + 1 + 2 + len(e._ServerName)
 }
 
 func (e *SNIExtension) Read(b []byte) (int, error) {
@@ -64,14 +64,14 @@ func (e *SNIExtension) Read(b []byte) (int, error) {
 	// RFC 3546, section 3.1
 	b[0] = byte(extensionServerName >> 8)
 	b[1] = byte(extensionServerName)
-	b[2] = byte((len(e.ServerName) + 5) >> 8)
-	b[3] = byte((len(e.ServerName) + 5))
-	b[4] = byte((len(e.ServerName) + 3) >> 8)
-	b[5] = byte(len(e.ServerName) + 3)
+	b[2] = byte((len(e._ServerName) + 5) >> 8)
+	b[3] = byte((len(e._ServerName) + 5))
+	b[4] = byte((len(e._ServerName) + 3) >> 8)
+	b[5] = byte(len(e._ServerName) + 3)
 	// b[6] Server Name Type: host_name (0)
-	b[7] = byte(len(e.ServerName) >> 8)
-	b[8] = byte(len(e.ServerName))
-	copy(b[9:], []byte(e.ServerName))
+	b[7] = byte(len(e._ServerName) >> 8)
+	b[8] = byte(len(e._ServerName))
+	copy(b[9:], []byte(e._ServerName))
 	return e.Len(), io.EOF
 }
 
@@ -102,17 +102,17 @@ func (e *StatusRequestExtension) Read(b []byte) (int, error) {
 }
 
 type SupportedCurvesExtension struct {
-	Curves []_CurveID
+	_Curves []_CurveID
 }
 
 func (e *SupportedCurvesExtension) writeToUConn(uc *UConn) error {
-	uc.Conn.config._CurvePreferences = e.Curves
-	uc._HandshakeState._Hello._SupportedCurves = e.Curves
+	uc.Conn.config._CurvePreferences = e._Curves
+	uc._HandshakeState._Hello._SupportedCurves = e._Curves
 	return nil
 }
 
 func (e *SupportedCurvesExtension) Len() int {
-	return 6 + 2*len(e.Curves)
+	return 6 + 2*len(e._Curves)
 }
 
 func (e *SupportedCurvesExtension) Read(b []byte) (int, error) {
@@ -122,11 +122,11 @@ func (e *SupportedCurvesExtension) Read(b []byte) (int, error) {
 	// http://tools.ietf.org/html/rfc4492#section-5.5.1
 	b[0] = byte(extensionSupportedCurves >> 8)
 	b[1] = byte(extensionSupportedCurves)
-	b[2] = byte((2 + 2*len(e.Curves)) >> 8)
-	b[3] = byte((2 + 2*len(e.Curves)))
-	b[4] = byte((2 * len(e.Curves)) >> 8)
-	b[5] = byte((2 * len(e.Curves)))
-	for i, curve := range e.Curves {
+	b[2] = byte((2 + 2*len(e._Curves)) >> 8)
+	b[3] = byte((2 + 2*len(e._Curves)))
+	b[4] = byte((2 * len(e._Curves)) >> 8)
+	b[5] = byte((2 * len(e._Curves)))
+	for i, curve := range e._Curves {
 		b[6+2*i] = byte(curve >> 8)
 		b[7+2*i] = byte(curve)
 	}
@@ -134,16 +134,16 @@ func (e *SupportedCurvesExtension) Read(b []byte) (int, error) {
 }
 
 type SupportedPointsExtension struct {
-	SupportedPoints []uint8
+	_SupportedPoints []uint8
 }
 
 func (e *SupportedPointsExtension) writeToUConn(uc *UConn) error {
-	uc._HandshakeState._Hello._SupportedPoints = e.SupportedPoints
+	uc._HandshakeState._Hello._SupportedPoints = e._SupportedPoints
 	return nil
 }
 
 func (e *SupportedPointsExtension) Len() int {
-	return 5 + len(e.SupportedPoints)
+	return 5 + len(e._SupportedPoints)
 }
 
 func (e *SupportedPointsExtension) Read(b []byte) (int, error) {
@@ -153,26 +153,26 @@ func (e *SupportedPointsExtension) Read(b []byte) (int, error) {
 	// http://tools.ietf.org/html/rfc4492#section-5.5.2
 	b[0] = byte(extensionSupportedPoints >> 8)
 	b[1] = byte(extensionSupportedPoints)
-	b[2] = byte((1 + len(e.SupportedPoints)) >> 8)
-	b[3] = byte((1 + len(e.SupportedPoints)))
-	b[4] = byte((len(e.SupportedPoints)))
-	for i, pointFormat := range e.SupportedPoints {
+	b[2] = byte((1 + len(e._SupportedPoints)) >> 8)
+	b[3] = byte((1 + len(e._SupportedPoints)))
+	b[4] = byte((len(e._SupportedPoints)))
+	for i, pointFormat := range e._SupportedPoints {
 		b[5+i] = pointFormat
 	}
 	return e.Len(), io.EOF
 }
 
 type SignatureAlgorithmsExtension struct {
-	SupportedSignatureAlgorithms []SignatureScheme
+	_SupportedSignatureAlgorithms []SignatureScheme
 }
 
 func (e *SignatureAlgorithmsExtension) writeToUConn(uc *UConn) error {
-	uc._HandshakeState._Hello._SupportedSignatureAlgorithms = e.SupportedSignatureAlgorithms
+	uc._HandshakeState._Hello._SupportedSignatureAlgorithms = e._SupportedSignatureAlgorithms
 	return nil
 }
 
 func (e *SignatureAlgorithmsExtension) Len() int {
-	return 6 + 2*len(e.SupportedSignatureAlgorithms)
+	return 6 + 2*len(e._SupportedSignatureAlgorithms)
 }
 
 func (e *SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
@@ -182,11 +182,11 @@ func (e *SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
 	// https://tools.ietf.org/html/rfc5246#section-7.4.1.4.1
 	b[0] = byte(extensionSignatureAlgorithms >> 8)
 	b[1] = byte(extensionSignatureAlgorithms)
-	b[2] = byte((2 + 2*len(e.SupportedSignatureAlgorithms)) >> 8)
-	b[3] = byte((2 + 2*len(e.SupportedSignatureAlgorithms)))
-	b[4] = byte((2 * len(e.SupportedSignatureAlgorithms)) >> 8)
-	b[5] = byte((2 * len(e.SupportedSignatureAlgorithms)))
-	for i, sigAndHash := range e.SupportedSignatureAlgorithms {
+	b[2] = byte((2 + 2*len(e._SupportedSignatureAlgorithms)) >> 8)
+	b[3] = byte((2 + 2*len(e._SupportedSignatureAlgorithms)))
+	b[4] = byte((2 * len(e._SupportedSignatureAlgorithms)) >> 8)
+	b[5] = byte((2 * len(e._SupportedSignatureAlgorithms)))
+	for i, sigAndHash := range e._SupportedSignatureAlgorithms {
 		b[6+2*i] = byte(sigAndHash >> 8)
 		b[7+2*i] = byte(sigAndHash)
 	}
@@ -194,14 +194,14 @@ func (e *SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
 }
 
 type RenegotiationInfoExtension struct {
-	// Renegotiation field limits how many times client will perform renegotiation: no limit, once, or never.
-	// The extension still will be sent, even if Renegotiation is set to RenegotiateNever.
-	Renegotiation RenegotiationSupport
+	// _Renegotiation field limits how many times client will perform renegotiation: no limit, once, or never.
+	// The extension still will be sent, even if _Renegotiation is set to RenegotiateNever.
+	_Renegotiation RenegotiationSupport
 }
 
 func (e *RenegotiationInfoExtension) writeToUConn(uc *UConn) error {
-	uc.Conn.config._Renegotiation = e.Renegotiation
-	switch e.Renegotiation {
+	uc.Conn.config._Renegotiation = e._Renegotiation
+	switch e._Renegotiation {
 	case RenegotiateOnceAsClient:
 		fallthrough
 	case _RenegotiateFreelyAsClient:
@@ -305,20 +305,20 @@ func (e *SCTExtension) Read(b []byte) (int, error) {
 }
 
 type SessionTicketExtension struct {
-	Session *_ClientSessionState
+	_Session *_ClientSessionState
 }
 
 func (e *SessionTicketExtension) writeToUConn(uc *UConn) error {
-	if e.Session != nil {
-		uc._HandshakeState._Session = e.Session
-		uc._HandshakeState._Hello._SessionTicket = e.Session.sessionTicket
+	if e._Session != nil {
+		uc._HandshakeState._Session = e._Session
+		uc._HandshakeState._Hello._SessionTicket = e._Session.sessionTicket
 	}
 	return nil
 }
 
 func (e *SessionTicketExtension) Len() int {
-	if e.Session != nil {
-		return 4 + len(e.Session.sessionTicket)
+	if e._Session != nil {
+		return 4 + len(e._Session.sessionTicket)
 	}
 	return 4
 }
@@ -335,15 +335,15 @@ func (e *SessionTicketExtension) Read(b []byte) (int, error) {
 	b[2] = byte(extBodyLen >> 8)
 	b[3] = byte(extBodyLen)
 	if extBodyLen > 0 {
-		copy(b[4:], e.Session.sessionTicket)
+		copy(b[4:], e._Session.sessionTicket)
 	}
 	return e.Len(), io.EOF
 }
 
 // _GenericExtension allows to include in ClientHello arbitrary unsupported extensions.
 type _GenericExtension struct {
-	Id   uint16
-	Data []byte
+	_Id   uint16
+	_Data []byte
 }
 
 func (e *_GenericExtension) writeToUConn(uc *UConn) error {
@@ -351,7 +351,7 @@ func (e *_GenericExtension) writeToUConn(uc *UConn) error {
 }
 
 func (e *_GenericExtension) Len() int {
-	return 4 + len(e.Data)
+	return 4 + len(e._Data)
 }
 
 func (e *_GenericExtension) Read(b []byte) (int, error) {
@@ -359,12 +359,12 @@ func (e *_GenericExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 
-	b[0] = byte(e.Id >> 8)
-	b[1] = byte(e.Id)
-	b[2] = byte(len(e.Data) >> 8)
-	b[3] = byte(len(e.Data))
-	if len(e.Data) > 0 {
-		copy(b[4:], e.Data)
+	b[0] = byte(e._Id >> 8)
+	b[1] = byte(e._Id)
+	b[2] = byte(len(e._Data) >> 8)
+	b[3] = byte(len(e._Data))
+	if len(e._Data) > 0 {
+		copy(b[4:], e._Data)
 	}
 	return e.Len(), io.EOF
 }
@@ -419,8 +419,8 @@ const (
 
 // it is responsibility of user not to generate multiple grease extensions with same value
 type UtlsGREASEExtension struct {
-	Value uint16
-	Body  []byte // in Chrome first grease has empty body, second grease has a single zero byte
+	_Value uint16
+	Body   []byte // in Chrome first grease has empty body, second grease has a single zero byte
 }
 
 func (e *UtlsGREASEExtension) writeToUConn(uc *UConn) error {
@@ -447,8 +447,8 @@ func (e *UtlsGREASEExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 
-	b[0] = byte(e.Value >> 8)
-	b[1] = byte(e.Value)
+	b[0] = byte(e._Value >> 8)
+	b[1] = byte(e._Value)
 	b[2] = byte(len(e.Body) >> 8)
 	b[3] = byte(len(e.Body))
 	if len(e.Body) > 0 {

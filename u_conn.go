@@ -119,7 +119,7 @@ func (uconn *UConn) _SetSessionState(session *_ClientSessionState) error {
 		if !ok {
 			continue
 		}
-		st.Session = session
+		st._Session = session
 		if session != nil {
 			if len(session._SessionTicket()) > 0 {
 				if uconn._GetSessionID != nil {

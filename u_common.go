@@ -56,7 +56,7 @@ var Android_API_26 = _ClientHelloSpec{
 		&UtlsExtendedMasterSecretExtension{},
 		&SessionTicketExtension{},
 		&SignatureAlgorithmsExtension{
-			SupportedSignatureAlgorithms: []SignatureScheme{
+			_SupportedSignatureAlgorithms: []SignatureScheme{
 				_ECDSAWithP256AndSHA256,
 			},
 		},
@@ -65,10 +65,10 @@ var Android_API_26 = _ClientHelloSpec{
 			_AlpnProtocols: []string{"http/1.1"},
 		},
 		&SupportedPointsExtension{
-			SupportedPoints: []uint8{pointFormatUncompressed},
+			_SupportedPoints: []uint8{pointFormatUncompressed},
 		},
 		&SupportedCurvesExtension{
-			Curves: []_CurveID{
+			_Curves: []_CurveID{
 				X25519,
 				_CurveP256,
 				_CurveP384,
