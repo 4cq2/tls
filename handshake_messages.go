@@ -79,8 +79,8 @@ type clientHelloMsg struct {
 	supportedPoints                  []uint8
 	ticketSupported                  bool
 	sessionTicket                    []uint8
-	supportedSignatureAlgorithms     []SignatureScheme
-	supportedSignatureAlgorithmsCert []SignatureScheme
+	supportedSignatureAlgorithms     []_SignatureScheme
+	supportedSignatureAlgorithmsCert []_SignatureScheme
 	secureRenegotiationSupported     bool
 	secureRenegotiation              []byte
 	alpnProtocols                    []string
@@ -475,7 +475,7 @@ func (m *clientHelloMsg) unmarshal(data []byte) bool {
 					return false
 				}
 				m.supportedSignatureAlgorithms = append(
-					m.supportedSignatureAlgorithms, SignatureScheme(sigAndAlg))
+					m.supportedSignatureAlgorithms, _SignatureScheme(sigAndAlg))
 			}
 		case extensionSignatureAlgorithmsCert:
 			// RFC 8446, Section 4.2.3
@@ -489,7 +489,7 @@ func (m *clientHelloMsg) unmarshal(data []byte) bool {
 					return false
 				}
 				m.supportedSignatureAlgorithmsCert = append(
-					m.supportedSignatureAlgorithmsCert, SignatureScheme(sigAndAlg))
+					m.supportedSignatureAlgorithmsCert, _SignatureScheme(sigAndAlg))
 			}
 		case extensionRenegotiationInfo:
 			// RFC 5746, Section 3.2
@@ -1077,8 +1077,8 @@ type certificateRequestMsgTLS13 struct {
 	raw                              []byte
 	ocspStapling                     bool
 	scts                             bool
-	supportedSignatureAlgorithms     []SignatureScheme
-	supportedSignatureAlgorithmsCert []SignatureScheme
+	supportedSignatureAlgorithms     []_SignatureScheme
+	supportedSignatureAlgorithmsCert []_SignatureScheme
 	certificateAuthorities           [][]byte
 }
 
@@ -1183,7 +1183,7 @@ func (m *certificateRequestMsgTLS13) unmarshal(data []byte) bool {
 					return false
 				}
 				m.supportedSignatureAlgorithms = append(
-					m.supportedSignatureAlgorithms, SignatureScheme(sigAndAlg))
+					m.supportedSignatureAlgorithms, _SignatureScheme(sigAndAlg))
 			}
 		case extensionSignatureAlgorithmsCert:
 			var sigAndAlgs cryptobyte.String
@@ -1196,7 +1196,7 @@ func (m *certificateRequestMsgTLS13) unmarshal(data []byte) bool {
 					return false
 				}
 				m.supportedSignatureAlgorithmsCert = append(
-					m.supportedSignatureAlgorithmsCert, SignatureScheme(sigAndAlg))
+					m.supportedSignatureAlgorithmsCert, _SignatureScheme(sigAndAlg))
 			}
 		case extensionCertificateAuthorities:
 			var auths cryptobyte.String
@@ -1654,7 +1654,7 @@ type certificateRequestMsg struct {
 	hasSignatureAlgorithm bool
 
 	certificateTypes             []byte
-	supportedSignatureAlgorithms []SignatureScheme
+	supportedSignatureAlgorithms []_SignatureScheme
 	certificateAuthorities       [][]byte
 }
 
@@ -1751,9 +1751,9 @@ func (m *certificateRequestMsg) unmarshal(data []byte) bool {
 			return false
 		}
 		numSigAlgos := sigAndHashLen / 2
-		m.supportedSignatureAlgorithms = make([]SignatureScheme, numSigAlgos)
+		m.supportedSignatureAlgorithms = make([]_SignatureScheme, numSigAlgos)
 		for i := range m.supportedSignatureAlgorithms {
-			m.supportedSignatureAlgorithms[i] = SignatureScheme(data[0])<<8 | SignatureScheme(data[1])
+			m.supportedSignatureAlgorithms[i] = _SignatureScheme(data[0])<<8 | _SignatureScheme(data[1])
 			data = data[2:]
 		}
 	}
@@ -1792,7 +1792,7 @@ func (m *certificateRequestMsg) unmarshal(data []byte) bool {
 type certificateVerifyMsg struct {
 	raw                   []byte
 	hasSignatureAlgorithm bool // format change introduced in TLS 1.2
-	signatureAlgorithm    SignatureScheme
+	signatureAlgorithm    _SignatureScheme
 	signature             []byte
 }
 

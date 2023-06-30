@@ -44,7 +44,7 @@ func (c *Conn) serverHandshake() error {
 		return err
 	}
 
-	if c.vers == VersionTLS13 {
+	if c.vers == _VersionTLS13 {
 		hs := serverHandshakeStateTLS13{
 			c:           c,
 			clientHello: clientHello,
@@ -213,8 +213,8 @@ Curves:
 	serverRandom := hs.hello.random
 	// Downgrade protection canaries. See RFC 8446, Section 4.1.3.
 	maxVers := c.config.maxSupportedVersion(false)
-	if maxVers >= VersionTLS12 && c.vers < maxVers {
-		if c.vers == VersionTLS12 {
+	if maxVers >= _VersionTLS12 && c.vers < maxVers {
+		if c.vers == _VersionTLS12 {
 			copy(serverRandom[24:], downgradeCanaryTLS12)
 		} else {
 			copy(serverRandom[24:], downgradeCanaryTLS11)
@@ -311,7 +311,7 @@ func (hs *serverHandshakeState) pickCipherSuite() error {
 	}
 
 	for _, id := range hs.clientHello.cipherSuites {
-		if id == TLS_FALLBACK_SCSV {
+		if id == _TLS_FALLBACK_SCSV {
 			// The client is doing a fallback connection. See RFC 7507.
 			if hs.clientHello.vers < c.config.maxSupportedVersion(false) {
 				c.sendAlert(alertInappropriateFallback)
@@ -454,14 +454,14 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 		}
 	}
 
-	if c.config._ClientAuth >= RequestClientCert {
+	if c.config._ClientAuth >= _RequestClientCert {
 		// Request a client certificate
 		certReq := new(certificateRequestMsg)
 		certReq.certificateTypes = []byte{
 			byte(certTypeRSASign),
 			byte(certTypeECDSASign),
 		}
-		if c.vers >= VersionTLS12 {
+		if c.vers >= _VersionTLS12 {
 			certReq.hasSignatureAlgorithm = true
 			certReq.supportedSignatureAlgorithms = supportedSignatureAlgorithms
 		}
@@ -499,7 +499,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 
 	// If we requested a client certificate, then the client must send a
 	// certificate message, even if it's empty.
-	if c.config._ClientAuth >= RequestClientCert {
+	if c.config._ClientAuth >= _RequestClientCert {
 		certMsg, ok := msg.(*certificateMsg)
 		if !ok {
 			c.sendAlert(alertUnexpectedMessage)
@@ -559,7 +559,7 @@ func (hs *serverHandshakeState) doFullHandshake() error {
 		}
 
 		// Determine the signature type.
-		_, sigType, hashFunc, err := pickSignatureAlgorithm(pub, []SignatureScheme{certVerify.signatureAlgorithm}, supportedSignatureAlgorithms, c.vers)
+		_, sigType, hashFunc, err := pickSignatureAlgorithm(pub, []_SignatureScheme{certVerify.signatureAlgorithm}, supportedSignatureAlgorithms, c.vers)
 		if err != nil {
 			c.sendAlert(alertIllegalParameter)
 			return err
@@ -721,7 +721,7 @@ func (c *Conn) processCertsFromClient(certificate _Certificate) error {
 		return errors.New("tls: client didn't provide a certificate")
 	}
 
-	if c.config._ClientAuth >= VerifyClientCertIfGiven && len(certs) > 0 {
+	if c.config._ClientAuth >= _VerifyClientCertIfGiven && len(certs) > 0 {
 		opts := x509.VerifyOptions{
 			Roots:         c.config._ClientCAs,
 			CurrentTime:   c.config.time(),
@@ -792,7 +792,7 @@ func (hs *serverHandshakeState) setCipherSuite(id uint16, supportedCipherSuites 
 			} else if !hs.rsaDecryptOk {
 				continue
 			}
-			if version < VersionTLS12 && candidate.flags&suiteTLS12 != 0 {
+			if version < _VersionTLS12 && candidate.flags&suiteTLS12 != 0 {
 				continue
 			}
 			hs.suite = candidate

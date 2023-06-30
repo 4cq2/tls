@@ -60,8 +60,8 @@ func (c *Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
 	// The version at the beginning of the ClientHello was capped at TLS 1.2
 	// for compatibility reasons. The supported_versions extension is used
 	// to negotiate versions now. See RFC 8446, Section 4.2.1.
-	if clientHelloVersion > VersionTLS12 {
-		clientHelloVersion = VersionTLS12
+	if clientHelloVersion > _VersionTLS12 {
+		clientHelloVersion = _VersionTLS12
 	}
 
 	hello := &clientHelloMsg{
@@ -94,7 +94,7 @@ func (c *Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
 			}
 			// Don't advertise TLS 1.2-only cipher suites unless
 			// we're attempting TLS 1.2.
-			if hello.vers < VersionTLS12 && suite.flags&suiteTLS12 != 0 {
+			if hello.vers < _VersionTLS12 && suite.flags&suiteTLS12 != 0 {
 				break
 			}
 			hello.cipherSuites = append(hello.cipherSuites, suiteId)
@@ -114,16 +114,16 @@ func (c *Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
 		return nil, nil, errors.New("tls: short read from Rand: " + err.Error())
 	}
 
-	if hello.vers >= VersionTLS12 {
+	if hello.vers >= _VersionTLS12 {
 		hello.supportedSignatureAlgorithms = supportedSignatureAlgorithms
 	}
 
 	var params ecdheParameters
-	if hello.supportedVersions[0] == VersionTLS13 {
+	if hello.supportedVersions[0] == _VersionTLS13 {
 		hello.cipherSuites = append(hello.cipherSuites, defaultCipherSuitesTLS13()...)
 
 		curveID := config.curvePreferences()[0]
-		if _, ok := curveForCurveID(curveID); curveID != X25519 && !ok {
+		if _, ok := curveForCurveID(curveID); curveID != _X25519 && !ok {
 			return nil, nil, errors.New("tls: CurvePreferences includes unsupported curve")
 		}
 		params, err = generateECDHEParameters(config.rand(), curveID)
@@ -184,7 +184,7 @@ func (c *Conn) clientHandshake() (err error) {
 		return err
 	}
 
-	if c.vers == VersionTLS13 {
+	if c.vers == _VersionTLS13 {
 		hs := &clientHandshakeStateTLS13{
 			c:           c,
 			serverHello: serverHello,
@@ -227,7 +227,7 @@ func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 
 	hello.ticketSupported = true
 
-	if hello.supportedVersions[0] == VersionTLS13 {
+	if hello.supportedVersions[0] == _VersionTLS13 {
 		// Require DHE on resumption as it guarantees forward secrecy against
 		// compromise of the session ticket key. See RFC 8446, Section 4.2.9.
 		hello.pskModes = []uint8{pskModeDHE}
@@ -278,7 +278,7 @@ func (c *Conn) loadSession(hello *clientHelloMsg) (cacheKey string,
 		}
 	}
 
-	if session.vers != VersionTLS13 {
+	if session.vers != _VersionTLS13 {
 		// In TLS 1.2 the cipher suite must match the resumed session. Ensure we
 		// are still offering it.
 		if mutualCipherSuite(hello.cipherSuites, session.cipherSuite) == nil {
@@ -565,7 +565,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 
 	if chainToSend != nil && len(chainToSend._Certificate) > 0 {
 		certVerify := &certificateVerifyMsg{
-			hasSignatureAlgorithm: c.vers >= VersionTLS12,
+			hasSignatureAlgorithm: c.vers >= _VersionTLS12,
 		}
 
 		key, ok := chainToSend._PrivateKey.(crypto.Signer)
@@ -866,7 +866,7 @@ func (c *Conn) verifyServerCertificate(certificates [][]byte) error {
 // tls11SignatureSchemes contains the signature schemes that we synthesise for
 // a TLS <= 1.1 connection, based on the supported certificate types.
 var (
-	tls11SignatureSchemes      = []SignatureScheme{_ECDSAWithP256AndSHA256, _ECDSAWithP384AndSHA384, _ECDSAWithP521AndSHA512, _PKCS1WithSHA256, _PKCS1WithSHA384, _PKCS1WithSHA512, _PKCS1WithSHA1}
+	tls11SignatureSchemes      = []_SignatureScheme{_ECDSAWithP256AndSHA256, _ECDSAWithP384AndSHA384, _ECDSAWithP521AndSHA512, _PKCS1WithSHA256, _PKCS1WithSHA384, _PKCS1WithSHA512, _PKCS1WithSHA1}
 	tls11SignatureSchemesECDSA = tls11SignatureSchemes[:3]
 	tls11SignatureSchemesRSA   = tls11SignatureSchemes[3:]
 )
@@ -908,7 +908,7 @@ func certificateRequestInfoFromMsg(certReq *certificateRequestMsg) *_Certificate
 	// the leaf key, while the certificate types only apply to the leaf key.
 	// See RFC 5246, Section 7.4.4 (where it calls this "somewhat complicated").
 	// Filter the signature schemes based on the certificate type.
-	cri._SignatureSchemes = make([]SignatureScheme, 0, len(certReq.supportedSignatureAlgorithms))
+	cri._SignatureSchemes = make([]_SignatureScheme, 0, len(certReq.supportedSignatureAlgorithms))
 	for _, sigScheme := range certReq.supportedSignatureAlgorithms {
 		switch signatureFromSignatureScheme(sigScheme) {
 		case signatureECDSA:

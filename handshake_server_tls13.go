@@ -29,7 +29,7 @@ type serverHandshakeStateTLS13 struct {
 	usingPSK        bool
 	suite           *cipherSuiteTLS13
 	cert            *_Certificate
-	sigAlg          SignatureScheme
+	sigAlg          _SignatureScheme
 	earlySecret     []byte
 	sharedKey       []byte
 	handshakeSecret []byte
@@ -87,7 +87,7 @@ func (hs *serverHandshakeStateTLS13) processClientHello() error {
 
 	// TLS 1.3 froze the ServerHello.legacy_version field, and uses
 	// supported_versions instead. See RFC 8446, sections 4.1.3 and 4.2.1.
-	hs.hello.vers = VersionTLS12
+	hs.hello.vers = _VersionTLS12
 	hs.hello.supportedVersion = c.vers
 
 	if len(hs.clientHello.supportedVersions) == 0 {
@@ -105,7 +105,7 @@ func (hs *serverHandshakeStateTLS13) processClientHello() error {
 	// supported_versions was not better because there was just no way to do a
 	// TLS 1.4 handshake without risking the server selecting TLS 1.3.
 	for _, id := range hs.clientHello.cipherSuites {
-		if id == TLS_FALLBACK_SCSV {
+		if id == _TLS_FALLBACK_SCSV {
 			// Use c.vers instead of max(supported_versions) because an attacker
 			// could defeat this by adding an arbitrary high version otherwise.
 			if c.vers < c.config.maxSupportedVersion(false) {
@@ -203,7 +203,7 @@ GroupSelection:
 		clientKeyShare = &hs.clientHello.keyShares[0]
 	}
 
-	if _, ok := curveForCurveID(selectedGroup); selectedGroup != X25519 && !ok {
+	if _, ok := curveForCurveID(selectedGroup); selectedGroup != _X25519 && !ok {
 		c.sendAlert(alertInternalError)
 		return errors.New("tls: CurvePreferences includes unsupported curve")
 	}
@@ -579,7 +579,7 @@ func (hs *serverHandshakeStateTLS13) sendServerParameters() error {
 }
 
 func (hs *serverHandshakeStateTLS13) requestClientCert() bool {
-	return hs.c.config._ClientAuth >= RequestClientCert && !hs.usingPSK
+	return hs.c.config._ClientAuth >= _RequestClientCert && !hs.usingPSK
 }
 
 func (hs *serverHandshakeStateTLS13) sendServerCertificate() error {

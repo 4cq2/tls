@@ -117,12 +117,12 @@ func (hs *clientHandshakeStateTLS13) checkServerHelloOrHRR() error {
 		return errors.New("tls: server selected TLS 1.3 using the legacy version field")
 	}
 
-	if hs.serverHello.supportedVersion != VersionTLS13 {
+	if hs.serverHello.supportedVersion != _VersionTLS13 {
 		c.sendAlert(alertIllegalParameter)
 		return errors.New("tls: server selected an invalid version after a HelloRetryRequest")
 	}
 
-	if hs.serverHello.vers != VersionTLS12 {
+	if hs.serverHello.vers != _VersionTLS12 {
 		c.sendAlert(alertIllegalParameter)
 		return errors.New("tls: server sent an incorrect legacy version")
 	}
@@ -214,7 +214,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 		c.sendAlert(alertIllegalParameter)
 		return errors.New("tls: server sent an unnecessary HelloRetryRequest message")
 	}
-	if _, ok := curveForCurveID(curveID); curveID != X25519 && !ok {
+	if _, ok := curveForCurveID(curveID); curveID != _X25519 && !ok {
 		c.sendAlert(alertInternalError)
 		return errors.New("tls: CurvePreferences includes unsupported curve")
 	}

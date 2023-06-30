@@ -199,7 +199,7 @@ type ecdheParameters interface {
 }
 
 func generateECDHEParameters(rand io.Reader, curveID _CurveID) (ecdheParameters, error) {
-	if curveID == X25519 {
+	if curveID == _X25519 {
 		p := &x25519Parameters{}
 		if _, err := io.ReadFull(rand, p.privateKey[:]); err != nil {
 			return nil, err
@@ -272,7 +272,7 @@ type x25519Parameters struct {
 }
 
 func (p *x25519Parameters) CurveID() _CurveID {
-	return X25519
+	return _X25519
 }
 
 func (p *x25519Parameters) PublicKey() []byte {

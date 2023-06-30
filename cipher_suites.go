@@ -77,8 +77,8 @@ type cipherSuite struct {
 var cipherSuites = []*cipherSuite{
 	// Ciphersuite order is chosen so that ECDHE comes before plain RSA and
 	// AEADs are the top preference.
-	{TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305, 32, 0, 12, ecdheRSAKA, suiteECDHE | suiteTLS12, nil, nil, aeadChaCha20Poly1305},
-	{TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305, 32, 0, 12, ecdheECDSAKA, suiteECDHE | suiteECDSA | suiteTLS12, nil, nil, aeadChaCha20Poly1305},
+	{_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305, 32, 0, 12, ecdheRSAKA, suiteECDHE | suiteTLS12, nil, nil, aeadChaCha20Poly1305},
+	{_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305, 32, 0, 12, ecdheECDSAKA, suiteECDHE | suiteECDSA | suiteTLS12, nil, nil, aeadChaCha20Poly1305},
 	{_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, 16, 0, 4, ecdheRSAKA, suiteECDHE | suiteTLS12, nil, nil, aeadAESGCM},
 	{_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, 16, 0, 4, ecdheECDSAKA, suiteECDHE | suiteECDSA | suiteTLS12, nil, nil, aeadAESGCM},
 	{_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, 32, 0, 4, ecdheRSAKA, suiteECDHE | suiteTLS12 | suiteSHA384, nil, nil, aeadAESGCM},
@@ -113,9 +113,9 @@ type cipherSuiteTLS13 struct {
 }
 
 var cipherSuitesTLS13 = []*cipherSuiteTLS13{
-	{TLS_AES_128_GCM_SHA256, 16, aeadAESGCMTLS13, crypto.SHA256},
-	{TLS_CHACHA20_POLY1305_SHA256, 32, aeadChaCha20Poly1305, crypto.SHA256},
-	{TLS_AES_256_GCM_SHA384, 32, aeadAESGCMTLS13, crypto.SHA384},
+	{_TLS_AES_128_GCM_SHA256, 16, aeadAESGCMTLS13, crypto.SHA256},
+	{_TLS_CHACHA20_POLY1305_SHA256, 32, aeadChaCha20Poly1305, crypto.SHA256},
+	{_TLS_AES_256_GCM_SHA384, 32, aeadAESGCMTLS13, crypto.SHA384},
 }
 
 func cipherRC4(key, iv []byte, isRead bool) interface{} {
@@ -141,7 +141,7 @@ func cipherAES(key, iv []byte, isRead bool) interface{} {
 
 // macSHA1 returns a macFunction for the given protocol version.
 func macSHA1(version uint16, key []byte) macFunction {
-	if version == VersionSSL30 {
+	if version == _VersionSSL30 {
 		mac := ssl30MAC{
 			h:   sha1.New(),
 			key: make([]byte, len(key)),
@@ -458,15 +458,15 @@ const (
 	_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 uint16 = 0xc02b
 	_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384   uint16 = 0xc030
 	_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 uint16 = 0xc02c
-	TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305     uint16 = 0xcca8
-	TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305   uint16 = 0xcca9
+	_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305    uint16 = 0xcca8
+	_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305  uint16 = 0xcca9
 
 	// TLS 1.3 cipher suites.
-	TLS_AES_128_GCM_SHA256       uint16 = 0x1301
-	TLS_AES_256_GCM_SHA384       uint16 = 0x1302
-	TLS_CHACHA20_POLY1305_SHA256 uint16 = 0x1303
+	_TLS_AES_128_GCM_SHA256       uint16 = 0x1301
+	_TLS_AES_256_GCM_SHA384       uint16 = 0x1302
+	_TLS_CHACHA20_POLY1305_SHA256 uint16 = 0x1303
 
-	// TLS_FALLBACK_SCSV isn't a standard cipher suite but an indicator
+	// _TLS_FALLBACK_SCSV isn't a standard cipher suite but an indicator
 	// that the client is doing version fallback. See RFC 7507.
-	TLS_FALLBACK_SCSV uint16 = 0x5600
+	_TLS_FALLBACK_SCSV uint16 = 0x5600
 )

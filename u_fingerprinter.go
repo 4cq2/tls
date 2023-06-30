@@ -196,14 +196,14 @@ func (f *_Fingerprinter) _FingerprintClientHello(data []byte) (*_ClientHelloSpec
 			if !extData.ReadUint16LengthPrefixed(&sigAndAlgs) || sigAndAlgs.Empty() {
 				return nil, errors.New("unable to read signature algorithms extension data")
 			}
-			supportedSignatureAlgorithms := []SignatureScheme{}
+			supportedSignatureAlgorithms := []_SignatureScheme{}
 			for !sigAndAlgs.Empty() {
 				var sigAndAlg uint16
 				if !sigAndAlgs.ReadUint16(&sigAndAlg) {
 					return nil, errors.New("unable to read signature algorithms extension data")
 				}
 				supportedSignatureAlgorithms = append(
-					supportedSignatureAlgorithms, SignatureScheme(sigAndAlg))
+					supportedSignatureAlgorithms, _SignatureScheme(sigAndAlg))
 			}
 			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &SignatureAlgorithmsExtension{supportedSignatureAlgorithms})
 

@@ -18,16 +18,16 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 	switch id {
 	case _HelloChrome_58, _HelloChrome_62:
 		return _ClientHelloSpec{
-			_TLSVersMax: VersionTLS12,
-			_TLSVersMin: VersionTLS10,
+			_TLSVersMax: _VersionTLS12,
+			_TLSVersMin: _VersionTLS10,
 			_CipherSuites: []uint16{
 				_GREASE_PLACEHOLDER,
 				_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-				TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 				_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
 				_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
 				_TLS_RSA_WITH_AES_128_GCM_SHA256,
@@ -43,7 +43,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
 				&SessionTicketExtension{},
-				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []SignatureScheme{
+				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
 					_PKCS1WithSHA256,
@@ -60,7 +60,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_FakeChannelIDExtension{},
 				&SupportedPointsExtension{_SupportedPoints: []byte{pointFormatUncompressed}},
 				&SupportedCurvesExtension{[]_CurveID{_CurveID(_GREASE_PLACEHOLDER),
-					X25519, _CurveP256, _CurveP384}},
+					_X25519, _CurveP256, _CurveP384}},
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{_GetPaddingLen: _BoringPaddingStyle},
 			},
@@ -68,19 +68,19 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 		}, nil
 	case _HelloChrome_70:
 		return _ClientHelloSpec{
-			_TLSVersMin: VersionTLS10,
-			_TLSVersMax: VersionTLS13,
+			_TLSVersMin: _VersionTLS10,
+			_TLSVersMax: _VersionTLS13,
 			_CipherSuites: []uint16{
 				_GREASE_PLACEHOLDER,
-				TLS_AES_128_GCM_SHA256,
-				TLS_AES_256_GCM_SHA384,
-				TLS_CHACHA20_POLY1305_SHA256,
+				_TLS_AES_128_GCM_SHA256,
+				_TLS_AES_256_GCM_SHA384,
+				_TLS_CHACHA20_POLY1305_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-				TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 				_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
 				_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
 				_TLS_RSA_WITH_AES_128_GCM_SHA256,
@@ -98,7 +98,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
 				&SessionTicketExtension{},
-				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []SignatureScheme{
+				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
 					_PKCS1WithSHA256,
@@ -118,18 +118,18 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				}},
 				&_KeyShareExtension{[]_KeyShare{
 					{_Group: _CurveID(_GREASE_PLACEHOLDER), _Data: []byte{0}},
-					{_Group: X25519},
+					{_Group: _X25519},
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
-					VersionTLS13,
-					VersionTLS12,
-					VersionTLS11,
-					VersionTLS10}},
+					_VersionTLS13,
+					_VersionTLS12,
+					_VersionTLS11,
+					_VersionTLS10}},
 				&SupportedCurvesExtension{[]_CurveID{
 					_CurveID(_GREASE_PLACEHOLDER),
-					X25519,
+					_X25519,
 					_CurveP256,
 					_CurveP384,
 				}},
@@ -142,15 +142,15 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 		return _ClientHelloSpec{
 			_CipherSuites: []uint16{
 				_GREASE_PLACEHOLDER,
-				TLS_AES_128_GCM_SHA256,
-				TLS_AES_256_GCM_SHA384,
-				TLS_CHACHA20_POLY1305_SHA256,
+				_TLS_AES_128_GCM_SHA256,
+				_TLS_AES_256_GCM_SHA384,
+				_TLS_CHACHA20_POLY1305_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-				TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 				_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
 				_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
 				_TLS_RSA_WITH_AES_128_GCM_SHA256,
@@ -169,7 +169,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&RenegotiationInfoExtension{_Renegotiation: RenegotiateOnceAsClient},
 				&SupportedCurvesExtension{[]_CurveID{
 					_CurveID(_GREASE_PLACEHOLDER),
-					X25519,
+					_X25519,
 					_CurveP256,
 					_CurveP384,
 				}},
@@ -179,7 +179,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SessionTicketExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
-				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []SignatureScheme{
+				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
 					_PKCS1WithSHA256,
@@ -193,17 +193,17 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SCTExtension{},
 				&_KeyShareExtension{[]_KeyShare{
 					{_Group: _CurveID(_GREASE_PLACEHOLDER), _Data: []byte{0}},
-					{_Group: X25519},
+					{_Group: _X25519},
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{
 					_PskModeDHE,
 				}},
 				&SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
-					VersionTLS13,
-					VersionTLS12,
-					VersionTLS11,
-					VersionTLS10,
+					_VersionTLS13,
+					_VersionTLS12,
+					_VersionTLS11,
+					_VersionTLS10,
 				}},
 				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
 					_CertCompressionBrotli,
@@ -216,15 +216,15 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 		return _ClientHelloSpec{
 			_CipherSuites: []uint16{
 				_GREASE_PLACEHOLDER,
-				TLS_AES_128_GCM_SHA256,
-				TLS_AES_256_GCM_SHA384,
-				TLS_CHACHA20_POLY1305_SHA256,
+				_TLS_AES_128_GCM_SHA256,
+				_TLS_AES_256_GCM_SHA384,
+				_TLS_CHACHA20_POLY1305_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-				TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 				_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
 				_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
 				_TLS_RSA_WITH_AES_128_GCM_SHA256,
@@ -242,7 +242,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&RenegotiationInfoExtension{_Renegotiation: RenegotiateOnceAsClient},
 				&SupportedCurvesExtension{[]_CurveID{
 					_CurveID(_GREASE_PLACEHOLDER),
-					X25519,
+					_X25519,
 					_CurveP256,
 					_CurveP384,
 				}},
@@ -252,7 +252,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SessionTicketExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
-				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []SignatureScheme{
+				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
 					_PKCS1WithSHA256,
@@ -265,17 +265,17 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SCTExtension{},
 				&_KeyShareExtension{[]_KeyShare{
 					{_Group: _CurveID(_GREASE_PLACEHOLDER), _Data: []byte{0}},
-					{_Group: X25519},
+					{_Group: _X25519},
 				}},
 				&_PSKKeyExchangeModesExtension{[]uint8{
 					_PskModeDHE,
 				}},
 				&SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
-					VersionTLS13,
-					VersionTLS12,
-					VersionTLS11,
-					VersionTLS10,
+					_VersionTLS13,
+					_VersionTLS12,
+					_VersionTLS11,
+					_VersionTLS10,
 				}},
 				&_FakeCertCompressionAlgsExtension{[]_CertCompressionAlgo{
 					_CertCompressionBrotli,
@@ -286,13 +286,13 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 		}, nil
 	case _HelloFirefox_55, _HelloFirefox_56:
 		return _ClientHelloSpec{
-			_TLSVersMax: VersionTLS12,
-			_TLSVersMin: VersionTLS10,
+			_TLSVersMax: _VersionTLS12,
+			_TLSVersMin: _VersionTLS10,
 			_CipherSuites: []uint16{
 				_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-				TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
@@ -310,12 +310,12 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
 				&RenegotiationInfoExtension{_Renegotiation: RenegotiateOnceAsClient},
-				&SupportedCurvesExtension{[]_CurveID{X25519, _CurveP256, _CurveP384, _CurveP521}},
+				&SupportedCurvesExtension{[]_CurveID{_X25519, _CurveP256, _CurveP384, _CurveP521}},
 				&SupportedPointsExtension{_SupportedPoints: []byte{pointFormatUncompressed}},
 				&SessionTicketExtension{},
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
-				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []SignatureScheme{
+				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_ECDSAWithP384AndSHA384,
 					_ECDSAWithP521AndSHA512,
@@ -334,16 +334,16 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 		}, nil
 	case _HelloFirefox_63, _HelloFirefox_65:
 		return _ClientHelloSpec{
-			_TLSVersMin: VersionTLS10,
-			_TLSVersMax: VersionTLS13,
+			_TLSVersMin: _VersionTLS10,
+			_TLSVersMax: _VersionTLS13,
 			_CipherSuites: []uint16{
-				TLS_AES_128_GCM_SHA256,
-				TLS_CHACHA20_POLY1305_SHA256,
-				TLS_AES_256_GCM_SHA384,
+				_TLS_AES_128_GCM_SHA256,
+				_TLS_CHACHA20_POLY1305_SHA256,
+				_TLS_AES_256_GCM_SHA384,
 				_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 				_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-				TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
@@ -364,7 +364,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsExtendedMasterSecretExtension{},
 				&RenegotiationInfoExtension{_Renegotiation: RenegotiateOnceAsClient},
 				&SupportedCurvesExtension{[]_CurveID{
-					X25519,
+					_X25519,
 					_CurveP256,
 					_CurveP384,
 					_CurveP521,
@@ -378,15 +378,15 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&_ALPNExtension{_AlpnProtocols: []string{"h2", "http/1.1"}},
 				&StatusRequestExtension{},
 				&_KeyShareExtension{[]_KeyShare{
-					{_Group: X25519},
+					{_Group: _X25519},
 					{_Group: _CurveP256},
 				}},
 				&SupportedVersionsExtension{[]uint16{
-					VersionTLS13,
-					VersionTLS12,
-					VersionTLS11,
-					VersionTLS10}},
-				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []SignatureScheme{
+					_VersionTLS13,
+					_VersionTLS12,
+					_VersionTLS11,
+					_VersionTLS10}},
+				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_ECDSAWithP384AndSHA384,
 					_ECDSAWithP521AndSHA512,
@@ -405,8 +405,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 			}}, nil
 	case _HelloIOS_11_1:
 		return _ClientHelloSpec{
-			_TLSVersMax: VersionTLS12,
-			_TLSVersMin: VersionTLS10,
+			_TLSVersMax: _VersionTLS12,
+			_TLSVersMin: _VersionTLS10,
 			_CipherSuites: []uint16{
 				_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
@@ -414,14 +414,14 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
 				_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 				_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				_DISABLED_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
 				_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
 				_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-				TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 				_TLS_RSA_WITH_AES_256_GCM_SHA384,
 				_TLS_RSA_WITH_AES_128_GCM_SHA256,
 				_DISABLED_TLS_RSA_WITH_AES_256_CBC_SHA256,
@@ -436,7 +436,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&RenegotiationInfoExtension{_Renegotiation: RenegotiateOnceAsClient},
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
-				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []SignatureScheme{
+				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
 					_PKCS1WithSHA256,
@@ -455,7 +455,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					pointFormatUncompressed,
 				}},
 				&SupportedCurvesExtension{_Curves: []_CurveID{
-					X25519,
+					_X25519,
 					_CurveP256,
 					_CurveP384,
 					_CurveP521,
@@ -471,14 +471,14 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
 				_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
 				_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-				TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 				_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				_DISABLED_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,
 				_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
 				_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
 				_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-				TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+				_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 				_TLS_RSA_WITH_AES_256_GCM_SHA384,
 				_TLS_RSA_WITH_AES_128_GCM_SHA256,
 				_DISABLED_TLS_RSA_WITH_AES_256_CBC_SHA256,
@@ -496,7 +496,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&RenegotiationInfoExtension{_Renegotiation: RenegotiateOnceAsClient},
 				&SNIExtension{},
 				&UtlsExtendedMasterSecretExtension{},
-				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []SignatureScheme{
+				&SignatureAlgorithmsExtension{_SupportedSignatureAlgorithms: []_SignatureScheme{
 					_ECDSAWithP256AndSHA256,
 					_PSSWithSHA256,
 					_PKCS1WithSHA256,
@@ -517,7 +517,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					pointFormatUncompressed,
 				}},
 				&SupportedCurvesExtension{[]_CurveID{
-					X25519,
+					_X25519,
 					_CurveP256,
 					_CurveP384,
 					_CurveP521,
@@ -738,8 +738,8 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	}
 
 	if r._FlipWeightedCoin(0.4) {
-		p._TLSVersMin = VersionTLS10
-		p._TLSVersMax = VersionTLS13
+		p._TLSVersMin = _VersionTLS10
+		p._TLSVersMax = _VersionTLS13
 		tls13ciphers := make([]uint16, len(defaultCipherSuitesTLS13()))
 		copy(tls13ciphers, defaultCipherSuitesTLS13())
 		r.rand.Shuffle(len(tls13ciphers), func(i, j int) {
@@ -751,8 +751,8 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 		// TLS 1.3 forbids RC4 in any configurations
 		shuffledSuites = removeRC4Ciphers(shuffledSuites)
 	} else {
-		p._TLSVersMin = VersionTLS10
-		p._TLSVersMax = VersionTLS12
+		p._TLSVersMin = _VersionTLS10
+		p._TLSVersMax = _VersionTLS12
 	}
 
 	p._CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
@@ -760,7 +760,7 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	sni := SNIExtension{uconn.Conn.config._ServerName}
 	sessionTicket := SessionTicketExtension{_Session: uconn._HandshakeState._Session}
 
-	sigAndHashAlgos := []SignatureScheme{
+	sigAndHashAlgos := []_SignatureScheme{
 		_ECDSAWithP256AndSHA256,
 		_PKCS1WithSHA256,
 		_ECDSAWithP384AndSHA384,
@@ -775,7 +775,7 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	if r._FlipWeightedCoin(0.59) {
 		sigAndHashAlgos = append(sigAndHashAlgos, _ECDSAWithP521AndSHA512)
 	}
-	if r._FlipWeightedCoin(0.51) || p._TLSVersMax == VersionTLS13 {
+	if r._FlipWeightedCoin(0.51) || p._TLSVersMax == _VersionTLS13 {
 		// https://tools.ietf.org/html/rfc8446 says "...RSASSA-PSS (which is mandatory in TLS 1.3)..."
 		sigAndHashAlgos = append(sigAndHashAlgos, _PSSWithSHA256)
 		if r._FlipWeightedCoin(0.9) {
@@ -796,8 +796,8 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	points := SupportedPointsExtension{_SupportedPoints: []byte{pointFormatUncompressed}}
 
 	curveIDs := []_CurveID{}
-	if r._FlipWeightedCoin(0.71) || p._TLSVersMax == VersionTLS13 {
-		curveIDs = append(curveIDs, X25519)
+	if r._FlipWeightedCoin(0.71) || p._TLSVersMax == _VersionTLS13 {
+		curveIDs = append(curveIDs, _X25519)
 	}
 	curveIDs = append(curveIDs, _CurveP256, _CurveP384)
 	if r._FlipWeightedCoin(0.46) {
@@ -826,7 +826,7 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 		p._Extensions = append(p._Extensions, &alpn)
 	}
 
-	if r._FlipWeightedCoin(0.62) || p._TLSVersMax == VersionTLS13 {
+	if r._FlipWeightedCoin(0.62) || p._TLSVersMax == _VersionTLS13 {
 		// always include for TLS 1.3, since TLS 1.3 ClientHellos are often over 256 bytes
 		// and that's when padding is required to work around buggy middleboxes
 		p._Extensions = append(p._Extensions, &padding)
@@ -843,9 +843,9 @@ func (uconn *_UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	if r._FlipWeightedCoin(0.77) {
 		p._Extensions = append(p._Extensions, &ems)
 	}
-	if p._TLSVersMax == VersionTLS13 {
+	if p._TLSVersMax == _VersionTLS13 {
 		ks := _KeyShareExtension{[]_KeyShare{
-			{_Group: X25519}, // the key for the group will be generated later
+			{_Group: _X25519}, // the key for the group will be generated later
 		}}
 		if r._FlipWeightedCoin(0.25) {
 			// do not ADD second keyShare because crypto/tls does not support multiple ecdheParams

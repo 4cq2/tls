@@ -119,7 +119,7 @@ type sessionStateTLS13 struct {
 
 func (m *sessionStateTLS13) marshal() []byte {
 	var b cryptobyte.Builder
-	b.AddUint16(VersionTLS13)
+	b.AddUint16(_VersionTLS13)
 	b.AddUint8(0) // revision
 	b.AddUint16(m.cipherSuite)
 	addUint64(&b, m.createdAt)
@@ -136,7 +136,7 @@ func (m *sessionStateTLS13) unmarshal(data []byte) bool {
 	var version uint16
 	var revision uint8
 	return s.ReadUint16(&version) &&
-		version == VersionTLS13 &&
+		version == _VersionTLS13 &&
 		s.ReadUint8(&revision) &&
 		revision == 0 &&
 		s.ReadUint16(&m.cipherSuite) &&

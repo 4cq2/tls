@@ -31,7 +31,7 @@ func (ka rsaKeyAgreement) processClientKeyExchange(config *_Config, cert *_Certi
 	}
 
 	ciphertext := ckx.ciphertext
-	if version != VersionSSL30 {
+	if version != _VersionSSL30 {
 		ciphertextLen := int(ckx.ciphertext[0])<<8 | int(ckx.ciphertext[1])
 		if ciphertextLen != len(ckx.ciphertext)-2 {
 			return nil, errClientKeyExchange
@@ -107,7 +107,7 @@ func md5SHA1Hash(slices [][]byte) []byte {
 // using the given hash function (for >= TLS 1.2) or using a default based on
 // the sigType (for earlier TLS versions).
 func hashForServerKeyExchange(sigType uint8, hashFunc crypto.Hash, version uint16, slices ...[]byte) []byte {
-	if version >= VersionTLS12 {
+	if version >= _VersionTLS12 {
 		h := hashFunc.New()
 		for _, slice := range slices {
 			h.Write(slice)
@@ -153,7 +153,7 @@ NextCandidate:
 	if curveID == 0 {
 		return nil, errors.New("tls: no supported elliptic curves offered")
 	}
-	if _, ok := curveForCurveID(curveID); curveID != X25519 && !ok {
+	if _, ok := curveForCurveID(curveID); curveID != _X25519 && !ok {
 		return nil, errors.New("tls: CurvePreferences includes unsupported curve")
 	}
 
@@ -198,13 +198,13 @@ NextCandidate:
 
 	skx := new(serverKeyExchangeMsg)
 	sigAndHashLen := 0
-	if ka.version >= VersionTLS12 {
+	if ka.version >= _VersionTLS12 {
 		sigAndHashLen = 2
 	}
 	skx.key = make([]byte, len(serverECDHParams)+sigAndHashLen+2+len(sig))
 	copy(skx.key, serverECDHParams)
 	k := skx.key[len(serverECDHParams):]
-	if ka.version >= VersionTLS12 {
+	if ka.version >= _VersionTLS12 {
 		k[0] = byte(signatureAlgorithm >> 8)
 		k[1] = byte(signatureAlgorithm)
 		k = k[2:]
@@ -250,7 +250,7 @@ func (ka *ecdheKeyAgreement) processServerKeyExchange(config *_Config, clientHel
 		return errServerKeyExchange
 	}
 
-	if _, ok := curveForCurveID(curveID); curveID != X25519 && !ok {
+	if _, ok := curveForCurveID(curveID); curveID != _X25519 && !ok {
 		return errors.New("tls: server selected unsupported curve")
 	}
 
@@ -271,16 +271,16 @@ func (ka *ecdheKeyAgreement) processServerKeyExchange(config *_Config, clientHel
 	ka.ckx.ciphertext[0] = byte(len(ourPublicKey))
 	copy(ka.ckx.ciphertext[1:], ourPublicKey)
 
-	var signatureAlgorithm SignatureScheme
-	if ka.version >= VersionTLS12 {
+	var signatureAlgorithm _SignatureScheme
+	if ka.version >= _VersionTLS12 {
 		// handle SignatureAndHashAlgorithm
-		signatureAlgorithm = SignatureScheme(sig[0])<<8 | SignatureScheme(sig[1])
+		signatureAlgorithm = _SignatureScheme(sig[0])<<8 | _SignatureScheme(sig[1])
 		sig = sig[2:]
 		if len(sig) < 2 {
 			return errServerKeyExchange
 		}
 	}
-	_, sigType, hashFunc, err := pickSignatureAlgorithm(cert.PublicKey, []SignatureScheme{signatureAlgorithm}, clientHello.supportedSignatureAlgorithms, ka.version)
+	_, sigType, hashFunc, err := pickSignatureAlgorithm(cert.PublicKey, []_SignatureScheme{signatureAlgorithm}, clientHello.supportedSignatureAlgorithms, ka.version)
 	if err != nil {
 		return err
 	}

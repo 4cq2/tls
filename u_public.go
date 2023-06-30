@@ -160,8 +160,8 @@ type _CertificateRequestMsgTLS13 struct {
 	_Raw                              []byte
 	_OcspStapling                     bool
 	_Scts                             bool
-	_SupportedSignatureAlgorithms     []SignatureScheme
-	_SupportedSignatureAlgorithmsCert []SignatureScheme
+	_SupportedSignatureAlgorithms     []_SignatureScheme
+	_SupportedSignatureAlgorithmsCert []_SignatureScheme
 	_CertificateAuthorities           [][]byte
 }
 
@@ -331,13 +331,13 @@ type _ClientHelloMsg struct {
 	_SupportedPoints              []uint8
 	_TicketSupported              bool
 	_SessionTicket                []uint8
-	_SupportedSignatureAlgorithms []SignatureScheme
+	_SupportedSignatureAlgorithms []_SignatureScheme
 	_SecureRenegotiation          []byte
 	_SecureRenegotiationSupported bool
 	_AlpnProtocols                []string
 
 	// 1.3
-	_SupportedSignatureAlgorithmsCert []SignatureScheme
+	_SupportedSignatureAlgorithmsCert []_SignatureScheme
 	_SupportedVersions                []uint16
 	_Cookie                           []byte
 	_KeyShares                        []_KeyShare

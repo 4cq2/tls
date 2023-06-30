@@ -237,7 +237,7 @@ func (c *_UConn) Write(b []byte) (int, error) {
 	// https://www.imperialviolet.org/2012/01/15/beastfollowup.html
 
 	var m int
-	if len(b) > 1 && c.Conn.vers <= VersionTLS10 {
+	if len(b) > 1 && c.Conn.vers <= _VersionTLS10 {
 		if _, ok := c.Conn.out.cipher.(cipher.BlockMode); ok {
 			n, err := c.Conn.writeRecordLocked(recordTypeApplicationData, b[:1])
 			if err != nil {
@@ -339,7 +339,7 @@ func (c *_UConn) clientHandshake() (err error) {
 	}
 
 	// uTLS: do not create new handshakeState, use existing one
-	if c.Conn.vers == VersionTLS13 {
+	if c.Conn.vers == _VersionTLS13 {
 		hs13 := c._HandshakeState.toPrivate13()
 		hs13.serverHello = serverHello
 		hs13.hello = hello
@@ -504,8 +504,8 @@ func (uconn *_UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions [
 		switch supportedVersionsExtensionsPresent {
 		case 0:
 			// if mandatory for TLS 1.3 extension is not present, just default to 1.2
-			minTLSVers = VersionTLS10
-			maxTLSVers = VersionTLS12
+			minTLSVers = _VersionTLS10
+			maxTLSVers = _VersionTLS12
 		case 1:
 		default:
 			return fmt.Errorf("uconn.Extensions contains %v separate SupportedVersions extensions",
@@ -513,11 +513,11 @@ func (uconn *_UConn) _SetTLSVers(minTLSVers, maxTLSVers uint16, specExtensions [
 		}
 	}
 
-	if minTLSVers < VersionTLS10 || minTLSVers > VersionTLS12 {
+	if minTLSVers < _VersionTLS10 || minTLSVers > _VersionTLS12 {
 		return fmt.Errorf("uTLS does not support 0x%X as min version", minTLSVers)
 	}
 
-	if maxTLSVers < VersionTLS10 || maxTLSVers > VersionTLS13 {
+	if maxTLSVers < _VersionTLS10 || maxTLSVers > _VersionTLS13 {
 		return fmt.Errorf("uTLS does not support 0x%X as max version", maxTLSVers)
 	}
 

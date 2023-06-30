@@ -21,11 +21,11 @@ import (
 )
 
 const (
-	VersionSSL30 = 0x0300
-	VersionTLS10 = 0x0301
-	VersionTLS11 = 0x0302
-	VersionTLS12 = 0x0303
-	VersionTLS13 = 0x0304
+	_VersionSSL30 = 0x0300
+	_VersionTLS10 = 0x0301
+	_VersionTLS11 = 0x0302
+	_VersionTLS12 = 0x0303
+	_VersionTLS13 = 0x0304
 )
 
 const (
@@ -111,7 +111,7 @@ const (
 	_CurveP256 _CurveID = 23
 	_CurveP384 _CurveID = 24
 	_CurveP521 _CurveID = 25
-	X25519     _CurveID = 29
+	_X25519    _CurveID = 29
 )
 
 // TLS 1.3 Key Share. See RFC 8446, Section 4.2.8.
@@ -162,7 +162,7 @@ const (
 // the code advertises as supported in a TLS 1.2+ ClientHello and in a TLS 1.2+
 // CertificateRequest. The two fields are merged to match with TLS 1.3.
 // Note that in TLS 1.2, the ECDSA algorithms are not constrained to P-256, etc.
-var supportedSignatureAlgorithms = []SignatureScheme{
+var supportedSignatureAlgorithms = []_SignatureScheme{
 	_PSSWithSHA256,
 	_PSSWithSHA384,
 	_PSSWithSHA512,
@@ -199,17 +199,17 @@ type _ClientAuthType int
 
 const (
 	_NoClientCert _ClientAuthType = iota
-	RequestClientCert
-	RequireAnyClientCert
-	VerifyClientCertIfGiven
-	RequireAndVerifyClientCert
+	_RequestClientCert
+	_RequireAnyClientCert
+	_VerifyClientCertIfGiven
+	_RequireAndVerifyClientCert
 )
 
 // requiresClientCert reports whether the ClientAuthType requires a client
 // certificate to be provided.
 func requiresClientCert(c _ClientAuthType) bool {
 	switch c {
-	case RequireAnyClientCert, RequireAndVerifyClientCert:
+	case _RequireAnyClientCert, _RequireAndVerifyClientCert:
 		return true
 	default:
 		return false
@@ -251,29 +251,29 @@ type _ClientSessionCache interface {
 	_Put(sessionKey string, cs *_ClientSessionState)
 }
 
-// SignatureScheme identifies a signature algorithm supported by TLS. See
+// _SignatureScheme identifies a signature algorithm supported by TLS. See
 // RFC 8446, Section 4.2.3.
-type SignatureScheme uint16
+type _SignatureScheme uint16
 
 const (
 	// RSASSA-PKCS1-v1_5 algorithms.
-	_PKCS1WithSHA256 SignatureScheme = 0x0401
-	_PKCS1WithSHA384 SignatureScheme = 0x0501
-	_PKCS1WithSHA512 SignatureScheme = 0x0601
+	_PKCS1WithSHA256 _SignatureScheme = 0x0401
+	_PKCS1WithSHA384 _SignatureScheme = 0x0501
+	_PKCS1WithSHA512 _SignatureScheme = 0x0601
 
 	// RSASSA-PSS algorithms with public key OID rsaEncryption.
-	_PSSWithSHA256 SignatureScheme = 0x0804
-	_PSSWithSHA384 SignatureScheme = 0x0805
-	_PSSWithSHA512 SignatureScheme = 0x0806
+	_PSSWithSHA256 _SignatureScheme = 0x0804
+	_PSSWithSHA384 _SignatureScheme = 0x0805
+	_PSSWithSHA512 _SignatureScheme = 0x0806
 
 	// ECDSA algorithms. Only constrained to a specific curve in TLS 1.3.
-	_ECDSAWithP256AndSHA256 SignatureScheme = 0x0403
-	_ECDSAWithP384AndSHA384 SignatureScheme = 0x0503
-	_ECDSAWithP521AndSHA512 SignatureScheme = 0x0603
+	_ECDSAWithP256AndSHA256 _SignatureScheme = 0x0403
+	_ECDSAWithP384AndSHA384 _SignatureScheme = 0x0503
+	_ECDSAWithP521AndSHA512 _SignatureScheme = 0x0603
 
 	// Legacy signature and hash algorithms for TLS 1.2.
-	_PKCS1WithSHA1 SignatureScheme = 0x0201
-	_ECDSAWithSHA1 SignatureScheme = 0x0203
+	_PKCS1WithSHA1 _SignatureScheme = 0x0201
+	_ECDSAWithSHA1 _SignatureScheme = 0x0203
 )
 
 // _ClientHelloInfo contains information from a ClientHello message in order to
@@ -301,7 +301,7 @@ type _ClientHelloInfo struct {
 	// _SignatureSchemes lists the signature and hash schemes that the client
 	// is willing to verify. _SignatureSchemes is set only if the Signature
 	// Algorithms Extension is being used (see RFC 5246, Section 7.4.1.4.1).
-	_SignatureSchemes []SignatureScheme
+	_SignatureSchemes []_SignatureScheme
 
 	// _SupportedProtos lists the application protocols supported by the client.
 	// _SupportedProtos is set only if the Application-Layer Protocol
@@ -335,10 +335,10 @@ type _CertificateRequestInfo struct {
 
 	// _SignatureSchemes lists the signature schemes that the server is
 	// willing to verify.
-	_SignatureSchemes []SignatureScheme
+	_SignatureSchemes []_SignatureScheme
 }
 
-// RenegotiationSupport enumerates the different levels of support for TLS
+// _RenegotiationSupport enumerates the different levels of support for TLS
 // renegotiation. TLS renegotiation is the act of performing subsequent
 // handshakes on a connection after the first. This significantly complicates
 // the state machine and has been the source of numerous, subtle security
@@ -352,11 +352,11 @@ type _CertificateRequestInfo struct {
 // HTTPS.
 //
 // Renegotiation is not defined in TLS 1.3.
-type RenegotiationSupport int
+type _RenegotiationSupport int
 
 const (
 	// RenegotiateNever disables renegotiation.
-	RenegotiateNever RenegotiationSupport = iota
+	RenegotiateNever _RenegotiationSupport = iota
 
 	// RenegotiateOnceAsClient allows a remote server to request
 	// renegotiation once per connection.
@@ -541,7 +541,7 @@ type _Config struct {
 
 	// _Renegotiation controls what types of renegotiation are supported.
 	// The default, none, is correct for the vast majority of applications.
-	_Renegotiation RenegotiationSupport
+	_Renegotiation _RenegotiationSupport
 
 	// _KeyLogWriter optionally specifies a destination for TLS master secrets
 	// in NSS key log format that can be used to allow external programs
@@ -658,11 +658,11 @@ func (c *_Config) cipherSuites() []uint16 {
 }
 
 var supportedVersions = []uint16{
-	VersionTLS13,
-	VersionTLS12,
-	VersionTLS11,
-	VersionTLS10,
-	VersionSSL30,
+	_VersionTLS13,
+	_VersionTLS12,
+	_VersionTLS11,
+	_VersionTLS10,
+	_VersionSSL30,
 }
 
 func (c *_Config) supportedVersions(isClient bool) []uint16 {
@@ -675,11 +675,11 @@ func (c *_Config) supportedVersions(isClient bool) []uint16 {
 			continue
 		}
 		// TLS 1.0 is the minimum version supported as a client.
-		if isClient && v < VersionTLS10 {
+		if isClient && v < _VersionTLS10 {
 			continue
 		}
 		// TLS 1.3 is opt-out in Go 1.13.
-		if v == VersionTLS13 && !isTLS13Supported() {
+		if v == _VersionTLS13 && !isTLS13Supported() {
 			continue
 		}
 		versions = append(versions, v)
@@ -747,7 +747,7 @@ func supportedVersionsFromMax(maxVersion uint16) []uint16 {
 	return versions
 }
 
-var defaultCurvePreferences = []_CurveID{X25519, _CurveP256, _CurveP384, _CurveP521}
+var defaultCurvePreferences = []_CurveID{_X25519, _CurveP256, _CurveP384, _CurveP521}
 
 func (c *_Config) curvePreferences() []_CurveID {
 	if c == nil || len(c._CurvePreferences) == 0 {
@@ -899,17 +899,17 @@ func initDefaultCipherSuites() {
 	// Without AES-GCM hardware, we put the ChaCha20-Poly1305
 	// cipher suites first.
 	topCipherSuites := []uint16{
-		TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
-		TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+		_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+		_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 		_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 		_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 		_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 		_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 	}
 	varDefaultCipherSuitesTLS13 = []uint16{
-		TLS_CHACHA20_POLY1305_SHA256,
-		TLS_AES_128_GCM_SHA256,
-		TLS_AES_256_GCM_SHA384,
+		_TLS_CHACHA20_POLY1305_SHA256,
+		_TLS_AES_128_GCM_SHA256,
+		_TLS_AES_256_GCM_SHA384,
 	}
 
 	varDefaultCipherSuites = make([]uint16, 0, len(cipherSuites))
@@ -933,7 +933,7 @@ func unexpectedMessageError(wanted, got interface{}) error {
 	return fmt.Errorf("tls: received unexpected handshake message of type %T when waiting for %T", got, wanted)
 }
 
-func isSupportedSignatureAlgorithm(sigAlg SignatureScheme, supportedSignatureAlgorithms []SignatureScheme) bool {
+func isSupportedSignatureAlgorithm(sigAlg _SignatureScheme, supportedSignatureAlgorithms []_SignatureScheme) bool {
 	for _, s := range supportedSignatureAlgorithms {
 		if s == sigAlg {
 			return true
@@ -944,7 +944,7 @@ func isSupportedSignatureAlgorithm(sigAlg SignatureScheme, supportedSignatureAlg
 
 // signatureFromSignatureScheme maps a signature algorithm to the underlying
 // signature method (without hash function).
-func signatureFromSignatureScheme(signatureAlgorithm SignatureScheme) uint8 {
+func signatureFromSignatureScheme(signatureAlgorithm _SignatureScheme) uint8 {
 	switch signatureAlgorithm {
 	case _PKCS1WithSHA1, _PKCS1WithSHA256, _PKCS1WithSHA384, _PKCS1WithSHA512:
 		return signaturePKCS1v15

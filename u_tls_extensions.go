@@ -163,7 +163,7 @@ func (e *SupportedPointsExtension) Read(b []byte) (int, error) {
 }
 
 type SignatureAlgorithmsExtension struct {
-	_SupportedSignatureAlgorithms []SignatureScheme
+	_SupportedSignatureAlgorithms []_SignatureScheme
 }
 
 func (e *SignatureAlgorithmsExtension) writeToUConn(uc *_UConn) error {
@@ -196,7 +196,7 @@ func (e *SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
 type RenegotiationInfoExtension struct {
 	// _Renegotiation field limits how many times client will perform renegotiation: no limit, once, or never.
 	// The extension still will be sent, even if _Renegotiation is set to RenegotiateNever.
-	_Renegotiation RenegotiationSupport
+	_Renegotiation _RenegotiationSupport
 }
 
 func (e *RenegotiationInfoExtension) writeToUConn(uc *_UConn) error {

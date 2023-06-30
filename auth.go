@@ -23,15 +23,15 @@ import (
 //
 // The returned SignatureScheme codepoint is only meaningful for TLS 1.2,
 // previous TLS versions have a fixed hash function.
-func pickSignatureAlgorithm(pubkey crypto.PublicKey, peerSigAlgs, ourSigAlgs []SignatureScheme, tlsVersion uint16) (sigAlg SignatureScheme, sigType uint8, hashFunc crypto.Hash, err error) {
-	if tlsVersion < VersionTLS12 || len(peerSigAlgs) == 0 {
+func pickSignatureAlgorithm(pubkey crypto.PublicKey, peerSigAlgs, ourSigAlgs []_SignatureScheme, tlsVersion uint16) (sigAlg _SignatureScheme, sigType uint8, hashFunc crypto.Hash, err error) {
+	if tlsVersion < _VersionTLS12 || len(peerSigAlgs) == 0 {
 		// For TLS 1.1 and before, the signature algorithm could not be
 		// negotiated and the hash is fixed based on the signature type. For TLS
 		// 1.2, if the client didn't send signature_algorithms extension then we
 		// can assume that it supports SHA1. See RFC 5246, Section 7.4.1.4.1.
 		switch pubkey.(type) {
 		case *rsa.PublicKey:
-			if tlsVersion < VersionTLS12 {
+			if tlsVersion < _VersionTLS12 {
 				return 0, signaturePKCS1v15, crypto.MD5SHA1, nil
 			} else {
 				return _PKCS1WithSHA1, signaturePKCS1v15, crypto.SHA1, nil
@@ -137,7 +137,7 @@ func writeSignedMessage(sigHash io.Writer, context string, transcript hash.Hash)
 // for a given certificate, based on the public key and the protocol version. It
 // does not support the crypto.Decrypter interface, so shouldn't be used on the
 // server side in TLS 1.2 and earlier.
-func signatureSchemesForCertificate(version uint16, cert *_Certificate) []SignatureScheme {
+func signatureSchemesForCertificate(version uint16, cert *_Certificate) []_SignatureScheme {
 	priv, ok := cert._PrivateKey.(crypto.Signer)
 	if !ok {
 		return nil
@@ -145,10 +145,10 @@ func signatureSchemesForCertificate(version uint16, cert *_Certificate) []Signat
 
 	switch pub := priv.Public().(type) {
 	case *ecdsa.PublicKey:
-		if version != VersionTLS13 {
+		if version != _VersionTLS13 {
 			// In TLS 1.2 and earlier, ECDSA algorithms are not
 			// constrained to a single curve.
-			return []SignatureScheme{
+			return []_SignatureScheme{
 				_ECDSAWithP256AndSHA256,
 				_ECDSAWithP384AndSHA384,
 				_ECDSAWithP521AndSHA512,
@@ -157,17 +157,17 @@ func signatureSchemesForCertificate(version uint16, cert *_Certificate) []Signat
 		}
 		switch pub.Curve {
 		case elliptic.P256():
-			return []SignatureScheme{_ECDSAWithP256AndSHA256}
+			return []_SignatureScheme{_ECDSAWithP256AndSHA256}
 		case elliptic.P384():
-			return []SignatureScheme{_ECDSAWithP384AndSHA384}
+			return []_SignatureScheme{_ECDSAWithP384AndSHA384}
 		case elliptic.P521():
-			return []SignatureScheme{_ECDSAWithP521AndSHA512}
+			return []_SignatureScheme{_ECDSAWithP521AndSHA512}
 		default:
 			return nil
 		}
 	case *rsa.PublicKey:
-		if version != VersionTLS13 {
-			return []SignatureScheme{
+		if version != _VersionTLS13 {
+			return []_SignatureScheme{
 				_PSSWithSHA256,
 				_PSSWithSHA384,
 				_PSSWithSHA512,
@@ -178,7 +178,7 @@ func signatureSchemesForCertificate(version uint16, cert *_Certificate) []Signat
 			}
 		}
 		// RSA keys with RSA-PSS OID are not supported by crypto/x509.
-		return []SignatureScheme{
+		return []_SignatureScheme{
 			_PSSWithSHA256,
 			_PSSWithSHA384,
 			_PSSWithSHA512,

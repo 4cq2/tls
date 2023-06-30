@@ -119,11 +119,11 @@ var serverFinishedLabel = []byte("server finished")
 
 func prfAndHashForVersion(version uint16, suite *cipherSuite) (func(result, secret, label, seed []byte), crypto.Hash) {
 	switch version {
-	case VersionSSL30:
+	case _VersionSSL30:
 		return prf30, crypto.Hash(0)
-	case VersionTLS10, VersionTLS11:
+	case _VersionTLS10, _VersionTLS11:
 		return prf10, crypto.Hash(0)
-	case VersionTLS12:
+	case _VersionTLS12:
 		if suite.flags&suiteSHA384 != 0 {
 			return prf12(sha512.New384), crypto.SHA384
 		}
@@ -177,7 +177,7 @@ func keysFromMasterSecret(version uint16, suite *cipherSuite, masterSecret, clie
 
 // hashFromSignatureScheme returns the corresponding crypto.Hash for a given
 // hash from a TLS SignatureScheme.
-func hashFromSignatureScheme(signatureAlgorithm SignatureScheme) (crypto.Hash, error) {
+func hashFromSignatureScheme(signatureAlgorithm _SignatureScheme) (crypto.Hash, error) {
 	switch signatureAlgorithm {
 	case _PKCS1WithSHA1, _ECDSAWithSHA1:
 		return crypto.SHA1, nil
@@ -194,7 +194,7 @@ func hashFromSignatureScheme(signatureAlgorithm SignatureScheme) (crypto.Hash, e
 
 func newFinishedHash(version uint16, cipherSuite *cipherSuite) finishedHash {
 	var buffer []byte
-	if version == VersionSSL30 || version >= VersionTLS12 {
+	if version == _VersionSSL30 || version >= _VersionTLS12 {
 		buffer = []byte{}
 	}
 
@@ -227,7 +227,7 @@ func (h *finishedHash) _Write(msg []byte) (n int, err error) {
 	h.client.Write(msg)
 	h.server.Write(msg)
 
-	if h.version < VersionTLS12 {
+	if h.version < _VersionTLS12 {
 		h.clientMD5.Write(msg)
 		h.serverMD5.Write(msg)
 	}
@@ -240,7 +240,7 @@ func (h *finishedHash) _Write(msg []byte) (n int, err error) {
 }
 
 func (h finishedHash) _Sum() []byte {
-	if h.version >= VersionTLS12 {
+	if h.version >= _VersionTLS12 {
 		return h.client.Sum(nil)
 	}
 
@@ -287,7 +287,7 @@ var ssl3ServerFinishedMagic = [4]byte{0x53, 0x52, 0x56, 0x52}
 // clientSum returns the contents of the verify_data member of a client's
 // Finished message.
 func (h finishedHash) clientSum(masterSecret []byte) []byte {
-	if h.version == VersionSSL30 {
+	if h.version == _VersionSSL30 {
 		return finishedSum30(h.clientMD5, h.client, masterSecret, ssl3ClientFinishedMagic[:])
 	}
 
@@ -299,7 +299,7 @@ func (h finishedHash) clientSum(masterSecret []byte) []byte {
 // serverSum returns the contents of the verify_data member of a server's
 // Finished message.
 func (h finishedHash) serverSum(masterSecret []byte) []byte {
-	if h.version == VersionSSL30 {
+	if h.version == _VersionSSL30 {
 		return finishedSum30(h.serverMD5, h.server, masterSecret, ssl3ServerFinishedMagic[:])
 	}
 
@@ -311,11 +311,11 @@ func (h finishedHash) serverSum(masterSecret []byte) []byte {
 // hashForClientCertificate returns a digest over the handshake messages so far,
 // suitable for signing by a TLS client certificate.
 func (h finishedHash) hashForClientCertificate(sigType uint8, hashAlg crypto.Hash, masterSecret []byte) ([]byte, error) {
-	if (h.version == VersionSSL30 || h.version >= VersionTLS12) && h.buffer == nil {
+	if (h.version == _VersionSSL30 || h.version >= _VersionTLS12) && h.buffer == nil {
 		panic("a handshake hash for a client-certificate was requested after discarding the handshake buffer")
 	}
 
-	if h.version == VersionSSL30 {
+	if h.version == _VersionSSL30 {
 		if sigType != signaturePKCS1v15 {
 			return nil, errors.New("tls: unsupported signature type for client certificate")
 		}
@@ -326,7 +326,7 @@ func (h finishedHash) hashForClientCertificate(sigType uint8, hashAlg crypto.Has
 		sha1Hash.Write(h.buffer)
 		return finishedSum30(md5Hash, sha1Hash, masterSecret, nil), nil
 	}
-	if h.version >= VersionTLS12 {
+	if h.version >= _VersionTLS12 {
 		hash := hashAlg.New()
 		hash.Write(h.buffer)
 		return hash.Sum(nil), nil

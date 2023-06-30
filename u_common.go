@@ -37,10 +37,10 @@ var _Android_API_26 = _ClientHelloSpec{
 	_CipherSuites: []uint16{
 		_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 		_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-		TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+		_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 		_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 		_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-		TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+		_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 		_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
 		_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
 		_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
@@ -56,7 +56,7 @@ var _Android_API_26 = _ClientHelloSpec{
 		&UtlsExtendedMasterSecretExtension{},
 		&SessionTicketExtension{},
 		&SignatureAlgorithmsExtension{
-			_SupportedSignatureAlgorithms: []SignatureScheme{
+			_SupportedSignatureAlgorithms: []_SignatureScheme{
 				_ECDSAWithP256AndSHA256,
 			},
 		},
@@ -69,7 +69,7 @@ var _Android_API_26 = _ClientHelloSpec{
 		},
 		&SupportedCurvesExtension{
 			_Curves: []_CurveID{
-				X25519,
+				_X25519,
 				_CurveP256,
 				_CurveP384,
 			},
