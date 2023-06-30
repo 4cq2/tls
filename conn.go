@@ -1093,7 +1093,7 @@ func (c *Conn) Write(b []byte) (int, error) {
 		}
 	}
 
-	if err := c.Handshake(); err != nil {
+	if err := c._Handshake(); err != nil {
 		return 0, err
 	}
 
@@ -1241,7 +1241,7 @@ func (c *Conn) handleKeyUpdate(keyUpdate *keyUpdateMsg) error {
 // Read can be made to time out and return a net.Error with Timeout() == true
 // after a fixed time limit; see SetDeadline and SetReadDeadline.
 func (c *Conn) Read(b []byte) (int, error) {
-	if err := c.Handshake(); err != nil {
+	if err := c._Handshake(); err != nil {
 		return 0, err
 	}
 	if len(b) == 0 {
@@ -1318,19 +1318,6 @@ func (c *Conn) Close() error {
 	return alertErr
 }
 
-var errEarlyCloseWrite = errors.New("tls: CloseWrite called before handshake complete")
-
-// CloseWrite shuts down the writing side of the connection. It should only be
-// called once the handshake has completed and does not call CloseWrite on the
-// underlying connection. Most callers should just use Close.
-func (c *Conn) CloseWrite() error {
-	if !c.handshakeComplete() {
-		return errEarlyCloseWrite
-	}
-
-	return c.closeNotify()
-}
-
 func (c *Conn) closeNotify() error {
 	c.out.Lock()
 	defer c.out.Unlock()
@@ -1342,11 +1329,11 @@ func (c *Conn) closeNotify() error {
 	return c.closeNotifyErr
 }
 
-// Handshake runs the client or server handshake
+// _Handshake runs the client or server handshake
 // protocol if it has not yet been run.
-// Most uses of this package need not call Handshake
+// Most uses of this package need not call _Handshake
 // explicitly: the first Read or Write will call it automatically.
-func (c *Conn) Handshake() error {
+func (c *Conn) _Handshake() error {
 	c.handshakeMutex.Lock()
 	defer c.handshakeMutex.Unlock()
 
@@ -1378,69 +1365,6 @@ func (c *Conn) Handshake() error {
 	}
 
 	return c.handshakeErr
-}
-
-// ConnectionState returns basic TLS details about the connection.
-func (c *Conn) ConnectionState() ConnectionState {
-	c.handshakeMutex.Lock()
-	defer c.handshakeMutex.Unlock()
-
-	var state ConnectionState
-	state.HandshakeComplete = c.handshakeComplete()
-	state.ServerName = c.serverName
-
-	if state.HandshakeComplete {
-		state.Version = c.vers
-		state.NegotiatedProtocol = c.clientProtocol
-		state.DidResume = c.didResume
-		state.NegotiatedProtocolIsMutual = !c.clientProtocolFallback
-		state.CipherSuite = c.cipherSuite
-		state.PeerCertificates = c.peerCertificates
-		state.VerifiedChains = c.verifiedChains
-		state.SignedCertificateTimestamps = c.scts
-		state.OCSPResponse = c.ocspResponse
-		if !c.didResume && c.vers != VersionTLS13 {
-			if c.clientFinishedIsFirst {
-				state.TLSUnique = c.clientFinished[:]
-			} else {
-				state.TLSUnique = c.serverFinished[:]
-			}
-		}
-		if c.config._Renegotiation != RenegotiateNever {
-			state.ekm = noExportedKeyingMaterial
-		} else {
-			state.ekm = c.ekm
-		}
-	}
-
-	return state
-}
-
-// OCSPResponse returns the stapled OCSP response from the TLS server, if
-// any. (Only valid for client connections.)
-func (c *Conn) OCSPResponse() []byte {
-	c.handshakeMutex.Lock()
-	defer c.handshakeMutex.Unlock()
-
-	return c.ocspResponse
-}
-
-// VerifyHostname checks that the peer certificate chain is valid for
-// connecting to host. If so, it returns nil; if not, it returns an error
-// describing the problem.
-func (c *Conn) VerifyHostname(host string) error {
-	c.handshakeMutex.Lock()
-	defer c.handshakeMutex.Unlock()
-	if !c.isClient {
-		return errors.New("tls: VerifyHostname called on TLS server connection")
-	}
-	if !c.handshakeComplete() {
-		return errors.New("tls: handshake has not yet been performed")
-	}
-	if len(c.verifiedChains) == 0 {
-		return errors.New("tls: handshake did not verify certificate chain")
-	}
-	return c.peerCertificates[0].VerifyHostname(host)
 }
 
 func (c *Conn) handshakeComplete() bool {

@@ -345,13 +345,6 @@ func (h *finishedHash) discardHandshakeBuffer() {
 	h.buffer = nil
 }
 
-// noExportedKeyingMaterial is used as a value of
-// ConnectionState.ekm when renegotation is enabled and thus
-// we wish to fail all key-material export requests.
-func noExportedKeyingMaterial(label string, context []byte, length int) ([]byte, error) {
-	return nil, errors.New("crypto/tls: ExportKeyingMaterial is unavailable when renegotiation is enabled")
-}
-
 // ekmFromMasterSecret generates exported keying material as defined in RFC 5705.
 func ekmFromMasterSecret(version uint16, suite *cipherSuite, masterSecret, clientRandom, serverRandom []byte) func(string, []byte, int) ([]byte, error) {
 	return func(label string, context []byte, length int) ([]byte, error) {

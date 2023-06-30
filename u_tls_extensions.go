@@ -235,17 +235,17 @@ func (e *RenegotiationInfoExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-type ALPNExtension struct {
+type _ALPNExtension struct {
 	_AlpnProtocols []string
 }
 
-func (e *ALPNExtension) writeToUConn(uc *UConn) error {
+func (e *_ALPNExtension) writeToUConn(uc *UConn) error {
 	uc.config._NextProtos = e._AlpnProtocols
 	uc.HandshakeState._Hello._AlpnProtocols = e._AlpnProtocols
 	return nil
 }
 
-func (e *ALPNExtension) Len() int {
+func (e *_ALPNExtension) Len() int {
 	bLen := 2 + 2 + 2
 	for _, s := range e._AlpnProtocols {
 		bLen += 1 + len(s)
@@ -253,7 +253,7 @@ func (e *ALPNExtension) Len() int {
 	return bLen
 }
 
-func (e *ALPNExtension) Read(b []byte) (int, error) {
+func (e *_ALPNExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -636,29 +636,29 @@ func (e *SupportedVersionsExtension) Read(b []byte) (int, error) {
 }
 
 // MUST NOT be part of initial ClientHello
-type CookieExtension struct {
-	Cookie []byte
+type _CookieExtension struct {
+	_Cookie []byte
 }
 
-func (e *CookieExtension) writeToUConn(uc *UConn) error {
+func (e *_CookieExtension) writeToUConn(uc *UConn) error {
 	return nil
 }
 
-func (e *CookieExtension) Len() int {
-	return 4 + len(e.Cookie)
+func (e *_CookieExtension) Len() int {
+	return 4 + len(e._Cookie)
 }
 
-func (e *CookieExtension) Read(b []byte) (int, error) {
+func (e *_CookieExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
 
 	b[0] = byte(extensionCookie >> 8)
 	b[1] = byte(extensionCookie)
-	b[2] = byte(len(e.Cookie) >> 8)
-	b[3] = byte(len(e.Cookie))
-	if len(e.Cookie) > 0 {
-		copy(b[4:], e.Cookie)
+	b[2] = byte(len(e._Cookie) >> 8)
+	b[3] = byte(len(e._Cookie))
+	if len(e._Cookie) > 0 {
+		copy(b[4:], e._Cookie)
 	}
 	return e.Len(), io.EOF
 }

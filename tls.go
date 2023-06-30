@@ -148,10 +148,10 @@ func DialWithDialer(dialer *net.Dialer, network, addr string, config *_Config) (
 	conn := _Client(rawConn, config)
 
 	if timeout == 0 {
-		err = conn.Handshake()
+		err = conn._Handshake()
 	} else {
 		go func() {
-			errChannel <- conn.Handshake()
+			errChannel <- conn._Handshake()
 		}()
 
 		err = <-errChannel

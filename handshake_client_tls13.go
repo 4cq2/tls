@@ -283,8 +283,8 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 				// serverHello specified a cookie, let's echo it
 				cookieFound := false
 				for _, ext := range hs.uconn.Extensions {
-					if ks, ok := ext.(*CookieExtension); ok {
-						ks.Cookie = hs.serverHello.cookie
+					if ks, ok := ext.(*_CookieExtension); ok {
+						ks._Cookie = hs.serverHello.cookie
 						cookieFound = true
 					}
 				}
@@ -303,7 +303,7 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 							cookieIndex, len(hs.uconn.Extensions))
 					}
 					hs.uconn.Extensions = append(hs.uconn.Extensions[:cookieIndex],
-						append([]TLSExtension{&CookieExtension{Cookie: hs.serverHello.cookie}},
+						append([]TLSExtension{&_CookieExtension{_Cookie: hs.serverHello.cookie}},
 							hs.uconn.Extensions[cookieIndex:]...)...)
 				}
 			}

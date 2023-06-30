@@ -194,40 +194,6 @@ const (
 	downgradeCanaryTLS11 = "DOWNGRD\x00"
 )
 
-// ConnectionState records basic TLS details about the connection.
-type ConnectionState struct {
-	Version                     uint16                // TLS version used by the connection (e.g. VersionTLS12)
-	HandshakeComplete           bool                  // TLS handshake is complete
-	DidResume                   bool                  // connection resumes a previous TLS connection
-	CipherSuite                 uint16                // cipher suite in use (TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, ...)
-	NegotiatedProtocol          string                // negotiated next protocol (not guaranteed to be from Config.NextProtos)
-	NegotiatedProtocolIsMutual  bool                  // negotiated protocol was advertised by server (client side only)
-	ServerName                  string                // server name requested by client, if any (server side only)
-	PeerCertificates            []*x509.Certificate   // certificate chain presented by remote peer
-	VerifiedChains              [][]*x509.Certificate // verified chains built from PeerCertificates
-	SignedCertificateTimestamps [][]byte              // SCTs from the peer, if any
-	OCSPResponse                []byte                // stapled OCSP response from peer, if any
-
-	// ekm is a closure exposed via ExportKeyingMaterial.
-	ekm func(label string, context []byte, length int) ([]byte, error)
-
-	// TLSUnique contains the "tls-unique" channel binding value (see RFC
-	// 5929, section 3). For resumed sessions this value will be nil
-	// because resumption does not include enough context (see
-	// https://mitls.org/pages/attacks/3SHAKE#channelbindings). This will
-	// change in future versions of Go once the TLS master-secret fix has
-	// been standardized and implemented. It is not defined in TLS 1.3.
-	TLSUnique []byte
-}
-
-// ExportKeyingMaterial returns length bytes of exported key material in a new
-// slice as defined in RFC 5705. If context is nil, it is not used as part of
-// the seed. If the connection was set to allow renegotiation via
-// Config.Renegotiation, this function will return an error.
-func (cs *ConnectionState) ExportKeyingMaterial(label string, context []byte, length int) ([]byte, error) {
-	return cs.ekm(label, context, length)
-}
-
 // _ClientAuthType declares the policy the server will follow for
 // TLS Client Authentication.
 type _ClientAuthType int
