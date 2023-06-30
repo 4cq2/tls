@@ -10,6 +10,46 @@ import (
 	"testing"
 )
 
+func Test_Android(t *testing.T) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, err := user_info(home + "/2a/gmail.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := url.Values{
+		"Email":              {user[0]},
+		"Passwd":             {user[1]},
+		"client_sig":         {""},
+		"droidguard_results": {"-"},
+	}.Encode()
+	req, err := http.NewRequest(
+		"POST", "https://android.googleapis.com/auth",
+		strings.NewReader(body),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	tr := Transport{_Spec: Android_API_26}
+	res, err := tr._RoundTrip(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := io.ReadAll(res.Body); err != nil {
+		t.Fatal(err)
+	}
+	if err := res.Body.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := tr._Conn.Conn.Close(); err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(res.Status)
+}
+
 func Test_Builder(t *testing.T) {
 	{
 		b := builder("hello")
@@ -121,46 +161,6 @@ func Test_Sanity(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := res.Body.Close(); err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(res.Status)
-}
-
-func Test_Android(t *testing.T) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		t.Fatal(err)
-	}
-	user, err := user_info(home + "/2a/gmail.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-	body := url.Values{
-		"Email":              {user[0]},
-		"Passwd":             {user[1]},
-		"client_sig":         {""},
-		"droidguard_results": {"-"},
-	}.Encode()
-	req, err := http.NewRequest(
-		"POST", "https://android.googleapis.com/auth",
-		strings.NewReader(body),
-	)
-	if err != nil {
-		t.Fatal(err)
-	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	tr := Transport{_Spec: Android_API_26}
-	res, err := tr._RoundTrip(req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := io.ReadAll(res.Body); err != nil {
-		t.Fatal(err)
-	}
-	if err := res.Body.Close(); err != nil {
-		t.Fatal(err)
-	}
-	if err := tr._Conn.Close(); err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(res.Status)

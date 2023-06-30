@@ -563,7 +563,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 		return err
 	}
 
-	privateHello, ecdheParams, err := uconn.makeClientHello()
+	privateHello, ecdheParams, err := uconn.Conn.makeClientHello()
 	if err != nil {
 		return err
 	}
@@ -575,7 +575,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 	switch len(hello._Random) {
 	case 0:
 		hello._Random = make([]byte, 32)
-		_, err := io.ReadFull(uconn.config.rand(), hello._Random)
+		_, err := io.ReadFull(uconn.Conn.config.rand(), hello._Random)
 		if err != nil {
 			return errors.New("tls: short read from Rand: " + err.Error())
 		}
@@ -595,7 +595,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 	// Currently, GREASE is assumed to come from BoringSSL
 	grease_bytes := make([]byte, 2*ssl_grease_last_index)
 	grease_extensions_seen := 0
-	_, err = io.ReadFull(uconn.config.rand(), grease_bytes)
+	_, err = io.ReadFull(uconn.Conn.config.rand(), grease_bytes)
 	if err != nil {
 		return errors.New("tls: short read from Rand: " + err.Error())
 	}
@@ -625,7 +625,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 		switch ext := e.(type) {
 		case *SNIExtension:
 			if ext.ServerName == "" {
-				ext.ServerName = uconn.config._ServerName
+				ext.ServerName = uconn.Conn.config._ServerName
 			}
 		case *UtlsGREASEExtension:
 			switch grease_extensions_seen {
@@ -639,9 +639,9 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 			}
 			grease_extensions_seen += 1
 		case *SessionTicketExtension:
-			if session == nil && uconn.config._ClientSessionCache != nil {
-				cacheKey := clientSessionCacheKey(uconn.RemoteAddr(), uconn.config)
-				session, _ = uconn.config._ClientSessionCache.Get(cacheKey)
+			if session == nil && uconn.Conn.config._ClientSessionCache != nil {
+				cacheKey := clientSessionCacheKey(uconn.Conn.RemoteAddr(), uconn.Conn.config)
+				session, _ = uconn.Conn.config._ClientSessionCache.Get(cacheKey)
 				// TODO: use uconn.loadSession(hello.getPrivateObj()) to support TLS 1.3 PSK-style resumption
 			}
 			err := uconn._SetSessionState(session)
@@ -666,7 +666,7 @@ func (uconn *UConn) ApplyPreset(p *_ClientHelloSpec) error {
 					continue
 				}
 
-				ecdheParams, err := generateECDHEParameters(uconn.config.rand(), curveID)
+				ecdheParams, err := generateECDHEParameters(uconn.Conn.config.rand(), curveID)
 				if err != nil {
 					return fmt.Errorf("unsupported Curve in KeyShareExtension: %v."+
 						"To mimic it, fill the Data(key) field manually.", curveID)
@@ -757,7 +757,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 
 	p._CipherSuites = removeRandomCiphers(r, shuffledSuites, 0.4)
 
-	sni := SNIExtension{uconn.config._ServerName}
+	sni := SNIExtension{uconn.Conn.config._ServerName}
 	sessionTicket := SessionTicketExtension{Session: uconn._HandshakeState._Session}
 
 	sigAndHashAlgos := []SignatureScheme{
@@ -818,11 +818,11 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	}
 
 	if WithALPN {
-		if len(uconn.config._NextProtos) == 0 {
+		if len(uconn.Conn.config._NextProtos) == 0 {
 			// if user didn't specify alpn yet, choose something popular
-			uconn.config._NextProtos = []string{"h2", "http/1.1"}
+			uconn.Conn.config._NextProtos = []string{"h2", "http/1.1"}
 		}
-		alpn := _ALPNExtension{_AlpnProtocols: uconn.config._NextProtos}
+		alpn := _ALPNExtension{_AlpnProtocols: uconn.Conn.config._NextProtos}
 		p._Extensions = append(p._Extensions, &alpn)
 	}
 
