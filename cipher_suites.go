@@ -159,12 +159,12 @@ func macSHA256(version uint16, key []byte) macFunction {
 }
 
 type macFunction interface {
-	// Size returns the length of the MAC.
-	Size() int
-	// MAC appends the MAC of (seq, header, data) to out. The extra data is fed
-	// into the MAC after obtaining the result to normalize timing. The result
-	// is only valid until the next invocation of MAC as the buffer is reused.
-	MAC(seq, header, data, extra []byte) []byte
+	// _Size returns the length of the MAC.
+	_Size() int
+	// _MAC appends the _MAC of (seq, header, data) to out. The extra data is fed
+	// into the _MAC after obtaining the result to normalize timing. The result
+	// is only valid until the next invocation of _MAC as the buffer is reused.
+	_MAC(seq, header, data, extra []byte) []byte
 }
 
 type aead interface {
@@ -296,7 +296,7 @@ type ssl30MAC struct {
 	buf []byte
 }
 
-func (s ssl30MAC) Size() int {
+func (s ssl30MAC) _Size() int {
 	return s.h.Size()
 }
 
@@ -304,9 +304,9 @@ var ssl30Pad1 = [48]byte{0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0
 
 var ssl30Pad2 = [48]byte{0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c}
 
-// MAC does not offer constant timing guarantees for SSL v3.0, since it's deemed
+// _MAC does not offer constant timing guarantees for SSL v3.0, since it's deemed
 // useless considering the similar, protocol-level POODLE vulnerability.
-func (s ssl30MAC) MAC(seq, header, data, extra []byte) []byte {
+func (s ssl30MAC) _MAC(seq, header, data, extra []byte) []byte {
 	padLength := 48
 	if s.h.Size() == 20 {
 		padLength = 40
@@ -357,14 +357,14 @@ type tls10MAC struct {
 	buf []byte
 }
 
-func (s tls10MAC) Size() int {
+func (s tls10MAC) _Size() int {
 	return s.h.Size()
 }
 
-// MAC is guaranteed to take constant time, as long as
+// _MAC is guaranteed to take constant time, as long as
 // len(seq)+len(header)+len(data)+len(extra) is constant. extra is not fed into
-// the MAC, but is only provided to make the timing profile constant.
-func (s tls10MAC) MAC(seq, header, data, extra []byte) []byte {
+// the _MAC, but is only provided to make the timing profile constant.
+func (s tls10MAC) _MAC(seq, header, data, extra []byte) []byte {
 	s.h.Reset()
 	s.h.Write(seq)
 	s.h.Write(header)

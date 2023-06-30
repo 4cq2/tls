@@ -671,7 +671,7 @@ func (uconn *_UConn) _ApplyPreset(p *_ClientHelloSpec) error {
 					return fmt.Errorf("unsupported Curve in KeyShareExtension: %v."+
 						"To mimic it, fill the Data(key) field manually.", curveID)
 				}
-				ext._KeyShares[i]._Data = ecdheParams.PublicKey()
+				ext._KeyShares[i]._Data = ecdheParams._PublicKey()
 				if !preferredCurveIsSet {
 					// only do this once for the first non-grease curve
 					uconn._HandshakeState._State13._EcdheParams = ecdheParams

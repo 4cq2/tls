@@ -163,8 +163,8 @@ func (c *_UConn) _Handshake() error {
 		return nil
 	}
 
-	c.Conn.in.Lock()
-	defer c.Conn.in.Unlock()
+	c.Conn.in._Mutex.Lock()
+	defer c.Conn.in._Mutex.Unlock()
 
 	if c.Conn.isClient {
 		// [uTLS section begins]
@@ -212,8 +212,8 @@ func (c *_UConn) Write(b []byte) (int, error) {
 		return 0, err
 	}
 
-	c.Conn.out.Lock()
-	defer c.Conn.out.Unlock()
+	c.Conn.out._Mutex.Lock()
+	defer c.Conn.out._Mutex.Unlock()
 
 	if err := c.Conn.out.err; err != nil {
 		return 0, err

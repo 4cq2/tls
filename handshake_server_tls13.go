@@ -212,7 +212,7 @@ GroupSelection:
 		c.sendAlert(alertInternalError)
 		return err
 	}
-	hs.hello.serverShare = keyShare{group: selectedGroup, data: params.PublicKey()}
+	hs.hello.serverShare = keyShare{group: selectedGroup, data: params._PublicKey()}
 	hs.sharedKey = params.SharedKey(clientKeyShare.data)
 	if hs.sharedKey == nil {
 		c.sendAlert(alertIllegalParameter)

@@ -121,7 +121,7 @@ func (c *_Conn) _RemoteAddr() net.Addr {
 // A halfConn represents one direction of the record layer
 // connection, either sending or receiving.
 type halfConn struct {
-	sync.Mutex
+	_Mutex sync.Mutex
 
 	err            error       // first permanent error
 	version        uint16      // protocol version
@@ -339,7 +339,7 @@ func (hc *halfConn) decrypt(record []byte) ([]byte, recordType, error) {
 			}
 		case cbcMode:
 			blockSize := c.BlockSize()
-			minPayload := explicitNonceLen + roundUp(hc.mac.Size()+1, blockSize)
+			minPayload := explicitNonceLen + roundUp(hc.mac._Size()+1, blockSize)
 			if len(payload)%blockSize != 0 || len(payload) < minPayload {
 				return nil, 0, alertBadRecordMAC
 			}
@@ -389,7 +389,7 @@ func (hc *halfConn) decrypt(record []byte) ([]byte, recordType, error) {
 	}
 
 	if hc.mac != nil {
-		macSize := hc.mac.Size()
+		macSize := hc.mac._Size()
 		if len(payload) < macSize {
 			return nil, 0, alertBadRecordMAC
 		}
@@ -399,7 +399,7 @@ func (hc *halfConn) decrypt(record []byte) ([]byte, recordType, error) {
 		record[3] = byte(n >> 8)
 		record[4] = byte(n)
 		remoteMAC := payload[n : n+macSize]
-		localMAC := hc.mac.MAC(hc.seq[0:], record[:recordHeaderLen], payload[:n], payload[n+macSize:])
+		localMAC := hc.mac._MAC(hc.seq[0:], record[:recordHeaderLen], payload[:n], payload[n+macSize:])
 
 		// This is equivalent to checking the MACs and paddingGood
 		// separately, but in constant-time to prevent distinguishing
@@ -464,7 +464,7 @@ func (hc *halfConn) encrypt(record, payload []byte, rand io.Reader) ([]byte, err
 
 	var mac []byte
 	if hc.mac != nil {
-		mac = hc.mac.MAC(hc.seq[:], record[:recordHeaderLen], payload, nil)
+		mac = hc.mac._MAC(hc.seq[:], record[:recordHeaderLen], payload, nil)
 	}
 
 	var dst []byte
@@ -800,8 +800,8 @@ func (c *_Conn) sendAlertLocked(err alert) error {
 
 // sendAlert sends a TLS alert message.
 func (c *_Conn) sendAlert(err alert) error {
-	c.out.Lock()
-	defer c.out.Unlock()
+	c.out._Mutex.Lock()
+	defer c.out._Mutex.Unlock()
 	return c.sendAlertLocked(err)
 }
 
@@ -849,7 +849,7 @@ func (c *_Conn) maxPayloadSizeForWrite(typ recordType) int {
 	if c.out.cipher != nil {
 		switch ciph := c.out.cipher.(type) {
 		case cipher.Stream:
-			payloadBytes -= c.out.mac.Size()
+			payloadBytes -= c.out.mac._Size()
 		case cipher.AEAD:
 			payloadBytes -= ciph.Overhead()
 		case cbcMode:
@@ -859,7 +859,7 @@ func (c *_Conn) maxPayloadSizeForWrite(typ recordType) int {
 			payloadBytes = (payloadBytes & ^(blockSize - 1)) - 1
 			// The MAC is appended before padding so affects the
 			// payload size directly.
-			payloadBytes -= c.out.mac.Size()
+			payloadBytes -= c.out.mac._Size()
 		default:
 			panic("unknown cipher type")
 		}
@@ -956,8 +956,8 @@ func (c *_Conn) writeRecordLocked(typ recordType, data []byte) (int, error) {
 // writeRecord writes a TLS record with the given type and payload to the
 // connection and updates the record layer state.
 func (c *_Conn) writeRecord(typ recordType, data []byte) (int, error) {
-	c.out.Lock()
-	defer c.out.Unlock()
+	c.out._Mutex.Lock()
+	defer c.out._Mutex.Unlock()
 
 	return c.writeRecordLocked(typ, data)
 }
@@ -1137,8 +1137,8 @@ func (c *_Conn) handleKeyUpdate(keyUpdate *keyUpdateMsg) error {
 	c.in.setTrafficSecret(cipherSuite, newSecret)
 
 	if keyUpdate.updateRequested {
-		c.out.Lock()
-		defer c.out.Unlock()
+		c.out._Mutex.Lock()
+		defer c.out._Mutex.Unlock()
 
 		msg := &keyUpdateMsg{}
 		_, err := c.writeRecordLocked(recordTypeHandshake, msg.marshal())
@@ -1167,8 +1167,8 @@ func (c *_Conn) Read(b []byte) (int, error) {
 		return 0, nil
 	}
 
-	c.in.Lock()
-	defer c.in.Unlock()
+	c.in._Mutex.Lock()
+	defer c.in._Mutex.Unlock()
 
 	for c.input.Len() == 0 {
 		if err := c.readRecord(); err != nil {
@@ -1236,8 +1236,8 @@ func (c *_Conn) _Close() error {
 }
 
 func (c *_Conn) closeNotify() error {
-	c.out.Lock()
-	defer c.out.Unlock()
+	c.out._Mutex.Lock()
+	defer c.out._Mutex.Unlock()
 
 	if !c.closeNotifySent {
 		c.closeNotifyErr = c.sendAlertLocked(alertCloseNotify)
@@ -1261,8 +1261,8 @@ func (c *_Conn) _Handshake() error {
 		return nil
 	}
 
-	c.in.Lock()
-	defer c.in.Unlock()
+	c.in._Mutex.Lock()
+	defer c.in._Mutex.Unlock()
 
 	if c.isClient {
 		c.handshakeErr = c.clientHandshake()

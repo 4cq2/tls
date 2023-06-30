@@ -164,7 +164,7 @@ NextCandidate:
 	ka.params = params
 
 	// See RFC 4492, Section 5.4.
-	ecdhePublic := params.PublicKey()
+	ecdhePublic := params._PublicKey()
 	serverECDHParams := make([]byte, 1+2+1+len(ecdhePublic))
 	serverECDHParams[0] = 3 // named curve
 	serverECDHParams[1] = byte(curveID >> 8)
@@ -265,7 +265,7 @@ func (ka *ecdheKeyAgreement) processServerKeyExchange(config *_Config, clientHel
 		return errServerKeyExchange
 	}
 
-	ourPublicKey := params.PublicKey()
+	ourPublicKey := params._PublicKey()
 	ka.ckx = new(clientKeyExchangeMsg)
 	ka.ckx.ciphertext = make([]byte, 1+len(ourPublicKey))
 	ka.ckx.ciphertext[0] = byte(len(ourPublicKey))

@@ -193,8 +193,8 @@ func (c *cipherSuiteTLS13) exportKeyingMaterial(masterSecret []byte, transcript 
 // ecdheParameters implements Diffie-Hellman with either NIST curves or X25519,
 // according to RFC 8446, Section 4.2.8.2.
 type ecdheParameters interface {
-	CurveID() _CurveID
-	PublicKey() []byte
+	_CurveID() _CurveID
+	_PublicKey() []byte
 	SharedKey(peerPublicKey []byte) []byte
 }
 
@@ -241,11 +241,11 @@ type nistParameters struct {
 	curveID    _CurveID
 }
 
-func (p *nistParameters) CurveID() _CurveID {
+func (p *nistParameters) _CurveID() _CurveID {
 	return p.curveID
 }
 
-func (p *nistParameters) PublicKey() []byte {
+func (p *nistParameters) _PublicKey() []byte {
 	curve, _ := curveForCurveID(p.curveID)
 	return elliptic.Marshal(curve, p.x, p.y)
 }
@@ -271,11 +271,11 @@ type x25519Parameters struct {
 	publicKey  [32]byte
 }
 
-func (p *x25519Parameters) CurveID() _CurveID {
+func (p *x25519Parameters) _CurveID() _CurveID {
 	return _X25519
 }
 
-func (p *x25519Parameters) PublicKey() []byte {
+func (p *x25519Parameters) _PublicKey() []byte {
 	return p.publicKey[:]
 }
 

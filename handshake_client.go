@@ -130,7 +130,7 @@ func (c *_Conn) makeClientHello() (*clientHelloMsg, ecdheParameters, error) {
 		if err != nil {
 			return nil, nil, err
 		}
-		hello.keyShares = []keyShare{{group: curveID, data: params.PublicKey()}}
+		hello.keyShares = []keyShare{{group: curveID, data: params._PublicKey()}}
 	}
 
 	return hello, params, nil
