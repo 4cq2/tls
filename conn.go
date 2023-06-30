@@ -550,8 +550,8 @@ func (hc *halfConn) encrypt(record, payload []byte, rand io.Reader) ([]byte, err
 	return record, nil
 }
 
-// RecordHeaderError is returned when a TLS record header is invalid.
-type RecordHeaderError struct {
+// _RecordHeaderError is returned when a TLS record header is invalid.
+type _RecordHeaderError struct {
 	// Msg contains a human readable string that describes the error.
 	Msg string
 	// RecordHeader contains the five bytes of TLS record header that
@@ -564,9 +564,9 @@ type RecordHeaderError struct {
 	Conn net.Conn
 }
 
-func (e RecordHeaderError) Error() string { return "tls: " + e.Msg }
+func (e _RecordHeaderError) Error() string { return "tls: " + e.Msg }
 
-func (c *Conn) newRecordHeaderError(conn net.Conn, msg string) (err RecordHeaderError) {
+func (c *Conn) newRecordHeaderError(conn net.Conn, msg string) (err _RecordHeaderError) {
 	err.Msg = msg
 	err.Conn = conn
 	copy(err.RecordHeader[:], c.rawInput.Bytes())
@@ -1164,7 +1164,7 @@ func (c *Conn) handleRenegotiation() error {
 		if c.handshakes > 1 {
 			return c.sendAlert(alertNoRenegotiation)
 		}
-	case RenegotiateFreelyAsClient:
+	case _RenegotiateFreelyAsClient:
 		// Ok.
 	default:
 		c.sendAlert(alertInternalError)

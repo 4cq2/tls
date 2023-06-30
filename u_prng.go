@@ -91,15 +91,15 @@ func (c *Roller) Dial(network, addr, serverName string) (*UConn, error) {
 }
 
 const (
-	PRNGSeedLength = 32
+	_PRNGSeedLength = 32
 )
 
-// PRNGSeed is a PRNG seed.
-type PRNGSeed [PRNGSeedLength]byte
+// _PRNGSeed is a PRNG seed.
+type _PRNGSeed [_PRNGSeedLength]byte
 
 // _NewPRNGSeed creates a new PRNG seed using crypto/rand.Read.
-func _NewPRNGSeed() (*PRNGSeed, error) {
-	seed := new(PRNGSeed)
+func _NewPRNGSeed() (*_PRNGSeed, error) {
+	seed := new(_PRNGSeed)
 	_, err := crypto_rand.Read(seed[:])
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func newPRNG() (*prng, error) {
 }
 
 // newPRNGWithSeed initializes a new PRNG using an existing seed.
-func newPRNGWithSeed(seed *PRNGSeed) (*prng, error) {
+func newPRNGWithSeed(seed *_PRNGSeed) (*prng, error) {
 	shake := sha3.NewShake256()
 	_, err := shake.Write(seed[:])
 	if err != nil {

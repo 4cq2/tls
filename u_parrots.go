@@ -45,13 +45,13 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SessionTicketExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					_ECDSAWithP256AndSHA256,
-					PSSWithSHA256,
-					PKCS1WithSHA256,
+					_PSSWithSHA256,
+					_PKCS1WithSHA256,
 					_ECDSAWithP384AndSHA384,
-					PSSWithSHA384,
-					PKCS1WithSHA384,
-					PSSWithSHA512,
-					PKCS1WithSHA512,
+					_PSSWithSHA384,
+					_PKCS1WithSHA384,
+					_PSSWithSHA512,
+					_PKCS1WithSHA512,
 					_PKCS1WithSHA1},
 				},
 				&StatusRequestExtension{},
@@ -100,13 +100,13 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&SessionTicketExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					_ECDSAWithP256AndSHA256,
-					PSSWithSHA256,
-					PKCS1WithSHA256,
+					_PSSWithSHA256,
+					_PKCS1WithSHA256,
 					_ECDSAWithP384AndSHA384,
-					PSSWithSHA384,
-					PKCS1WithSHA384,
-					PSSWithSHA512,
-					PKCS1WithSHA512,
+					_PSSWithSHA384,
+					_PKCS1WithSHA384,
+					_PSSWithSHA512,
+					_PKCS1WithSHA512,
 					_PKCS1WithSHA1,
 				}},
 				&StatusRequestExtension{},
@@ -120,7 +120,7 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
-				&PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
+				&_PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
 					VersionTLS13,
@@ -181,13 +181,13 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					_ECDSAWithP256AndSHA256,
-					PSSWithSHA256,
-					PKCS1WithSHA256,
+					_PSSWithSHA256,
+					_PKCS1WithSHA256,
 					_ECDSAWithP384AndSHA384,
-					PSSWithSHA384,
-					PKCS1WithSHA384,
-					PSSWithSHA512,
-					PKCS1WithSHA512,
+					_PSSWithSHA384,
+					_PKCS1WithSHA384,
+					_PSSWithSHA512,
+					_PKCS1WithSHA512,
 					_PKCS1WithSHA1,
 				}},
 				&SCTExtension{},
@@ -195,8 +195,8 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
-				&PSKKeyExchangeModesExtension{[]uint8{
-					PskModeDHE,
+				&_PSKKeyExchangeModesExtension{[]uint8{
+					_PskModeDHE,
 				}},
 				&SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
@@ -254,21 +254,21 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&StatusRequestExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					_ECDSAWithP256AndSHA256,
-					PSSWithSHA256,
-					PKCS1WithSHA256,
+					_PSSWithSHA256,
+					_PKCS1WithSHA256,
 					_ECDSAWithP384AndSHA384,
-					PSSWithSHA384,
-					PKCS1WithSHA384,
-					PSSWithSHA512,
-					PKCS1WithSHA512,
+					_PSSWithSHA384,
+					_PKCS1WithSHA384,
+					_PSSWithSHA512,
+					_PKCS1WithSHA512,
 				}},
 				&SCTExtension{},
 				&_KeyShareExtension{[]_KeyShare{
 					{Group: _CurveID(_GREASE_PLACEHOLDER), Data: []byte{0}},
 					{Group: X25519},
 				}},
-				&PSKKeyExchangeModesExtension{[]uint8{
-					PskModeDHE,
+				&_PSKKeyExchangeModesExtension{[]uint8{
+					_PskModeDHE,
 				}},
 				&SupportedVersionsExtension{[]uint16{
 					_GREASE_PLACEHOLDER,
@@ -319,12 +319,12 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_ECDSAWithP256AndSHA256,
 					_ECDSAWithP384AndSHA384,
 					_ECDSAWithP521AndSHA512,
-					PSSWithSHA256,
-					PSSWithSHA384,
-					PSSWithSHA512,
-					PKCS1WithSHA256,
-					PKCS1WithSHA384,
-					PKCS1WithSHA512,
+					_PSSWithSHA256,
+					_PSSWithSHA384,
+					_PSSWithSHA512,
+					_PKCS1WithSHA256,
+					_PKCS1WithSHA384,
+					_PKCS1WithSHA512,
 					_ECDSAWithSHA1,
 					_PKCS1WithSHA1},
 				},
@@ -390,16 +390,16 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 					_ECDSAWithP256AndSHA256,
 					_ECDSAWithP384AndSHA384,
 					_ECDSAWithP521AndSHA512,
-					PSSWithSHA256,
-					PSSWithSHA384,
-					PSSWithSHA512,
-					PKCS1WithSHA256,
-					PKCS1WithSHA384,
-					PKCS1WithSHA512,
+					_PSSWithSHA256,
+					_PSSWithSHA384,
+					_PSSWithSHA512,
+					_PKCS1WithSHA256,
+					_PKCS1WithSHA384,
+					_PKCS1WithSHA512,
 					_ECDSAWithSHA1,
 					_PKCS1WithSHA1,
 				}},
-				&PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
+				&_PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}},
 				&_FakeRecordSizeLimitExtension{0x4001},
 				&UtlsPaddingExtension{GetPaddingLen: _BoringPaddingStyle},
 			}}, nil
@@ -438,13 +438,13 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsExtendedMasterSecretExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					_ECDSAWithP256AndSHA256,
-					PSSWithSHA256,
-					PKCS1WithSHA256,
+					_PSSWithSHA256,
+					_PKCS1WithSHA256,
 					_ECDSAWithP384AndSHA384,
-					PSSWithSHA384,
-					PKCS1WithSHA384,
-					PSSWithSHA512,
-					PKCS1WithSHA512,
+					_PSSWithSHA384,
+					_PKCS1WithSHA384,
+					_PSSWithSHA512,
+					_PKCS1WithSHA512,
 					_PKCS1WithSHA1,
 				}},
 				&StatusRequestExtension{},
@@ -498,15 +498,15 @@ func utlsIdToSpec(id _ClientHelloID) (_ClientHelloSpec, error) {
 				&UtlsExtendedMasterSecretExtension{},
 				&SignatureAlgorithmsExtension{SupportedSignatureAlgorithms: []SignatureScheme{
 					_ECDSAWithP256AndSHA256,
-					PSSWithSHA256,
-					PKCS1WithSHA256,
+					_PSSWithSHA256,
+					_PKCS1WithSHA256,
 					_ECDSAWithP384AndSHA384,
 					_ECDSAWithSHA1,
-					PSSWithSHA384,
-					PSSWithSHA384,
-					PKCS1WithSHA384,
-					PSSWithSHA512,
-					PKCS1WithSHA512,
+					_PSSWithSHA384,
+					_PSSWithSHA384,
+					_PKCS1WithSHA384,
+					_PSSWithSHA512,
+					_PKCS1WithSHA512,
 					_PKCS1WithSHA1,
 				}},
 				&StatusRequestExtension{},
@@ -762,11 +762,11 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 
 	sigAndHashAlgos := []SignatureScheme{
 		_ECDSAWithP256AndSHA256,
-		PKCS1WithSHA256,
+		_PKCS1WithSHA256,
 		_ECDSAWithP384AndSHA384,
-		PKCS1WithSHA384,
+		_PKCS1WithSHA384,
 		_PKCS1WithSHA1,
-		PKCS1WithSHA512,
+		_PKCS1WithSHA512,
 	}
 
 	if r.FlipWeightedCoin(0.63) {
@@ -777,11 +777,11 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 	}
 	if r.FlipWeightedCoin(0.51) || p._TLSVersMax == VersionTLS13 {
 		// https://tools.ietf.org/html/rfc8446 says "...RSASSA-PSS (which is mandatory in TLS 1.3)..."
-		sigAndHashAlgos = append(sigAndHashAlgos, PSSWithSHA256)
+		sigAndHashAlgos = append(sigAndHashAlgos, _PSSWithSHA256)
 		if r.FlipWeightedCoin(0.9) {
 			// these usually go together
-			sigAndHashAlgos = append(sigAndHashAlgos, PSSWithSHA384)
-			sigAndHashAlgos = append(sigAndHashAlgos, PSSWithSHA512)
+			sigAndHashAlgos = append(sigAndHashAlgos, _PSSWithSHA384)
+			sigAndHashAlgos = append(sigAndHashAlgos, _PSSWithSHA512)
 		}
 	}
 
@@ -853,7 +853,7 @@ func (uconn *UConn) generateRandomizedSpec() (_ClientHelloSpec, error) {
 			// ks.KeyShares = append(ks.KeyShares, KeyShare{Group: CurveP256})
 			ks.KeyShares[0].Group = _CurveP256
 		}
-		pskExchangeModes := PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}}
+		pskExchangeModes := _PSKKeyExchangeModesExtension{[]uint8{pskModeDHE}}
 		supportedVersionsExt := SupportedVersionsExtension{
 			Versions: makeSupportedVersions(p._TLSVersMin, p._TLSVersMax),
 		}

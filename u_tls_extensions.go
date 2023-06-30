@@ -204,7 +204,7 @@ func (e *RenegotiationInfoExtension) writeToUConn(uc *UConn) error {
 	switch e.Renegotiation {
 	case RenegotiateOnceAsClient:
 		fallthrough
-	case RenegotiateFreelyAsClient:
+	case _RenegotiateFreelyAsClient:
 		uc.HandshakeState._Hello._SecureRenegotiationSupported = true
 	case RenegotiateNever:
 	default:
@@ -561,15 +561,15 @@ func (e *_KeyShareExtension) writeToUConn(uc *UConn) error {
 	return nil
 }
 
-type PSKKeyExchangeModesExtension struct {
+type _PSKKeyExchangeModesExtension struct {
 	Modes []uint8
 }
 
-func (e *PSKKeyExchangeModesExtension) Len() int {
+func (e *_PSKKeyExchangeModesExtension) Len() int {
 	return 4 + 1 + len(e.Modes)
 }
 
-func (e *PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
+func (e *_PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
@@ -593,7 +593,7 @@ func (e *PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
 	return e.Len(), io.EOF
 }
 
-func (e *PSKKeyExchangeModesExtension) writeToUConn(uc *UConn) error {
+func (e *_PSKKeyExchangeModesExtension) writeToUConn(uc *UConn) error {
 	uc.HandshakeState._Hello._PskModes = e.Modes
 	return nil
 }

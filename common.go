@@ -163,14 +163,14 @@ const (
 // CertificateRequest. The two fields are merged to match with TLS 1.3.
 // Note that in TLS 1.2, the ECDSA algorithms are not constrained to P-256, etc.
 var supportedSignatureAlgorithms = []SignatureScheme{
-	PSSWithSHA256,
-	PSSWithSHA384,
-	PSSWithSHA512,
-	PKCS1WithSHA256,
+	_PSSWithSHA256,
+	_PSSWithSHA384,
+	_PSSWithSHA512,
+	_PKCS1WithSHA256,
 	_ECDSAWithP256AndSHA256,
-	PKCS1WithSHA384,
+	_PKCS1WithSHA384,
 	_ECDSAWithP384AndSHA384,
-	PKCS1WithSHA512,
+	_PKCS1WithSHA512,
 	_ECDSAWithP521AndSHA512,
 	_PKCS1WithSHA1,
 	_ECDSAWithSHA1,
@@ -257,14 +257,14 @@ type SignatureScheme uint16
 
 const (
 	// RSASSA-PKCS1-v1_5 algorithms.
-	PKCS1WithSHA256 SignatureScheme = 0x0401
-	PKCS1WithSHA384 SignatureScheme = 0x0501
-	PKCS1WithSHA512 SignatureScheme = 0x0601
+	_PKCS1WithSHA256 SignatureScheme = 0x0401
+	_PKCS1WithSHA384 SignatureScheme = 0x0501
+	_PKCS1WithSHA512 SignatureScheme = 0x0601
 
 	// RSASSA-PSS algorithms with public key OID rsaEncryption.
-	PSSWithSHA256 SignatureScheme = 0x0804
-	PSSWithSHA384 SignatureScheme = 0x0805
-	PSSWithSHA512 SignatureScheme = 0x0806
+	_PSSWithSHA256 SignatureScheme = 0x0804
+	_PSSWithSHA384 SignatureScheme = 0x0805
+	_PSSWithSHA512 SignatureScheme = 0x0806
 
 	// ECDSA algorithms. Only constrained to a specific curve in TLS 1.3.
 	_ECDSAWithP256AndSHA256 SignatureScheme = 0x0403
@@ -362,9 +362,9 @@ const (
 	// renegotiation once per connection.
 	RenegotiateOnceAsClient
 
-	// RenegotiateFreelyAsClient allows a remote server to repeatedly
+	// _RenegotiateFreelyAsClient allows a remote server to repeatedly
 	// request renegotiation.
-	RenegotiateFreelyAsClient
+	_RenegotiateFreelyAsClient
 )
 
 // A _Config structure is used to configure a TLS client or server.
@@ -946,9 +946,9 @@ func isSupportedSignatureAlgorithm(sigAlg SignatureScheme, supportedSignatureAlg
 // signature method (without hash function).
 func signatureFromSignatureScheme(signatureAlgorithm SignatureScheme) uint8 {
 	switch signatureAlgorithm {
-	case _PKCS1WithSHA1, PKCS1WithSHA256, PKCS1WithSHA384, PKCS1WithSHA512:
+	case _PKCS1WithSHA1, _PKCS1WithSHA256, _PKCS1WithSHA384, _PKCS1WithSHA512:
 		return signaturePKCS1v15
-	case PSSWithSHA256, PSSWithSHA384, PSSWithSHA512:
+	case _PSSWithSHA256, _PSSWithSHA384, _PSSWithSHA512:
 		return signatureRSAPSS
 	case _ECDSAWithSHA1, _ECDSAWithP256AndSHA256, _ECDSAWithP384AndSHA384, _ECDSAWithP521AndSHA512:
 		return signatureECDSA

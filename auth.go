@@ -168,20 +168,20 @@ func signatureSchemesForCertificate(version uint16, cert *_Certificate) []Signat
 	case *rsa.PublicKey:
 		if version != VersionTLS13 {
 			return []SignatureScheme{
-				PSSWithSHA256,
-				PSSWithSHA384,
-				PSSWithSHA512,
-				PKCS1WithSHA256,
-				PKCS1WithSHA384,
-				PKCS1WithSHA512,
+				_PSSWithSHA256,
+				_PSSWithSHA384,
+				_PSSWithSHA512,
+				_PKCS1WithSHA256,
+				_PKCS1WithSHA384,
+				_PKCS1WithSHA512,
 				_PKCS1WithSHA1,
 			}
 		}
 		// RSA keys with RSA-PSS OID are not supported by crypto/x509.
 		return []SignatureScheme{
-			PSSWithSHA256,
-			PSSWithSHA384,
-			PSSWithSHA512,
+			_PSSWithSHA256,
+			_PSSWithSHA384,
+			_PSSWithSHA512,
 		}
 	default:
 		return nil

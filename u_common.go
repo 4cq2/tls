@@ -188,8 +188,8 @@ const (
 )
 
 const (
-	PskModePlain uint8 = pskModePlain
-	PskModeDHE   uint8 = pskModeDHE
+	_PskModePlain uint8 = pskModePlain
+	_PskModeDHE   uint8 = pskModeDHE
 )
 
 type _ClientHelloID struct {
@@ -201,7 +201,7 @@ type _ClientHelloID struct {
 
 	// _Seed is only used for randomized fingerprints to seed PRNG.
 	// Must not be modified once set.
-	_Seed *PRNGSeed
+	_Seed *_PRNGSeed
 }
 
 func (p *_ClientHelloID) _Str() string {

@@ -294,7 +294,7 @@ func (f *_Fingerprinter) FingerprintClientHello(data []byte) (*_ClientHelloSpec,
 			if !readUint8LengthPrefixed(&extData, &pskModes) {
 				return nil, errors.New("unable to read PSK extension data")
 			}
-			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &PSKKeyExchangeModesExtension{pskModes})
+			clientHelloSpec._Extensions = append(clientHelloSpec._Extensions, &_PSKKeyExchangeModesExtension{pskModes})
 
 		case utlsExtensionExtendedMasterSecret:
 			// https://tools.ietf.org/html/rfc7627

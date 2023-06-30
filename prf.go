@@ -181,11 +181,11 @@ func hashFromSignatureScheme(signatureAlgorithm SignatureScheme) (crypto.Hash, e
 	switch signatureAlgorithm {
 	case _PKCS1WithSHA1, _ECDSAWithSHA1:
 		return crypto.SHA1, nil
-	case PKCS1WithSHA256, PSSWithSHA256, _ECDSAWithP256AndSHA256:
+	case _PKCS1WithSHA256, _PSSWithSHA256, _ECDSAWithP256AndSHA256:
 		return crypto.SHA256, nil
-	case PKCS1WithSHA384, PSSWithSHA384, _ECDSAWithP384AndSHA384:
+	case _PKCS1WithSHA384, _PSSWithSHA384, _ECDSAWithP384AndSHA384:
 		return crypto.SHA384, nil
-	case PKCS1WithSHA512, PSSWithSHA512, _ECDSAWithP521AndSHA512:
+	case _PKCS1WithSHA512, _PSSWithSHA512, _ECDSAWithP521AndSHA512:
 		return crypto.SHA512, nil
 	default:
 		return 0, fmt.Errorf("tls: unsupported signature algorithm: %#04x", signatureAlgorithm)
