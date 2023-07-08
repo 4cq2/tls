@@ -401,7 +401,7 @@ func (uconn *_UConn) _MarshalClientHello() error {
 			if paddingExt == nil {
 				paddingExt = pe
 			} else {
-				return errors.New("Multiple padding extensions!")
+				return errors.New("multiple padding extensions")
 			}
 		}
 	}

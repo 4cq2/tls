@@ -33,8 +33,8 @@ func Test_Android(t *testing.T) {
 		t.Fatal(err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	tr := _Transport{_Spec: _Android_API_26}
-	res, err := tr._RoundTrip(req)
+	tr := Transport{Spec: Android_API_26}
+	res, err := tr.RoundTrip(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -167,7 +167,7 @@ func Test_Sanity(t *testing.T) {
 }
 
 func Test_String(t *testing.T) {
-	fmt.Printf("%#v\n", _Android_API_26)
+	fmt.Printf("%#v\n", Android_API_26)
 }
 
 func user_info(name string) ([]string, error) {
