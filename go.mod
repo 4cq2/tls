@@ -1,4 +1,4 @@
-module crypto-tls.pages.dev
+module 154.pages.dev/tls
 
 go 1.20
 
