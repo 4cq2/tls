@@ -1,6 +1,7 @@
 package tls
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,13 +16,13 @@ func Test_Android(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	user, err := user_info(home + "/2a/gmail.txt")
+	u, err := user(home + "/gmail.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 	body := url.Values{
-		"Email":              {user[0]},
-		"Passwd":             {user[1]},
+		"Email":              {u["username"]},
+		"Passwd":             {u["password"]},
 		"client_sig":         {""},
 		"droidguard_results": {"-"},
 	}.Encode()
@@ -48,6 +49,18 @@ func Test_Android(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Println(res.Status)
+}
+
+func user(name string) (map[string]string, error) {
+	b, err := os.ReadFile(name)
+	if err != nil {
+		return nil, err
+	}
+	var m map[string]string
+	if err := json.Unmarshal(b, &m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func Test_Builder(t *testing.T) {
@@ -135,13 +148,13 @@ func Test_Sanity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	user, err := user_info(home + "/2a/gmail.txt")
+	u, err := user(home + "/gmail.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 	body := url.Values{
-		"Email":              {user[0]},
-		"Passwd":             {user[1]},
+		"Email":              {u["username"]},
+		"Passwd":             {u["password"]},
 		"client_sig":         {""},
 		"droidguard_results": {"-"},
 	}.Encode()
@@ -168,12 +181,4 @@ func Test_Sanity(t *testing.T) {
 
 func Test_String(t *testing.T) {
 	fmt.Printf("%#v\n", Android_API_26)
-}
-
-func user_info(name string) ([]string, error) {
-	data, err := os.ReadFile(name)
-	if err != nil {
-		return nil, err
-	}
-	return strings.Split(string(data), "\n"), nil
 }
