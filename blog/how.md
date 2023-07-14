@@ -131,3 +131,11 @@ fix:
 +               TLS_AES_128_GCM_SHA256,
 +               TLS_AES_256_GCM_SHA384,
 ~~~
+
+these must be exported:
+
+~~~
+UConn.Write
+dsaSignature.R
+dsaSignature.S
+~~~

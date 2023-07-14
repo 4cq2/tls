@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"strings"
@@ -35,6 +36,13 @@ func Test_Android(t *testing.T) {
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	tr := Transport{Spec: Android_API_26}
+	{
+		b, err := httputil.DumpRequest(req, true)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Println(string(b))
+	}
 	res, err := tr.RoundTrip(req)
 	if err != nil {
 		t.Fatal(err)
